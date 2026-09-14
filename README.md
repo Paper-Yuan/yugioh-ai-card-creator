@@ -149,7 +149,9 @@ yugioh-ai-card-creator/
 │   └── desktop/                   # C# 启动器 / 安装向导
 ├── electron/                      # Electron 主进程
 ├── scripts/                       # 资源下载 / 提取 / 打包脚本
+│   └── mine-rule-texts.js         # 扫描 YGOPro 全量卡脚本，统计效果外文本机制
 └── docs/
+    └── RULE_TEXTS.md              # 效果外文本支持范围与语料库统计依据
 ```
 
 ---

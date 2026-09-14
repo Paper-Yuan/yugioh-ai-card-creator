@@ -316,42 +316,10 @@ class ClientScriptAssembler {
     lines.push(`function s.initial_effect(c)`);
 
     // 效果外文本与全局规则 (Rule Texts)
-    const ruleTexts = cardData.ruleTexts || {};
-    if (ruleTexts.ruleAlias && ruleTexts.ruleAliasName) {
-      lines.push(`  -- 规则视作其他卡名`);
-      lines.push(`  local e_alias=Effect.CreateEffect(c)`);
-      lines.push(`  e_alias:SetType(EFFECT_TYPE_SINGLE)`);
-      lines.push(`  e_alias:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)`);
-      lines.push(`  e_alias:SetCode(EFFECT_ADD_CODE)`);
-      const aliasId = parseInt(ruleTexts.ruleAliasId) || 89631139;
-      lines.push(`  e_alias:SetValue(${aliasId})`);
-      lines.push(`  c:RegisterEffect(e_alias)`);
-    }
-    if (ruleTexts.ssOncePerTurn) {
-      lines.push(`  -- 同名卡1回合只能特殊召唤1次`);
-      lines.push(`  c:SetSPSummonOnce(id)`);
-    }
-    if (ruleTexts.cannotNormalSummon) {
-      lines.push(`  -- 特殊召唤怪兽限制 (不能通常召唤)`);
-      lines.push(`  c:EnableReviveLimit()`);
-      lines.push(`  local e_nomi=Effect.CreateEffect(c)`);
-      lines.push(`  e_nomi:SetType(EFFECT_TYPE_SINGLE)`);
-      lines.push(`  e_nomi:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)`);
-      lines.push(`  e_nomi:SetCode(EFFECT_CANNOT_SUMMON)`);
-      lines.push(`  c:RegisterEffect(e_nomi)`);
-    }
-    if (ruleTexts.materialRestriction) {
-      lines.push(`  -- 额外卡组特殊召唤素材限制`);
-      lines.push(`  local e_mat=Effect.CreateEffect(c)`);
-      lines.push(`  e_mat:SetType(EFFECT_TYPE_SINGLE)`);
-      lines.push(`  e_mat:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)`);
-      lines.push(`  e_mat:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)`);
-      lines.push(`  e_mat:SetValue(1)`);
-      lines.push(`  c:RegisterEffect(e_mat)`);
-      lines.push(`  local e_mat_s=e_mat:Clone() e_mat_s:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL) c:RegisterEffect(e_mat_s)`);
-      lines.push(`  local e_mat_x=e_mat:Clone() e_mat_x:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL) c:RegisterEffect(e_mat_x)`);
-      lines.push(`  local e_mat_l=e_mat:Clone() e_mat_l:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL) c:RegisterEffect(e_mat_l)`);
-    }
+    this.assembleRuleTexts(lines, cardData);
+
+    // 额外卡组召唤方式手续 (融合/同调/超量/连接/仪式) —— 依怪兽种类自动适配
+    this.assembleSummonProcedure(lines, cardData);
 
     // 灵摆怪兽刻度手续支持
     if (cardData.type & 16777216) {
@@ -424,6 +392,292 @@ class ClientScriptAssembler {
     lines.push(logicFunctions.join('\n\n'));
 
     return lines.join('\n');
+  }
+
+  /**
+   * 效果外文本 (Rule Texts) 装配。
+   *
+   * 说明：以下条款均属「规则性文字」，由 OCGCore 的常驻 Effect 直接表达，
+   * 可生成可执行脚本；「自定义独有规则」例外——引擎无法把一个自由句
+   * 翻译成确定语义，故只写入卡面文本，不生成任何 Lua（详见 ruleTexts.customRule）。
+   *
+   * 各条款的写法对齐 ProjectIgnis/CardScripts 官方脚本语料库的既有惯用法，
+   * 详见 scripts/mine-rule-texts.js 的统计结果。
+   */
+  assembleRuleTexts(lines, cardData) {
+    const r = cardData.ruleTexts || {};
+    const type = cardData.type || 0;
+    const isMonster = (type & 1) || cardData.mainType === 'monster' || !(type & (2 | 4));
+
+    // 1. 规则视作其他卡名 (EFFECT_ADD_CODE)
+    if (r.ruleAlias && r.ruleAliasName) {
+      const aliasId = parseInt(r.ruleAliasId) || 89631139;
+      lines.push(`  -- 效果外文本: 规则视作其他卡名`);
+      lines.push(`  local e_rt_alias=Effect.CreateEffect(c)`);
+      lines.push(`  e_rt_alias:SetType(EFFECT_TYPE_SINGLE)`);
+      lines.push(`  e_rt_alias:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)`);
+      lines.push(`  e_rt_alias:SetCode(EFFECT_ADD_CODE)`);
+      lines.push(`  e_rt_alias:SetValue(${aliasId})`);
+      lines.push(`  c:RegisterEffect(e_rt_alias)`);
+    }
+
+    // 2. 同名卡 1 回合只能特殊召唤 1 次 (c:SetSPSummonOnce)，仅怪兽适用
+    if (isMonster && r.ssOncePerTurn) {
+      lines.push(`  -- 效果外文本: 同名卡1回合只能特殊召唤1次`);
+      lines.push(`  c:SetSPSummonOnce(id)`);
+    }
+
+    // 3. 不能通常召唤 / 苏生限制 (c:EnableReviveLimit)，仅怪兽适用
+    if (isMonster && r.cannotNormalSummon) {
+      lines.push(`  -- 效果外文本: 不能通常召唤 (苏生限制)`);
+      lines.push(`  c:EnableReviveLimit()`);
+      // 「仅自身手续特召」(nomi)：额外封死其他一切特殊召唤
+      if (r.nomiType === 'self_effect') {
+        lines.push(`  local e_rt_nomi=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_nomi:SetType(EFFECT_TYPE_SINGLE)`);
+        lines.push(`  e_rt_nomi:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)`);
+        lines.push(`  e_rt_nomi:SetCode(EFFECT_SPSUMMON_CONDITION)`);
+        lines.push(`  e_rt_nomi:SetValue(aux.FALSE)`);
+        lines.push(`  c:RegisterEffect(e_rt_nomi)`);
+      }
+    }
+
+    // 4. 不能特殊召唤 (EFFECT_SPSUMMON_CONDITION → aux.FALSE)，仅怪兽适用
+    if (isMonster && r.cannotSpecialSummon && !r.cannotNormalSummon) {
+      lines.push(`  -- 效果外文本: 不能特殊召唤`);
+      lines.push(`  local e_rt_nosps=Effect.CreateEffect(c)`);
+      lines.push(`  e_rt_nosps:SetType(EFFECT_TYPE_SINGLE)`);
+      lines.push(`  e_rt_nosps:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)`);
+      lines.push(`  e_rt_nosps:SetCode(EFFECT_SPSUMMON_CONDITION)`);
+      lines.push(`  e_rt_nosps:SetValue(aux.FALSE)`);
+      lines.push(`  c:RegisterEffect(e_rt_nosps)`);
+    }
+
+    // 4b. 不能里侧盖放 (EFFECT_CANNOT_MSET)
+    // 4c. 效果不能发动 (EFFECT_CANNOT_TRIGGER)
+    // 5. 作为融合/同调/超量/连接召唤素材的限制
+    // 6. 不能解放 (EFFECT_UNRELEASABLE_SUM + NONSUM)
+    // —— 以上条款仅怪兽卡适用，统一放入 isMonster 分支 ——
+    if (isMonster) {
+      // 4b. 不能里侧盖放
+      if (r.cannotMSet) {
+        lines.push(`  -- 效果外文本: 不能里侧盖放`);
+        lines.push(`  local e_rt_mset=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_mset:SetType(EFFECT_TYPE_SINGLE)`);
+        lines.push(`  e_rt_mset:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)`);
+        lines.push(`  e_rt_mset:SetCode(EFFECT_CANNOT_MSET)`);
+        lines.push(`  c:RegisterEffect(e_rt_mset)`);
+      }
+
+      // 4c. 效果不能发动
+      if (r.cannotTrigger) {
+        lines.push(`  -- 效果外文本: 效果不能发动`);
+        lines.push(`  local e_rt_notrg=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_notrg:SetType(EFFECT_TYPE_SINGLE)`);
+        lines.push(`  e_rt_notrg:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)`);
+        lines.push(`  e_rt_notrg:SetCode(EFFECT_CANNOT_TRIGGER)`);
+        lines.push(`  c:RegisterEffect(e_rt_notrg)`);
+      }
+
+      // 5. 作为融合/同调/超量/连接召唤素材的限制
+      if (r.materialRestriction) {
+        const codes = [];
+        const mt = r.materialType || 'all_extra';
+        if (mt === 'all_extra') {
+          codes.push('EFFECT_CANNOT_BE_FUSION_MATERIAL', 'EFFECT_CANNOT_BE_SYNCHRO_MATERIAL', 'EFFECT_CANNOT_BE_XYZ_MATERIAL', 'EFFECT_CANNOT_BE_LINK_MATERIAL');
+        } else if (mt === 'any_material') codes.push('EFFECT_CANNOT_BE_MATERIAL');
+        else if (mt === 'fusion_only') codes.push('EFFECT_CANNOT_BE_FUSION_MATERIAL');
+        else if (mt === 'synchro_only') codes.push('EFFECT_CANNOT_BE_SYNCHRO_MATERIAL');
+        else if (mt === 'xyz_only') codes.push('EFFECT_CANNOT_BE_XYZ_MATERIAL');
+        else if (mt === 'link_only') codes.push('EFFECT_CANNOT_BE_LINK_MATERIAL');
+        lines.push(`  -- 效果外文本: 不能作为召唤素材`);
+        codes.forEach((code, i) => {
+          const v = `e_rt_mat${i}`;
+          if (i === 0) {
+            lines.push(`  local ${v}=Effect.CreateEffect(c)`);
+            lines.push(`  ${v}:SetType(EFFECT_TYPE_SINGLE)`);
+            lines.push(`  ${v}:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)`);
+          } else {
+            lines.push(`  local ${v}=e_rt_mat0:Clone()`);
+          }
+          lines.push(`  ${v}:SetCode(${code})`);
+          lines.push(`  ${v}:SetValue(1)`);
+          lines.push(`  c:RegisterEffect(${v})`);
+        });
+      }
+
+      // 6. 不能解放
+      if (r.cannotBeReleased) {
+        lines.push(`  -- 效果外文本: 不能解放`);
+        lines.push(`  local e_rt_rel=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_rel:SetType(EFFECT_TYPE_SINGLE)`);
+        lines.push(`  e_rt_rel:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)`);
+        lines.push(`  e_rt_rel:SetCode(EFFECT_UNRELEASABLE_SUM)`);
+        lines.push(`  e_rt_rel:SetValue(1)`);
+        lines.push(`  c:RegisterEffect(e_rt_rel)`);
+        lines.push(`  local e_rt_rel2=e_rt_rel:Clone()`);
+        lines.push(`  e_rt_rel2:SetCode(EFFECT_UNRELEASABLE_NONSUM)`);
+        lines.push(`  c:RegisterEffect(e_rt_rel2)`);
+      }
+
+      // 7. 规则上追加怪兽种类 (同调/超量/融合/效果等)
+      if (r.addMonsterType) {
+        const tmap = { effect: 'TYPE_EFFECT', fusion: 'TYPE_FUSION', synchro: 'TYPE_SYNCHRO', xyz: 'TYPE_XYZ', link: 'TYPE_LINK', ritual: 'TYPE_RITUAL', pendulum: 'TYPE_PENDULUM' };
+        const tv = tmap[r.addMonsterType];
+        if (tv) {
+          lines.push(`  -- 效果外文本: 规则上追加怪兽种类`);
+          lines.push(`  local e_rt_type=Effect.CreateEffect(c)`);
+          lines.push(`  e_rt_type:SetType(EFFECT_TYPE_SINGLE)`);
+          lines.push(`  e_rt_type:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)`);
+          lines.push(`  e_rt_type:SetCode(EFFECT_ADD_TYPE)`);
+          lines.push(`  e_rt_type:SetValue(${tv})`);
+          lines.push(`  c:RegisterEffect(e_rt_type)`);
+        }
+      }
+
+      // 8. 规则上变更属性
+      if (r.ruleAttribute) {
+        const amap = { dark: 'ATTRIBUTE_DARK', light: 'ATTRIBUTE_LIGHT', earth: 'ATTRIBUTE_EARTH', water: 'ATTRIBUTE_WATER', fire: 'ATTRIBUTE_FIRE', wind: 'ATTRIBUTE_WIND', divine: 'ATTRIBUTE_DIVINE' };
+        const av = amap[r.ruleAttribute];
+        if (av) {
+          lines.push(`  -- 效果外文本: 规则上变更属性`);
+          lines.push(`  local e_rt_attr=Effect.CreateEffect(c)`);
+          lines.push(`  e_rt_attr:SetType(EFFECT_TYPE_SINGLE)`);
+          lines.push(`  e_rt_attr:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)`);
+          lines.push(`  e_rt_attr:SetCode(EFFECT_CHANGE_ATTRIBUTE)`);
+          lines.push(`  e_rt_attr:SetValue(${av})`);
+          lines.push(`  c:RegisterEffect(e_rt_attr)`);
+        }
+      }
+
+      // 9. 规则上追加种族
+      if (r.ruleRace) {
+        const rmap = {
+          warrior: 'RACE_WARRIOR', spellcaster: 'RACE_SPELLCASTER', fairy: 'RACE_FAIRY', fiend: 'RACE_FIEND',
+          zombie: 'RACE_ZOMBIE', machine: 'RACE_MACHINE', aqua: 'RACE_AQUA', pyro: 'RACE_PYRO', rock: 'RACE_ROCK',
+          wingedbeast: 'RACE_WINGEDBEAST', plant: 'RACE_PLANT', insect: 'RACE_INSECT', thunder: 'RACE_THUNDER',
+          dragon: 'RACE_DRAGON', beast: 'RACE_BEAST', beastwarrior: 'RACE_BEASTWARRIOR', dinosaur: 'RACE_DINOSAUR',
+          fish: 'RACE_FISH', seaserpent: 'RACE_SEASERPENT', reptile: 'RACE_REPTILE', psychic: 'RACE_PSYCHIC',
+          divinebeast: 'RACE_DIVINE', wyrm: 'RACE_WYRM', cyberse: 'RACE_CYBERSE', illusion: 'RACE_ILLUSION'
+        };
+        const rv = rmap[r.ruleRace];
+        if (rv) {
+          lines.push(`  -- 效果外文本: 规则上追加种族`);
+          lines.push(`  local e_rt_race=Effect.CreateEffect(c)`);
+          lines.push(`  e_rt_race:SetType(EFFECT_TYPE_SINGLE)`);
+          lines.push(`  e_rt_race:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)`);
+          lines.push(`  e_rt_race:SetCode(EFFECT_ADD_RACE)`);
+          lines.push(`  e_rt_race:SetValue(${rv})`);
+          lines.push(`  c:RegisterEffect(e_rt_race)`);
+        }
+      }
+
+      // 10. 规则上变更等级 (灵摆怪兽的等级仅在怪兽区生效)
+      const ruleLevel = parseInt(r.ruleLevel) || 0;
+      if (ruleLevel > 0) {
+        lines.push(`  -- 效果外文本: 规则上变更等级`);
+        lines.push(`  local e_rt_lv=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_lv:SetType(EFFECT_TYPE_SINGLE)`);
+        lines.push(`  e_rt_lv:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)`);
+        lines.push(`  e_rt_lv:SetRange(LOCATION_MZONE)`);
+        lines.push(`  e_rt_lv:SetCode(EFFECT_CHANGE_LEVEL)`);
+        lines.push(`  e_rt_lv:SetValue(${ruleLevel})`);
+        lines.push(`  c:RegisterEffect(e_rt_lv)`);
+      }
+
+      // 11. 不能变更表示形式
+      if (r.cannotChangePosition) {
+        lines.push(`  -- 效果外文本: 不能变更表示形式`);
+        lines.push(`  local e_rt_pos=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_pos:SetType(EFFECT_TYPE_SINGLE)`);
+        lines.push(`  e_rt_pos:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)`);
+        lines.push(`  e_rt_pos:SetRange(LOCATION_MZONE)`);
+        lines.push(`  e_rt_pos:SetCode(EFFECT_CANNOT_CHANGE_POSITION)`);
+        lines.push(`  c:RegisterEffect(e_rt_pos)`);
+      }
+
+      // 12. 不能攻击
+      if (r.cannotAttack) {
+        lines.push(`  -- 效果外文本: 不能攻击`);
+        lines.push(`  local e_rt_atk=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_atk:SetType(EFFECT_TYPE_SINGLE)`);
+        lines.push(`  e_rt_atk:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)`);
+        lines.push(`  e_rt_atk:SetRange(LOCATION_MZONE)`);
+        lines.push(`  e_rt_atk:SetCode(EFFECT_CANNOT_ATTACK)`);
+        lines.push(`  c:RegisterEffect(e_rt_atk)`);
+      }
+
+      // 13. 不能成为攻击对象
+      if (r.cannotBeAttacked) {
+        lines.push(`  -- 效果外文本: 不能成为攻击对象`);
+        lines.push(`  local e_rt_bt=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_bt:SetType(EFFECT_TYPE_SINGLE)`);
+        lines.push(`  e_rt_bt:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)`);
+        lines.push(`  e_rt_bt:SetRange(LOCATION_MZONE)`);
+        lines.push(`  e_rt_bt:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)`);
+        lines.push(`  e_rt_bt:SetValue(aux.imval1)`);
+        lines.push(`  c:RegisterEffect(e_rt_bt)`);
+      }
+
+      // 14. 可以直接攻击
+      if (r.canDirectAttack) {
+        lines.push(`  -- 效果外文本: 可以直接攻击`);
+        lines.push(`  local e_rt_da=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_da:SetType(EFFECT_TYPE_SINGLE)`);
+        lines.push(`  e_rt_da:SetCode(EFFECT_DIRECT_ATTACK)`);
+        lines.push(`  c:RegisterEffect(e_rt_da)`);
+      }
+    }
+
+    // 15. 自定义独有规则：仅写入卡面文本，不生成脚本（引擎无法解析自由语句）
+    if (r.customRule && r.customRuleText) {
+      lines.push(`  -- 效果外文本(自定义): ${String(r.customRuleText).replace(/[\r\n]+/g, ' ')}`);
+      lines.push(`  -- [注意] 自定义规则为自由文本，无法自动生成可执行脚本，请自行按需补写 Lua`);
+    }
+  }
+
+  /**
+   * 额外卡组召唤方式手续装配。
+   *
+   * 严格对齐 ProjectIgnis/CardScripts 官方语料的调用签名：
+   *   Xyz.AddProcedure(c,filter,level,count)
+   *   Synchro.AddProcedure(c,filter1,min1,max1,filter2,min2,max2)
+   *   Link.AddProcedure(c,filter,min,count)
+   *   Fusion.AddProcMixN(c,self,self2,filter,count) / Fusion.AddProcMixRep(c,self,self2,filter,min,max)
+   *   Ritual.AddProcGreater({handler=c,filter=...,stage2=...})
+   * 素材筛选留空时使用 aux.TRUE（不限素材）。
+   */
+  assembleSummonProcedure(lines, cardData) {
+    const type = cardData.type || 0;
+    const isMonster = (type & 1) || cardData.mainType === 'monster' || !(type & (2 | 4));
+    if (!isMonster) return;
+
+    const r = cardData.ruleTexts || {};
+    // 默认依怪兽种类自动适配召唤手续；用户可显式关闭
+    if (r.autoSummonProcedure === false) return;
+    const matFilter = r.procMaterialFilterExpr || 'aux.TRUE';
+    const procType = r.procSummonType || (type & 64 ? 'fusion' : type & 8192 ? 'synchro' : type & 8388608 ? 'xyz' : type & 67108864 ? 'link' : type & 128 ? 'ritual' : '');
+
+    const level = parseInt(cardData.level) || 4;
+    const count = parseInt(r.procMaterialCount) || 2;
+
+    if (procType === 'fusion') {
+      const n = parseInt(r.procMaterialCount) || 2;
+      lines.push(`  -- 召唤方式手续: 融合召唤 (需 ${n} 只素材)`);
+      lines.push(`  Fusion.AddProcMixN(c,true,true,${matFilter},${n})`);
+    } else if (procType === 'synchro') {
+      lines.push(`  -- 召唤方式手续: 同调召唤 (调整 + 非调整)`);
+      lines.push(`  Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,99)`);
+    } else if (procType === 'xyz') {
+      lines.push(`  -- 召唤方式手续: 超量召唤 (阶级 ${level} · ${count} 只素材)`);
+      lines.push(`  Xyz.AddProcedure(c,nil,${level},${count})`);
+    } else if (procType === 'link') {
+      lines.push(`  -- 召唤方式手续: 连接召唤 (需 ${count} 只素材)`);
+      lines.push(`  Link.AddProcedure(c,${matFilter},${count},${count})`);
+    } else if (procType === 'ritual') {
+      lines.push(`  -- 召唤方式手续: 仪式召唤 (仪式魔法与素材均不设限，可按需补填 filter/matfilter)`);
+      lines.push(`  Ritual.AddProcGreater({handler=c,matfilter=${matFilter}})`);
+    }
   }
 
   /**

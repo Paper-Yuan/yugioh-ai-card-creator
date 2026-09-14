@@ -146,9 +146,27 @@ function readFormToState() {
     ssOncePerTurn: document.getElementById('ruleSsOnceEnabled')?.checked || false,
     cannotNormalSummon: document.getElementById('ruleNomiEnabled')?.checked || false,
     nomiType: document.getElementById('ruleNomiType')?.value || 'self_effect',
+    cannotSpecialSummon: document.getElementById('ruleNoSpecialSummon')?.checked || false,
     materialRestriction: document.getElementById('ruleMaterialLimitEnabled')?.checked || false,
     materialType: document.getElementById('ruleMaterialType')?.value || 'all_extra',
     deckLimitOne: document.getElementById('ruleDeckLimitOne')?.checked || false,
+    cannotBeReleased: document.getElementById('ruleCannotBeReleased')?.checked || false,
+    cannotMSet: document.getElementById('ruleCannotMSet')?.checked || false,
+    cannotTrigger: document.getElementById('ruleCannotTrigger')?.checked || false,
+    cannotChangePosition: document.getElementById('ruleCannotChangePosition')?.checked || false,
+    cannotAttack: document.getElementById('ruleCannotAttack')?.checked || false,
+    cannotBeAttacked: document.getElementById('ruleCannotBeAttacked')?.checked || false,
+    canDirectAttack: document.getElementById('ruleDirectAttack')?.checked || false,
+    addMonsterType: document.getElementById('ruleAddMonsterType')?.value || '',
+    ruleAttribute: document.getElementById('ruleAttribute')?.value || '',
+    ruleRace: document.getElementById('ruleRace')?.value || '',
+    ruleLevel: document.getElementById('ruleLevel')?.value.trim() || '',
+    // 召唤方式手续：默认跟随怪兽种类自动适配；用户显式勾选后可覆盖召唤方式与素材数量
+    autoSummonProcedure: true,
+    procSummonType: document.getElementById('ruleSummonProcEnabled')?.checked
+      ? (document.getElementById('ruleProcSummonType')?.value || '')
+      : '',
+    procMaterialCount: document.getElementById('ruleProcMaterialCount')?.value.trim() || '',
     customRule: document.getElementById('ruleCustomEnabled')?.checked || false,
     customRuleText: document.getElementById('ruleCustomText')?.value.trim() || ''
   };
@@ -449,6 +467,7 @@ function selectMainCardType(mainType) {
     refreshLiveCard();
   }
 
+  if (typeof applyRuleTextAdaptation === 'function') applyRuleTextAdaptation();
   syncWizardToCardDescription();
 }
 
@@ -571,6 +590,9 @@ function onMonsterCategoryChanged(preserveTraits = false) {
   state.cardData.type = typeCode;
 
   syncTraitChipsFromType(typeCode);
+
+  // 怪兽种类变化 → 重新适配效果外文本中「仅怪兽适用」的条款
+  if (typeof applyRuleTextAdaptation === 'function') applyRuleTextAdaptation();
 
   if (!state.cardData.hasManuallyEditedTypeHeader) {
     const lang = state.cardData.language === 'ja' ? 'ja' : 'zh';
@@ -1507,25 +1529,63 @@ function goToWizardEffect(idx) {
 }
 
 function onRuleTextsChanged() {
+  const setDisp = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? 'block' : 'none'; };
+
   const aliasChk = document.getElementById('ruleAliasEnabled');
-  const aliasWrap = document.getElementById('wrapRuleAliasInput');
-  if (aliasWrap && aliasChk) aliasWrap.style.display = aliasChk.checked ? 'block' : 'none';
+  setDisp('wrapRuleAliasInput', !!(aliasChk && aliasChk.checked));
 
   const nomiChk = document.getElementById('ruleNomiEnabled');
-  const nomiWrap = document.getElementById('wrapRuleNomiSelect');
-  if (nomiWrap && nomiChk) nomiWrap.style.display = nomiChk.checked ? 'block' : 'none';
+  setDisp('wrapRuleNomiSelect', !!(nomiChk && nomiChk.checked));
 
   const matChk = document.getElementById('ruleMaterialLimitEnabled');
-  const matWrap = document.getElementById('wrapRuleMaterialSelect');
-  if (matWrap && matChk) matWrap.style.display = matChk.checked ? 'block' : 'none';
+  setDisp('wrapRuleMaterialSelect', !!(matChk && matChk.checked));
+
+  const procChk = document.getElementById('ruleSummonProcEnabled');
+  setDisp('wrapRuleSummonProc', !!(procChk && procChk.checked));
 
   const customChk = document.getElementById('ruleCustomEnabled');
-  const customWrap = document.getElementById('wrapRuleCustomInput');
-  if (customWrap && customChk) customWrap.style.display = customChk.checked ? 'block' : 'none';
+  setDisp('wrapRuleCustomInput', !!(customChk && customChk.checked));
 
+  applyRuleTextAdaptation();
   readFormToState();
   syncWizardToCardDescription();
   compileLuaPreview();
+}
+
+/**
+ * 依当前卡片的「召唤方式 / 怪兽种类」自动适配效果外文本条款：
+ * - 非怪兽卡：隐藏仅怪兽适用的条款（不能特召/不能解放/表示形式/攻击相关/召唤手续/规则变更）
+ * - 融合·同调·超量·连接·仪式怪兽：自动预选对应召唤方式手续并显示
+ */
+function applyRuleTextAdaptation() {
+  const type = state.cardData.type || 0;
+  const isMonster = (type & 1) || state.cardData.mainType === 'monster' || !(type & (2 | 4));
+
+  document.querySelectorAll('[data-rule-scope="monster"]').forEach(el => {
+    el.style.display = isMonster ? 'block' : 'none';
+  });
+
+  const hint = document.getElementById('ruleTextsAdaptHint');
+  if (hint) {
+    hint.textContent = isMonster
+      ? '已依召唤方式与怪兽种类自动适配'
+      : '魔陷卡不适用怪兽专属条款，相关项已隐藏';
+  }
+
+  // 依怪兽种类推断召唤方式，自动预选（不勾选启用开关，避免替用户做决定）
+  const procSel = document.getElementById('ruleProcSummonType');
+  if (procSel) {
+    let inferred = '';
+    if (type & 64) inferred = 'fusion';
+    else if (type & 8192) inferred = 'synchro';
+    else if (type & 8388608) inferred = 'xyz';
+    else if (type & 67108864) inferred = 'link';
+    else if (type & 128) inferred = 'ritual';
+    if (inferred) procSel.value = inferred;
+  }
+  const procWrap = document.getElementById('wrapRuleSummonProc');
+  const procChk = document.getElementById('ruleSummonProcEnabled');
+  if (procWrap && procChk) procWrap.style.display = procChk.checked ? 'block' : 'none';
 }
 
 function syncWizardToCardDescription() {
@@ -1539,18 +1599,19 @@ function syncWizardToCardDescription() {
 
   // --- 1. 中文效果文本 (用于向导界面、表单卡文与中文卡面渲染) ---
   const linesZh = [];
+  const isMonsterZh = state.cardData.mainType === 'monster' || !!((state.cardData.type || 0) & 1);
   if (r.ruleAlias && r.ruleAliasName) {
     linesZh.push(`这张卡的卡名在规则上也当作「${r.ruleAliasName}」使用。`);
   } else if (cfg.aliasEnabled && cfg.aliasName) {
     linesZh.push(`规则上，这张卡的卡名也当作「${cfg.aliasName}」使用。`);
   }
 
-  if (r.ssOncePerTurn) {
+  if (isMonsterZh && r.ssOncePerTurn) {
     const cardName = state.cardData.name || '此卡名';
     linesZh.push(`自己对「${cardName}」1回合只能特殊召唤1次。`);
   }
 
-  if (r.cannotNormalSummon) {
+  if (isMonsterZh && r.cannotNormalSummon) {
     if (r.nomiType === 'extra_only') {
       linesZh.push(`这张卡不能通常召唤。只能以原本的召唤方式特殊召唤。`);
     } else if (r.nomiType === 'cannot_ns_any') {
@@ -1585,6 +1646,53 @@ function syncWizardToCardDescription() {
     linesZh.push(`同名卡在卡组中最多只能投入1张。`);
   }
 
+  // --- 新增规则条款卡文 (仅怪兽适用) ---
+  if (isMonsterZh) {
+    if (r.cannotSpecialSummon && !r.cannotNormalSummon) {
+      linesZh.push(`这张卡不能特殊召唤。`);
+    }
+    if (r.cannotBeReleased) {
+      linesZh.push(`这张卡不能解放。`);
+    }
+    if (r.cannotMSet) {
+      linesZh.push(`这张卡不能里侧表示盖放。`);
+    }
+    if (r.cannotTrigger) {
+      linesZh.push(`这张卡的效果不能发动。`);
+    }
+    if (r.cannotChangePosition) {
+      linesZh.push(`这张卡不能变更表示形式。`);
+    }
+    if (r.cannotAttack) {
+      linesZh.push(`这张卡不能攻击。`);
+    }
+    if (r.cannotBeAttacked) {
+      linesZh.push(`这张卡不能成为攻击对象。`);
+    }
+    if (r.canDirectAttack) {
+      linesZh.push(`这张卡可以直接攻击。`);
+    }
+    const typeNameZh = { effect: '效果', fusion: '融合', synchro: '同调', xyz: '超量', link: '连接', ritual: '仪式', pendulum: '灵摆' }[r.addMonsterType];
+    if (typeNameZh) {
+      linesZh.push(`这张卡在规则上也当作「${typeNameZh}怪兽」使用。`);
+    }
+    const attrZh = { dark: '暗', light: '光', earth: '地', water: '水', fire: '炎', wind: '风', divine: '神' }[r.ruleAttribute];
+    if (attrZh) {
+      linesZh.push(`这张卡在规则上也当作「${attrZh}属性」使用。`);
+    }
+    const raceZh = {
+      warrior: '战士族', spellcaster: '魔法师族', fairy: '天使族', fiend: '恶魔族', zombie: '不死族',
+      machine: '机械族', dragon: '龙族', cyberse: '电子界族', illusion: '幻想魔族'
+    }[r.ruleRace];
+    if (raceZh) {
+      linesZh.push(`这张卡在规则上也当作「${raceZh}」使用。`);
+    }
+    const rl = parseInt(r.ruleLevel) || 0;
+    if (rl > 0) {
+      linesZh.push(`这张卡在规则上的等级变成${rl}。`);
+    }
+  }
+
   if (r.customRule && r.customRuleText) {
     linesZh.push(r.customRuleText);
   }
@@ -1613,18 +1721,19 @@ function syncWizardToCardDescription() {
 
   // --- 2. 对应日文 OCG 效果文本 (直接渲染至日文卡面，实现向导中文选择/卡面日文呈现) ---
   const linesJa = [];
+  const isMonsterJa = state.cardData.mainType === 'monster' || !!((state.cardData.type || 0) & 1);
   if (r.ruleAlias && r.ruleAliasName) {
     linesJa.push(`ルール上、このカードのカード名は「${r.ruleAliasName}」としても扱う。`);
   } else if (cfg.aliasEnabled && cfg.aliasName) {
     linesJa.push(`ルール上、このカードのカード名は「${cfg.aliasName}」としても扱う。`);
   }
 
-  if (r.ssOncePerTurn) {
+  if (isMonsterJa && r.ssOncePerTurn) {
     const cardName = state.cardData.name || 'このカード名';
     linesJa.push(`自分は「${cardName}」を１ターンに１度しか特殊召喚できない。`);
   }
 
-  if (r.cannotNormalSummon) {
+  if (isMonsterJa && r.cannotNormalSummon) {
     if (r.nomiType === 'extra_only') {
       linesJa.push(`このカードは通常召喚できない。本来の召喚方法でのみ特殊召喚できる。`);
     } else if (r.nomiType === 'cannot_ns_any') {
@@ -1657,6 +1766,53 @@ function syncWizardToCardDescription() {
 
   if (r.deckLimitOne) {
     linesJa.push(`同名カードはデッキに１枚しか投入できない。`);
+  }
+
+  // --- 新增规则条款卡文 (仅怪兽适用) ---
+  if (isMonsterJa) {
+    if (r.cannotSpecialSummon && !r.cannotNormalSummon) {
+      linesJa.push(`このカードは特殊召喚できない。`);
+    }
+    if (r.cannotBeReleased) {
+      linesJa.push(`このカードはリリースできない。`);
+    }
+    if (r.cannotMSet) {
+      linesJa.push(`このカードは裏側表示でセットできない。`);
+    }
+    if (r.cannotTrigger) {
+      linesJa.push(`このカードの効果は発動できない。`);
+    }
+    if (r.cannotChangePosition) {
+      linesJa.push(`このカードは表示形式を変更できない。`);
+    }
+    if (r.cannotAttack) {
+      linesJa.push(`このカードは攻撃できない。`);
+    }
+    if (r.cannotBeAttacked) {
+      linesJa.push(`このカードは攻撃対象にできない。`);
+    }
+    if (r.canDirectAttack) {
+      linesJa.push(`このカードは直接攻撃できる。`);
+    }
+    const typeNameJa = { effect: '効果', fusion: '融合', synchro: 'Ｓ', xyz: 'Ｘ', link: 'Ｌ', ritual: '儀式', pendulum: 'Ｐ' }[r.addMonsterType];
+    if (typeNameJa) {
+      linesJa.push(`このカードはルール上「${typeNameJa}モンスター」としても扱う。`);
+    }
+    const attrJa = { dark: '闇', light: '光', earth: '地', water: '水', fire: '炎', wind: '風', divine: '神' }[r.ruleAttribute];
+    if (attrJa) {
+      linesJa.push(`このカードはルール上「${attrJa}属性」としても扱う。`);
+    }
+    const raceJa = {
+      warrior: '戦士族', spellcaster: '魔法使い族', fairy: '天使族', fiend: '悪魔族', zombie: 'アンデット族',
+      machine: '機械族', dragon: 'ドラゴン族', cyberse: 'サイバース族', illusion: '幻想魔族'
+    }[r.ruleRace];
+    if (raceJa) {
+      linesJa.push(`このカードはルール上「${raceJa}」としても扱う。`);
+    }
+    const rlJa = parseInt(r.ruleLevel) || 0;
+    if (rlJa > 0) {
+      linesJa.push(`このカードのルール上のレベルは${rlJa}になる。`);
+    }
   }
 
   if (r.customRule && r.customRuleText) {
@@ -1718,6 +1874,7 @@ window.prevWizardEffect = prevWizardEffect;
 window.goToWizardEffect = goToWizardEffect;
 window.syncWizardToCardDescription = syncWizardToCardDescription;
 window.onRuleTextsChanged = onRuleTextsChanged;
+window.applyRuleTextAdaptation = applyRuleTextAdaptation;
 
 function compileLuaPreview() {
   readFormToState();
@@ -2243,6 +2400,38 @@ function fillFormFromState() {
   if (aliasWrap) aliasWrap.style.display = cfg.aliasEnabled ? 'block' : 'none';
   if (aliasInput) aliasInput.value = cfg.aliasName || '';
   if (summonRestr) summonRestr.value = cfg.summonRestriction || 'none';
+
+  // 4.5 还原效果外文本 / 独立规则条款
+  const rt = c.ruleTexts || {};
+  const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+  setChk('ruleAliasEnabled', rt.ruleAlias);
+  setEl('ruleAliasName', rt.ruleAliasName || '');
+  setEl('ruleAliasId', rt.ruleAliasId || '');
+  setChk('ruleSsOnceEnabled', rt.ssOncePerTurn);
+  setChk('ruleNomiEnabled', rt.cannotNormalSummon);
+  setEl('ruleNomiType', rt.nomiType || 'self_effect');
+  setChk('ruleNoSpecialSummon', rt.cannotSpecialSummon);
+  setChk('ruleMaterialLimitEnabled', rt.materialRestriction);
+  setEl('ruleMaterialType', rt.materialType || 'all_extra');
+  setChk('ruleDeckLimitOne', rt.deckLimitOne);
+  setChk('ruleCannotBeReleased', rt.cannotBeReleased);
+  setChk('ruleCannotMSet', rt.cannotMSet);
+  setChk('ruleCannotTrigger', rt.cannotTrigger);
+  setChk('ruleCannotChangePosition', rt.cannotChangePosition);
+  setChk('ruleCannotAttack', rt.cannotAttack);
+  setChk('ruleCannotBeAttacked', rt.cannotBeAttacked);
+  setChk('ruleDirectAttack', rt.canDirectAttack);
+  setEl('ruleAddMonsterType', rt.addMonsterType || '');
+  setEl('ruleAttribute', rt.ruleAttribute || '');
+  setEl('ruleRace', rt.ruleRace || '');
+  setEl('ruleLevel', rt.ruleLevel || '');
+  const procEnabled = !!(rt.procSummonType);
+  setChk('ruleSummonProcEnabled', procEnabled);
+  if (rt.procSummonType) setEl('ruleProcSummonType', rt.procSummonType);
+  if (rt.procMaterialCount) setEl('ruleProcMaterialCount', rt.procMaterialCount);
+  setChk('ruleCustomEnabled', rt.customRule);
+  setEl('ruleCustomText', rt.customRuleText || '');
+  if (typeof onRuleTextsChanged === 'function') onRuleTextsChanged();
 
   // 5. 还原效果总数按钮高亮与频次限制卡片
   const count = cfg.totalEffects || 1;

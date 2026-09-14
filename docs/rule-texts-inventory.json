@@ -1,0 +1,661 @@
+{
+  "scanned": 22739,
+  "scannedModern": 19431,
+  "byDir": {
+    "(root)": 25,
+    "goat": 191,
+    "official": 13461,
+    "pre-errata": 68,
+    "pre-release": 181,
+    "rush": 3109,
+    "skill": 174,
+    "unofficial": 5530
+  },
+  "root": "E:/tmp/ygocorpus/cs",
+  "rows": [
+    {
+      "id": "enable_revive_limit",
+      "group": "summon",
+      "label": "苏生限制(不能通常召唤+未正规出场不能特召)",
+      "re": {},
+      "occurrences": 3706,
+      "files": 3705,
+      "modernOccurrences": 3346,
+      "modernFiles": 3345,
+      "samples": [
+        "c504700001.lua",
+        "c504700007.lua",
+        "c504700045.lua",
+        "c504700062.lua",
+        "c504700080.lua",
+        "c504700086.lua"
+      ]
+    },
+    {
+      "id": "cannot_spsummon",
+      "group": "summon",
+      "label": "不能特殊召唤(EFFECT_CANNOT_SPECIAL_SUMMON)",
+      "re": {},
+      "occurrences": 1066,
+      "files": 1055,
+      "modernOccurrences": 1034,
+      "modernFiles": 1025,
+      "samples": [
+        "cards_specific_functions.lua",
+        "constant.lua",
+        "c504700123.lua",
+        "c10117149.lua",
+        "c10140443.lua",
+        "c10158145.lua"
+      ]
+    },
+    {
+      "id": "proc_fusion",
+      "group": "procedure_api",
+      "label": "融合召唤手续",
+      "re": {},
+      "occurrences": 1055,
+      "files": 1015,
+      "modernOccurrences": 700,
+      "modernFiles": 699,
+      "samples": [
+        "c504700007.lua",
+        "c504700045.lua",
+        "c504700102.lua",
+        "c504700161.lua",
+        "c504700177.lua",
+        "c10040267.lua"
+      ]
+    },
+    {
+      "id": "spsummon_proc",
+      "group": "summon",
+      "label": "特殊召唤手续(EFFECT_SPSUMMON_PROC)",
+      "re": {},
+      "occurrences": 942,
+      "files": 927,
+      "modernOccurrences": 871,
+      "modernFiles": 862,
+      "samples": [
+        "cards_specific_functions.lua",
+        "constant.lua",
+        "c504700001.lua",
+        "c504700021.lua",
+        "c504700062.lua",
+        "c504700083.lua"
+      ]
+    },
+    {
+      "id": "disable_effect",
+      "group": "immune",
+      "label": "效果无效化",
+      "re": {},
+      "occurrences": 1527,
+      "files": 843,
+      "modernOccurrences": 1516,
+      "modernFiles": 836,
+      "samples": [
+        "constant.lua",
+        "c504700017.lua",
+        "c504700036.lua",
+        "c504700038.lua",
+        "c504700082.lua",
+        "c504700164.lua"
+      ]
+    },
+    {
+      "id": "proc_xyz",
+      "group": "procedure_api",
+      "label": "超量召唤手续",
+      "re": {},
+      "occurrences": 789,
+      "files": 789,
+      "modernOccurrences": 788,
+      "modernFiles": 788,
+      "samples": [
+        "c10000030.lua",
+        "c10002346.lua",
+        "c10300821.lua",
+        "c10389142.lua",
+        "c10406322.lua",
+        "c10443957.lua"
+      ]
+    },
+    {
+      "id": "cannot_attack",
+      "group": "battle",
+      "label": "不能攻击(EFFECT_CANNOT_ATTACK)",
+      "re": {},
+      "occurrences": 750,
+      "files": 731,
+      "modernOccurrences": 579,
+      "modernFiles": 560,
+      "samples": [
+        "constant.lua",
+        "c504700021.lua",
+        "c504700050.lua",
+        "c504700062.lua",
+        "c504700083.lua",
+        "c504700086.lua"
+      ]
+    },
+    {
+      "id": "spsummon_condition",
+      "group": "summon",
+      "label": "特殊召唤条件(EFFECT_SPSUMMON_CONDITION)",
+      "re": {},
+      "occurrences": 678,
+      "files": 662,
+      "modernOccurrences": 647,
+      "modernFiles": 645,
+      "samples": [
+        "cards_specific_functions.lua",
+        "constant.lua",
+        "c504700021.lua",
+        "c504700080.lua",
+        "c504700083.lua",
+        "c504700131.lua"
+      ]
+    },
+    {
+      "id": "proc_synchro",
+      "group": "procedure_api",
+      "label": "同调召唤手续",
+      "re": {},
+      "occurrences": 649,
+      "files": 648,
+      "modernOccurrences": 648,
+      "modernFiles": 647,
+      "samples": [
+        "c10140443.lua",
+        "c10515412.lua",
+        "c10602628.lua",
+        "c10732060.lua",
+        "c10755984.lua",
+        "c109401.lua"
+      ]
+    },
+    {
+      "id": "proc_link",
+      "group": "procedure_api",
+      "label": "连接召唤手续",
+      "re": {},
+      "occurrences": 576,
+      "files": 574,
+      "modernOccurrences": 575,
+      "modernFiles": 573,
+      "samples": [
+        "c10019086.lua",
+        "c10547580.lua",
+        "c10552026.lua",
+        "c10669138.lua",
+        "c11516241.lua",
+        "c11674673.lua"
+      ]
+    },
+    {
+      "id": "proc_pendulum",
+      "group": "procedure_api",
+      "label": "灵摆刻度手续",
+      "re": {},
+      "occurrences": 530,
+      "files": 529,
+      "modernOccurrences": 529,
+      "modernFiles": 528,
+      "samples": [
+        "c10024317.lua",
+        "c10117149.lua",
+        "c10239627.lua",
+        "c10266279.lua",
+        "c10731333.lua",
+        "c11067666.lua"
+      ]
+    },
+    {
+      "id": "direct_attack",
+      "group": "battle",
+      "label": "可以直接攻击",
+      "re": {},
+      "occurrences": 496,
+      "files": 411,
+      "modernOccurrences": 443,
+      "modernFiles": 373,
+      "samples": [
+        "constant.lua",
+        "c504700062.lua",
+        "c504700086.lua",
+        "c504700108.lua",
+        "c504700160.lua",
+        "c504700183.lua"
+      ]
+    },
+    {
+      "id": "immune_effect",
+      "group": "immune",
+      "label": "不受效果影响(EFFECT_IMMUNE_EFFECT)",
+      "re": {},
+      "occurrences": 372,
+      "files": 359,
+      "modernOccurrences": 361,
+      "modernFiles": 349,
+      "samples": [
+        "constant.lua",
+        "c504700015.lua",
+        "c504700081.lua",
+        "c504700126.lua",
+        "c10000090.lua",
+        "c10669138.lua"
+      ]
+    },
+    {
+      "id": "change_level",
+      "group": "level",
+      "label": "规则上变更等级",
+      "re": {},
+      "occurrences": 325,
+      "files": 308,
+      "modernOccurrences": 321,
+      "modernFiles": 305,
+      "samples": [
+        "constant.lua",
+        "c10441498.lua",
+        "c10591919.lua",
+        "c10602628.lua",
+        "c10971759.lua",
+        "c12743620.lua"
+      ]
+    },
+    {
+      "id": "cannot_summon",
+      "group": "summon",
+      "label": "不能通常召唤(EFFECT_CANNOT_SUMMON)",
+      "re": {},
+      "occurrences": 241,
+      "files": 236,
+      "modernOccurrences": 212,
+      "modernFiles": 210,
+      "samples": [
+        "constant.lua",
+        "c504700066.lua",
+        "c504700123.lua",
+        "c504700158.lua",
+        "c102380.lua",
+        "c10755153.lua"
+      ]
+    },
+    {
+      "id": "add_type",
+      "group": "type",
+      "label": "规则上追加怪兽种类(同调/超量/融合等)",
+      "re": {},
+      "occurrences": 185,
+      "files": 179,
+      "modernOccurrences": 181,
+      "modernFiles": 175,
+      "samples": [
+        "constant.lua",
+        "c10182251.lua",
+        "c12743620.lua",
+        "c12948099.lua",
+        "c12975671.lua",
+        "c13391185.lua"
+      ]
+    },
+    {
+      "id": "change_race",
+      "group": "race",
+      "label": "规则上变更种族",
+      "re": {},
+      "occurrences": 168,
+      "files": 157,
+      "modernOccurrences": 131,
+      "modernFiles": 121,
+      "samples": [
+        "constant.lua",
+        "c10632284.lua",
+        "c11790356.lua",
+        "c1259814.lua",
+        "c14457896.lua",
+        "c14505685.lua"
+      ]
+    },
+    {
+      "id": "change_attribute",
+      "group": "attribute",
+      "label": "规则上变更属性",
+      "re": {},
+      "occurrences": 163,
+      "files": 153,
+      "modernOccurrences": 146,
+      "modernFiles": 137,
+      "samples": [
+        "constant.lua",
+        "c504700181.lua",
+        "c10352095.lua",
+        "c10632284.lua",
+        "c12644061.lua",
+        "c14554127.lua"
+      ]
+    },
+    {
+      "id": "unreleasable_sum",
+      "group": "release",
+      "label": "不能解放(EFFECT_UNRELEASABLE_SUM)",
+      "re": {},
+      "occurrences": 147,
+      "files": 143,
+      "modernOccurrences": 127,
+      "modernFiles": 123,
+      "samples": [
+        "constant.lua",
+        "c504700123.lua",
+        "c11050415.lua",
+        "c14089428.lua",
+        "c14470845.lua",
+        "c15341821.lua"
+      ]
+    },
+    {
+      "id": "cannot_change_pos",
+      "group": "position",
+      "label": "不能变更表示形式",
+      "re": {},
+      "occurrences": 143,
+      "files": 137,
+      "modernOccurrences": 133,
+      "modernFiles": 131,
+      "samples": [
+        "constant.lua",
+        "c504700018.lua",
+        "c504700050.lua",
+        "c504700102.lua",
+        "c12296376.lua",
+        "c12470447.lua"
+      ]
+    },
+    {
+      "id": "cannot_be_attacked",
+      "group": "battle",
+      "label": "不能成为攻击对象",
+      "re": {},
+      "occurrences": 116,
+      "files": 114,
+      "modernOccurrences": 110,
+      "modernFiles": 110,
+      "samples": [
+        "constant.lua",
+        "c504700030.lua",
+        "c10000080.lua",
+        "c10375182.lua",
+        "c10875327.lua",
+        "c11825276.lua"
+      ]
+    },
+    {
+      "id": "mat_synchro",
+      "group": "material",
+      "label": "不能作为同调素材",
+      "re": {},
+      "occurrences": 98,
+      "files": 98,
+      "modernOccurrences": 97,
+      "modernFiles": 97,
+      "samples": [
+        "constant.lua",
+        "c10178757.lua",
+        "c10736540.lua",
+        "c10802915.lua",
+        "c12863633.lua",
+        "c1357146.lua"
+      ]
+    },
+    {
+      "id": "unreleasable_non",
+      "group": "release",
+      "label": "不能作为解放替代(EFFECT_UNRELEASABLE_NONSUM)",
+      "re": {},
+      "occurrences": 85,
+      "files": 83,
+      "modernOccurrences": 77,
+      "modernFiles": 75,
+      "samples": [
+        "constant.lua",
+        "c11050415.lua",
+        "c15735108.lua",
+        "c16366810.lua",
+        "c18027138.lua",
+        "c18046862.lua"
+      ]
+    },
+    {
+      "id": "spsummon_once",
+      "group": "summon",
+      "label": "同名卡1回合特召1次(SetSPSummonOnce)",
+      "re": {},
+      "occurrences": 77,
+      "files": 77,
+      "modernOccurrences": 77,
+      "modernFiles": 77,
+      "samples": [
+        "c10796448.lua",
+        "c12421694.lua",
+        "c13143275.lua",
+        "c13567610.lua",
+        "c13890468.lua",
+        "c14513016.lua"
+      ]
+    },
+    {
+      "id": "proc_ritual",
+      "group": "procedure_api",
+      "label": "仪式召唤手续",
+      "re": {},
+      "occurrences": 87,
+      "files": 77,
+      "modernOccurrences": 76,
+      "modernFiles": 76,
+      "samples": [
+        "c11398951.lua",
+        "c12157563.lua",
+        "c14094090.lua",
+        "c14166715.lua",
+        "c14735698.lua",
+        "c16310544.lua"
+      ]
+    },
+    {
+      "id": "mat_link",
+      "group": "material",
+      "label": "不能作为连接素材",
+      "re": {},
+      "occurrences": 70,
+      "files": 70,
+      "modernOccurrences": 69,
+      "modernFiles": 69,
+      "samples": [
+        "constant.lua",
+        "c11969228.lua",
+        "c146746.lua",
+        "c14816857.lua",
+        "c1528054.lua",
+        "c15627227.lua"
+      ]
+    },
+    {
+      "id": "proc_union",
+      "group": "trait_api",
+      "label": "同盟怪兽手续(Union)",
+      "re": {},
+      "occurrences": 56,
+      "files": 55,
+      "modernOccurrences": 53,
+      "modernFiles": 53,
+      "samples": [
+        "constant.lua",
+        "c504700012.lua",
+        "c504700048.lua",
+        "c11678191.lua",
+        "c12965761.lua",
+        "c19086954.lua"
+      ]
+    },
+    {
+      "id": "mat_xyz",
+      "group": "material",
+      "label": "不能作为超量素材",
+      "re": {},
+      "occurrences": 55,
+      "files": 53,
+      "modernOccurrences": 54,
+      "modernFiles": 52,
+      "samples": [
+        "constant.lua",
+        "c1003028.lua",
+        "c13289758.lua",
+        "c14212201.lua",
+        "c15983048.lua",
+        "c19301729.lua"
+      ]
+    },
+    {
+      "id": "proc_spirit",
+      "group": "trait_api",
+      "label": "灵魂怪兽手续(Spirit)",
+      "re": {},
+      "occurrences": 84,
+      "files": 50,
+      "modernOccurrences": 58,
+      "modernFiles": 47,
+      "samples": [
+        "constant.lua",
+        "deprecated_functions.lua",
+        "c504700131.lua",
+        "c1200843.lua",
+        "c16889337.lua",
+        "c17241370.lua"
+      ]
+    },
+    {
+      "id": "proc_gemini",
+      "group": "trait_api",
+      "label": "二重怪兽手续(Gemini)",
+      "re": {},
+      "occurrences": 47,
+      "files": 47,
+      "modernOccurrences": 45,
+      "modernFiles": 45,
+      "samples": [
+        "deprecated_functions.lua",
+        "c15767889.lua",
+        "c16146511.lua",
+        "c16984449.lua",
+        "c17871506.lua",
+        "c18993198.lua"
+      ]
+    },
+    {
+      "id": "mat_any",
+      "group": "material",
+      "label": "不能作为任意召唤素材(EFFECT_CANNOT_BE_MATERIAL)",
+      "re": {},
+      "occurrences": 44,
+      "files": 41,
+      "modernOccurrences": 40,
+      "modernFiles": 37,
+      "samples": [
+        "constant.lua",
+        "c11429811.lua",
+        "c14283055.lua",
+        "c14478717.lua",
+        "c16366810.lua",
+        "c24643913.lua"
+      ]
+    },
+    {
+      "id": "mat_fusion",
+      "group": "material",
+      "label": "不能作为融合素材",
+      "re": {},
+      "occurrences": 35,
+      "files": 33,
+      "modernOccurrences": 26,
+      "modernFiles": 26,
+      "samples": [
+        "constant.lua",
+        "c13735899.lua",
+        "c22638495.lua",
+        "c25700114.lua",
+        "c28226490.lua",
+        "c30864377.lua"
+      ]
+    },
+    {
+      "id": "alias_name",
+      "group": "name",
+      "label": "规则视作其他卡名",
+      "re": {},
+      "occurrences": 27,
+      "files": 27,
+      "modernOccurrences": 19,
+      "modernFiles": 19,
+      "samples": [
+        "constant.lua",
+        "c11082056.lua",
+        "c13857930.lua",
+        "c1784686.lua",
+        "c24521325.lua",
+        "c35618217.lua"
+      ]
+    },
+    {
+      "id": "add_race",
+      "group": "race",
+      "label": "规则上追加种族",
+      "re": {},
+      "occurrences": 19,
+      "files": 19,
+      "modernOccurrences": 18,
+      "modernFiles": 18,
+      "samples": [
+        "constant.lua",
+        "c35073065.lua",
+        "c77189532.lua",
+        "c511000072.lua",
+        "c511000073.lua",
+        "c511000074.lua"
+      ]
+    },
+    {
+      "id": "change_rank",
+      "group": "level",
+      "label": "规则上变更阶级",
+      "re": {},
+      "occurrences": 6,
+      "files": 5,
+      "modernOccurrences": 4,
+      "modernFiles": 4,
+      "samples": [
+        "constant.lua",
+        "c17086528.lua",
+        "c73496100.lua",
+        "c8243121.lua",
+        "c511002456.lua"
+      ]
+    },
+    {
+      "id": "spsummon_count_limit",
+      "group": "summon",
+      "label": "1回合特召次数上限(EFFECT_SPSUMMON_COUNT_LIMIT)",
+      "re": {},
+      "occurrences": 3,
+      "files": 3,
+      "modernOccurrences": 2,
+      "modernFiles": 2,
+      "samples": [
+        "constant.lua",
+        "c68087897.lua",
+        "c94977269.lua"
+      ]
+    }
+  ]
+}

@@ -518,9 +518,11 @@
                     <span class="icon">📜</span>
                     <h3 style="margin:0;">效果外文本 / 独立规则条款 (Rule Texts)</h3>
                   </div>
+                  <span id="ruleTextsAdaptHint" style="font-size:12px;color:var(--text-muted);">将依所选召唤方式与怪兽种类自动适配</span>
                 </div>
 
                 <div class="rule-texts-grid" style="display:grid;grid-template-columns:1fr;gap:12px;">
+                  <!-- ===== 通用条款 ===== -->
                   <!-- 1. 规则视作其他卡名 -->
                   <div class="rule-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
                     <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
@@ -558,7 +560,7 @@
                     </div>
                     <div id="wrapRuleNomiSelect" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
                       <select id="ruleNomiType" class="form-select" onchange="onRuleTextsChanged()">
-                        <option value="self_effect" selected>不能通常召唤。只有用自身效果/召唤手续才能特殊召唤</option>
+                        <option value="self_effect" selected>不能通常召唤。只有用自身效果/召唤手续才能特殊召唤（正规出场限制）</option>
                         <option value="extra_only">不能通常召唤。只能以原本召唤方式（融合/同调/超量/连接）特殊召唤</option>
                         <option value="cannot_ns_any">不能通常召唤（仅不能通常召唤，其余特召无限制）</option>
                       </select>
@@ -576,9 +578,11 @@
                     <div id="wrapRuleMaterialSelect" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
                       <select id="ruleMaterialType" class="form-select" onchange="onRuleTextsChanged()">
                         <option value="all_extra" selected>这张卡不能作为融合·同调·超量·连接召唤的素材</option>
+                        <option value="fusion_only">这张卡不能作为融合召唤的素材</option>
                         <option value="synchro_only">这张卡不能作为同调召唤的素材</option>
                         <option value="xyz_only">这张卡不能作为超量召唤的素材</option>
                         <option value="link_only">这张卡不能作为连接召唤的素材</option>
+                        <option value="any_material">这张卡不能作为任何召唤的素材 (EFFECT_CANNOT_BE_MATERIAL)</option>
                       </select>
                     </div>
                   </div>
@@ -593,16 +597,155 @@
                     </div>
                   </div>
 
+                  <!-- ===== 仅怪兽适用条款 ===== -->
+                  <div class="rule-box" data-rule-scope="monster" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleNoSpecialSummon" onchange="onRuleTextsChanged()">
+                      <label for="ruleNoSpecialSummon" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        ⛔ 不能特殊召唤 (EFFECT_SPSUMMON_CONDITION → aux.FALSE)
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="rule-box" data-rule-scope="monster" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleCannotBeReleased" onchange="onRuleTextsChanged()">
+                      <label for="ruleCannotBeReleased" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        🪢 这张卡不能解放 (EFFECT_UNRELEASABLE_SUM + NONSUM)
+                      </label>
+                    </div>
+                    <div style="margin-top:8px;padding-left:26px;display:flex;flex-direction:column;gap:8px;">
+                      <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="ruleCannotMSet" onchange="onRuleTextsChanged()">
+                        <label for="ruleCannotMSet" style="font-size:13px;cursor:pointer;color:#cbd5e1;">
+                          🔽 这张卡不能里侧盖放 (EFFECT_CANNOT_MSET)
+                        </label>
+                      </div>
+                      <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="ruleCannotTrigger" onchange="onRuleTextsChanged()">
+                        <label for="ruleCannotTrigger" style="font-size:13px;cursor:pointer;color:#cbd5e1;">
+                          🚫 这张卡的效果不能发动 (EFFECT_CANNOT_TRIGGER)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rule-box" data-rule-scope="monster" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleCannotChangePosition" onchange="onRuleTextsChanged()">
+                      <label for="ruleCannotChangePosition" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        🔄 不能变更表示形式 (EFFECT_CANNOT_CHANGE_POSITION)
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="rule-box" data-rule-scope="monster" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleCannotAttack" onchange="onRuleTextsChanged()">
+                      <label for="ruleCannotAttack" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        🚷 这张卡不能攻击 (EFFECT_CANNOT_ATTACK)
+                      </label>
+                    </div>
+                    <div style="margin-top:8px;padding-left:26px;">
+                      <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="ruleCannotBeAttacked" onchange="onRuleTextsChanged()">
+                        <label for="ruleCannotBeAttacked" style="font-size:13px;cursor:pointer;color:#cbd5e1;">
+                          🛡️ 不能成为攻击对象 (EFFECT_CANNOT_BE_BATTLE_TARGET)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rule-box" data-rule-scope="monster" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleDirectAttack" onchange="onRuleTextsChanged()">
+                      <label for="ruleDirectAttack" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        🎯 这张卡可以直接攻击 (EFFECT_DIRECT_ATTACK)
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- 召唤方式手续 (依怪兽种类自动适配) -->
+                  <div class="rule-box" data-rule-scope="monster" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleSummonProcEnabled" onchange="onRuleTextsChanged()">
+                      <label for="ruleSummonProcEnabled" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        🧩 生成召唤方式手续 (融合/同调/超量/连接/仪式)
+                      </label>
+                    </div>
+                    <div id="wrapRuleSummonProc" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
+                      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <label style="font-size:13px;color:#cbd5e1;">召唤方式：</label>
+                        <select id="ruleProcSummonType" class="form-select" style="width:170px;" onchange="onRuleTextsChanged()">
+                          <option value="fusion">融合召唤</option>
+                          <option value="synchro">同调召唤</option>
+                          <option value="xyz">超量召唤</option>
+                          <option value="link">连接召唤</option>
+                          <option value="ritual">仪式召唤</option>
+                        </select>
+                        <label style="font-size:13px;color:#cbd5e1;">素材数量：</label>
+                        <input type="number" id="ruleProcMaterialCount" value="2" min="1" max="8" style="width:80px;" oninput="onRuleTextsChanged()">
+                      </div>
+                      <small style="color:var(--text-muted);display:block;margin-top:6px;">
+                        默认依怪兽种类自动判断；素材筛选留空为「不限」，需要限定素材时可在脚本中补填 filter。
+                      </small>
+                    </div>
+                  </div>
+
+                  <!-- 规则变更：种类 / 属性 / 种族 / 等级 -->
+                  <div class="rule-box" data-rule-scope="monster" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div style="font-weight:600;color:#f8fafc;font-size:13px;margin-bottom:8px;">🧬 规则上的种类 / 属性 / 种族 / 等级变更</div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                      <select id="ruleAddMonsterType" class="form-select" style="width:180px;" onchange="onRuleTextsChanged()">
+                        <option value="">— 追加怪兽种类 (不追加) —</option>
+                        <option value="effect">规则上也当作效果怪兽</option>
+                        <option value="fusion">规则上也当作融合怪兽</option>
+                        <option value="synchro">规则上也当作同调怪兽</option>
+                        <option value="xyz">规则上也当作超量怪兽</option>
+                        <option value="link">规则上也当作连接怪兽</option>
+                        <option value="ritual">规则上也当作仪式怪兽</option>
+                      </select>
+                      <select id="ruleAttribute" class="form-select" style="width:170px;" onchange="onRuleTextsChanged()">
+                        <option value="">— 变更属性 (不变更) —</option>
+                        <option value="dark">规则上当作暗属性</option>
+                        <option value="light">规则上当作光属性</option>
+                        <option value="earth">规则上当作地属性</option>
+                        <option value="water">规则上当作水属性</option>
+                        <option value="fire">规则上当作炎属性</option>
+                        <option value="wind">规则上当作风属性</option>
+                        <option value="divine">规则上当作神属性</option>
+                      </select>
+                      <select id="ruleRace" class="form-select" style="width:190px;" onchange="onRuleTextsChanged()">
+                        <option value="">— 追加种族 (不追加) —</option>
+                        <option value="warrior">规则上也当作战士族</option>
+                        <option value="spellcaster">规则上也当作魔法师族</option>
+                        <option value="fairy">规则上也当作天使族</option>
+                        <option value="fiend">规则上也当作恶魔族</option>
+                        <option value="zombie">规则上也当作不死族</option>
+                        <option value="machine">规则上也当作机械族</option>
+                        <option value="dragon">规则上也当作龙族</option>
+                        <option value="cyberse">规则上也当作电子界族</option>
+                        <option value="illusion">规则上也当作幻想魔族</option>
+                      </select>
+                      <label style="font-size:13px;color:#cbd5e1;">变更等级：</label>
+                      <input type="number" id="ruleLevel" value="" min="1" max="12" placeholder="留空不变" style="width:90px;" oninput="onRuleTextsChanged()">
+                    </div>
+                  </div>
+
                   <!-- 6. 自由定义规则条款 -->
-                  <div class="rule-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                  <div class="rule-box" id="ruleCustomBox" style="background:rgba(255,255,255,0.03);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:10px 14px;">
                     <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
                       <input type="checkbox" id="ruleCustomEnabled" onchange="onRuleTextsChanged()">
                       <label for="ruleCustomEnabled" style="font-weight:600;cursor:pointer;color:#f8fafc;">
-                        ✍️ 自定义独有规则条款 (不绑定具体字段，自由定义)
+                        ✍️ 自定义独有规则条款 (仅写入卡面文本)
                       </label>
                     </div>
                     <div id="wrapRuleCustomInput" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
                       <input type="text" id="ruleCustomText" placeholder="例如：这张卡的属性在规则上也当作「光」使用。" style="width:100%;" oninput="onRuleTextsChanged()">
+                      <small style="color:#f59e0b;display:block;margin-top:6px;">
+                        ⚠️ 自定义条款为自由语句，引擎无法翻译为确定语义，因此<b>不会生成任何 Lua 脚本</b>，仅显示在卡面上。
+                        如需实际生效，请导出脚本后自行补写对应效果。
+                      </small>
                     </div>
                   </div>
                 </div>
