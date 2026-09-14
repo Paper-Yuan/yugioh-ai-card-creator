@@ -7,21 +7,34 @@ import { fileURLToPath } from 'url';
 /**
  * MDPro3 风格卡面字体注册 (服务端 @napi-rs/canvas 渲染)
  * 字体来源与选择依据见 src/web/public/css/main.css 顶部说明：
- *  - YgoMDKai     = 霞鹜文楷 Medium  (对应 MDPro3 简中卡面字体 方正北魏楷书，用于卡名/标头)
- *  - YgoMDKaiText = 霞鹜文楷 Regular (用于效果文本)
- *  - YgoMDGothic  = 思源黑体 Bold    (对应 MDPro3 AtkDef 黑体数字，用于 ATK/DEF)
+ *  - 卡名 / 标头 / 效果文本：原作方正楷体优先，缺失时回退思源黑体
+ *  - ATK / DEF 等数字：思源黑体 Bold
+ *
+ * 注意：早期版本使用霞鹜文楷（LXGWWenKai），但该字体文件在本仓库中已损坏
+ * （GPOS 表偏移越界，@napi-rs/canvas 下完全无法渲染），故统一改用思源黑体。
  */
 const FONT_DIR = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   'web/public/assets/yugioh/font'
 );
 try {
-  GlobalFonts.registerFromPath(path.join(FONT_DIR, 'LXGWWenKai-Medium.ttf'), 'YgoMDKai');
-  GlobalFonts.registerFromPath(path.join(FONT_DIR, 'LXGWWenKai-Regular.ttf'), 'YgoMDKaiText');
-  GlobalFonts.registerFromPath(path.join(FONT_DIR, 'SourceHanSansSC-Bold.otf'), 'YgoMDGothic');
+  // 逐字体独立注册：原作楷体若存在则优先，思源黑体作为随仓库分发的回退
+  const fontFiles: Array<[string, string]> = [
+    ['RenderFontChineseSimplified.ttf', 'YgoMDKaiFZ'],
+    ['SourceHanSansSC-Medium.otf', 'YgoMDKaiSHS'],
+    ['SourceHanSansSC-Bold.otf', 'YgoMDGothic']
+  ];
+  for (const [file, name] of fontFiles) {
+    try {
+      GlobalFonts.registerFromPath(path.join(FONT_DIR, file), name);
+    } catch { /* 个别字体缺失不影响其余注册 */ }
+  }
 } catch (e) {
-  console.warn('[ImageGenerator] MDPro3-style font registration failed, using system fonts:', e);
+  console.warn('[ImageGenerator] font registration failed, using system fonts:', e);
 }
+
+/** 卡名 / 标头 / 效果文本的字体栈：原作楷体优先，缺失时回退思源黑体 */
+const CJK_FONT_STACK = '"YgoMDKaiFZ", "YgoMDKaiSHS", "Microsoft YaHei", Arial';
 
 /**
  * 卡片图片生成器
@@ -177,7 +190,7 @@ export class CardImageGenerator {
 
     // 卡片名称水印
     ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.font = 'bold 32px "YgoMDKaiText", "Microsoft YaHei", Arial';
+    ctx.font = `bold 32px ${CJK_FONT_STACK}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(card.name, artX + artWidth / 2, artY + artHeight / 2);
@@ -194,16 +207,16 @@ export class CardImageGenerator {
 
     // 卡片名称
     ctx.fillStyle = '#000000';
-    ctx.font = 'bold 20px "YgoMDKai", "Microsoft YaHei", Arial';
+    ctx.font = `bold 20px ${CJK_FONT_STACK}`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     
     // 文字过长时缩小
     let fontSize = 20;
-    ctx.font = `bold ${fontSize}px "YgoMDKai", "Microsoft YaHei", Arial`;
+    ctx.font = `bold ${fontSize}px ${CJK_FONT_STACK}`;
     while (ctx.measureText(card.name).width > this.CARD_WIDTH - 110 && fontSize > 12) {
       fontSize--;
-      ctx.font = `bold ${fontSize}px "YgoMDKai", "Microsoft YaHei", Arial`;
+      ctx.font = `bold ${fontSize}px ${CJK_FONT_STACK}`;
     }
     
     ctx.fillText(card.name, 28, 37);
@@ -236,7 +249,7 @@ export class CardImageGenerator {
 
     // 属性文字
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 16px "YgoMDKai", "Microsoft YaHei", Arial';
+    ctx.font = `bold 16px ${CJK_FONT_STACK}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(attrName, this.CARD_WIDTH - 40, 37);
@@ -292,7 +305,7 @@ export class CardImageGenerator {
     // 怪兽类型信息
     if (card.type & CardType.MONSTER) {
       ctx.fillStyle = '#000000';
-      ctx.font = '11px "YgoMDKaiText", Arial';
+      ctx.font = `11px ${CJK_FONT_STACK}`;
       ctx.textAlign = 'left';
       const typeText = this.getTypeText(card);
       ctx.fillText(typeText, textX + 8, textY + 15);
@@ -300,7 +313,7 @@ export class CardImageGenerator {
 
     // 效果文字
     ctx.fillStyle = '#000000';
-    ctx.font = '10px "YgoMDKaiText", "Microsoft YaHei", Arial';
+    ctx.font = `10px ${CJK_FONT_STACK}`;
     ctx.textAlign = 'left';
     
     const startY = textY + (card.type & CardType.MONSTER ? 30 : 15);

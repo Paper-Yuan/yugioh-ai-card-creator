@@ -327,7 +327,7 @@ yugioh-ai-card-creator/
    - 作者：kooriookami
    - 链接：https://github.com/kooriookami/yugioh-card
 
-此外还使用了 LXGW WenKai（霞鹜文楷，OFL）、思源黑体（OFL）等开源字体。
+此外使用了思源黑体 Source Han Sans（OFL）作为随仓库分发的开源字体。
 
 感谢原作者的贡献！
 

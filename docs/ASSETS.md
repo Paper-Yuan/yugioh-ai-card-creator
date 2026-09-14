@@ -16,13 +16,15 @@
 
 | 字体 | 用途 | 许可 |
 | --- | --- | --- |
-| LXGW WenKai 霞鹜文楷（Medium / Regular） | 卡名、效果文、标头 | SIL OFL 1.1 |
-| Source Han Sans SC 思源黑体（Bold / Medium） | ATK/DEF、等级、密码等数字 | SIL OFL 1.1 |
+| Source Han Sans SC 思源黑体（Bold / Medium） | 卡名、效果文、标头、ATK/DEF、等级、密码等数字 | SIL OFL 1.1 |
 
-许可证随文件放在 `font/` 目录下（`LICENSE-LXGWWenKai.txt`、`LICENSE-SourceHanSans.txt`）。
+许可证随文件放在 `font/` 目录下（`LICENSE-SourceHanSans.txt`）。
 
-> 默认渲染用的就是上述两种开源字体。若你本机安装了方正楷体、Fontworks FOT-Rodin 等原作字体，
-> 程序会通过 `local()` 与 canvas 回退链优先使用，以获得更贴近官方卡面的字形。
+> 公开克隆缺少原作字体时，全部卡面字族都会回退到思源黑体。若你本机安装了方正楷体、
+> Fontworks FOT-Rodin 等原作字体，程序会通过 `local()` 与 canvas 回退链优先使用，以获得更贴近官方卡面的字形。
+>
+> 说明：早期版本曾使用霞鹜文楷（LXGW WenKai）作为回退字体，但其随仓库分发的文件已损坏
+> （GPOS 表偏移越界，部分渲染器下会输出空白），现已移除并统一改用思源黑体。
 
 ### 卡片数据 JSON
 

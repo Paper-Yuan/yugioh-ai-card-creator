@@ -39,7 +39,8 @@
 ### 日文 OCG 适配
 
 - 上部文本按 OCG 标头格式生成（种族 / 召唤分类 / 能力 / 效果）
-- 卡名与效果文的一键振假名注音
+- **卡名注音**：一键为日文卡名注入振假名（`[漢字(ルビ)]`）
+- **效果文注音**：可开关地为日文效果文本自动加振假名，卡面按官方版式将注音排布在汉字上方（导出 CDB 时会自动剥离注音标记，只保留纯文本）
 
 ### 卡包工程与导出
 
@@ -191,7 +192,7 @@ yugioh-ai-card-creator/
 3. **[kooriookami/yugioh-card](https://github.com/kooriookami/yugioh-card)** — 作者 kooriookami
    参考了卡框、属性图标、LINK 箭头等素材与卡面渲染的实现思路；`scripts/download-assets.js` 从该项目拉取可公开获取的素材。
 
-此外还使用了 [LXGW WenKai（霞鹜文楷，OFL）](https://github.com/lxgw/LxgwWenKai)、[思源黑体（OFL）](https://github.com/adobe-fonts/source-han-sans) 等开源字体。
+此外使用了 [思源黑体 Source Han Sans（OFL）](https://github.com/adobe-fonts/source-han-sans) 作为随仓库分发的开源字体。
 
 ---
 

@@ -332,6 +332,54 @@ class FuriganaService {
       { kanji: '鏡', ruby: 'かがみ' },
       { kanji: '鈴', ruby: 'すず' }
     ];
+
+    // 效果文本常用 OCG 术语注音表 (用于为日文效果文自动加振假名)
+    // 长词优先，避免「攻撃力」被「攻撃」先行替换
+    this.EFFECT_TEXT_RUBY_MAP = [
+      { kanji: '攻撃力', ruby: 'こうげきりょく' },
+      { kanji: '守備力', ruby: 'しゅびりょく' },
+      { kanji: '特殊召喚', ruby: 'とくしゅしょうかん' },
+      { kanji: '効果', ruby: 'こうか' },
+      { kanji: '発動', ruby: 'はつどう' },
+      { kanji: '墓地', ruby: 'ぼち' },
+      { kanji: '手札', ruby: 'てふだ' },
+      { kanji: '自分', ruby: 'じぶん' },
+      { kanji: '相手', ruby: 'あいて' },
+      { kanji: '場合', ruby: 'ばあい' },
+      { kanji: '選択', ruby: 'せんたく' },
+      { kanji: '除外', ruby: 'じょがい' },
+      { kanji: '攻撃', ruby: 'こうげき' },
+      { kanji: '守備', ruby: 'しゅび' },
+      { kanji: '表示', ruby: 'ひょうじ' },
+      { kanji: '存在', ruby: 'そんざい' },
+      { kanji: '対象', ruby: 'たいしょう' },
+      { kanji: '無効', ruby: 'むこう' },
+      { kanji: '破壊', ruby: 'はかい' },
+      { kanji: '加える', ruby: 'くわえる' },
+      { kanji: '送る', ruby: 'おくる' },
+      { kanji: '戻す', ruby: 'もどす' },
+      { kanji: '得る', ruby: 'える' },
+      { kanji: '行う', ruby: 'おこなう' },
+      { kanji: '使用', ruby: 'しよう' },
+      { kanji: '宣言', ruby: 'せんげん' },
+      { kanji: '同名', ruby: 'どうめい' },
+      { kanji: '以上', ruby: 'いじょう' },
+      { kanji: '以下', ruby: 'いか' },
+      { kanji: '自身', ruby: 'じしん' },
+      { kanji: '枚', ruby: 'まい' },
+      { kanji: '選ぶ', ruby: 'えらぶ' },
+      { kanji: '払う', ruby: 'はらう' },
+      { kanji: '捨てる', ruby: 'すてる' },
+      { kanji: '引く', ruby: 'ひく' },
+      { kanji: '与える', ruby: 'あたえる' },
+      { kanji: '受ける', ruby: 'うける' },
+      { kanji: '回復', ruby: 'かいふく' },
+      { kanji: '回', ruby: 'かい' },
+      { kanji: '度', ruby: 'ど' },
+      { kanji: '枚数', ruby: 'まいすう' },
+      { kanji: '体', ruby: 'たい' },
+      { kanji: '発動する', ruby: '' }
+    ].filter(item => item.ruby);
     this.jaCardDict = null;
     this.initDictPromise = null;
     this.loadDictionary();
@@ -449,6 +497,30 @@ class FuriganaService {
     }
 
     return workingName;
+  }
+
+  /**
+   * 为日文效果文本注入振假名 (`[漢字(ルビ)]` 语法)。
+   * - 已带注音的 `[...]` 区间会被跳过，避免重复
+   * - 仅处理 EFFECT_TEXT_RUBY_MAP 中的常用术语，其余汉字保持原样
+   * - 注意：请勿重复调用；已注入的文本会被识别并跳过
+   */
+  injectEffectFurigana(text) {
+    let working = String(text || '');
+    if (!working || !/[\u4E00-\u9FFF]/.test(working)) return working;
+    for (const item of this.EFFECT_TEXT_RUBY_MAP) {
+      if (working.includes(item.kanji)) {
+        working = this.safeReplaceKanji(working, item.kanji, item.ruby);
+      }
+    }
+    return working;
+  }
+
+  /**
+   * 判断效果文本是否已包含注音语法
+   */
+  hasEffectFurigana(text) {
+    return /\[[^\]]*[\(（][^\)）]*[\)）]\]/.test(String(text || ''));
   }
 
   /**

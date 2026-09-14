@@ -16,7 +16,7 @@
 ## 本版本说明
 
 - 代码部分采用 **MIT** 协议开源。
-- 仓库已包含**可自由再分发的卡面素材**：卡框 / 属性图标 / LINK 箭头等图片（来自 kooriookami/yugioh-card，MIT）与两款开源字体（霞鹜文楷、思源黑体，SIL OFL 1.1）。克隆后卡面主体即可渲染。
+- 仓库已包含**可自由再分发的卡面素材**：卡框 / 属性图标 / LINK 箭头等图片（来自 kooriookami/yugioh-card，MIT）与开源字体思源黑体（SIL OFL 1.1）。克隆后卡面主体即可渲染。
 - **未包含**商业字体（方正、Fontworks、华康等）与 Konami 官方工艺素材（罕贵度 / 出框 / 水印等），因版权原因需自行准备，缺失时程序会自动回退。详见 [docs/ASSETS.md](https://github.com/Paper-Yuan/yugioh-ai-card-creator/blob/main/docs/ASSETS.md)。
 - 本 Release **仅提供源码**，不含预编译二进制。需要桌面版 / APK 可参照 [README](https://github.com/Paper-Yuan/yugioh-ai-card-creator#readme) 自行构建。
 

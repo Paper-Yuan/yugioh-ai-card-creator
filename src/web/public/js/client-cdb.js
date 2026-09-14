@@ -104,6 +104,7 @@ class ClientCDBManager {
 
       // 处理灵摆与怪兽双描述 (支持日文 OCG 导出)
       const isJa = cardData.language === 'ja';
+      const stripRuby = (s) => String(s || '').replace(/\[([^\[\]]*?)[\(（][^\(\)（）]*?[\)）]\]/g, '$1');
       let fullDesc = (isJa && cardData.jaDescription) ? cardData.jaDescription : (cardData.description || '');
       if (cardData.type & 16777216) {
         const pen = (isJa && cardData.jaPendulumDescription) 
@@ -115,6 +116,8 @@ class ClientCDBManager {
             : `【灵摆效果】\n${pen}\n【怪兽效果】\n${fullDesc}`;
         }
       }
+      // CDB 文本不含注音排版标记，剥离 [漢字(ルビ)] 只保留汉字
+      fullDesc = stripRuby(fullDesc);
 
       // 提取 str1 ~ str16
       const effectList = cardData.effectStrings || [];

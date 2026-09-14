@@ -13,22 +13,17 @@ const config: CapacitorConfig = {
   },
   android: {
     allowMixedContent: true,
-    backgroundColor: '#667eea',
+    backgroundColor: '#0a0e17',
     buildOptions: {
       keystorePath: './android/app/yugioh-release-key.jks',
       keystoreAlias: 'yugioh'
     }
   },
   plugins: {
-    SplashScreen: {
-      launchShowDuration: 2000,
-      backgroundColor: '#667eea',
-      androidSplashResourceName: 'splash',
-      androidScaleType: 'CENTER_CROP',
-      showSpinner: false,
-      androidSpinnerStyle: 'large',
-      spinnerColor: '#ffffff'
-    },
+    // 注意：未安装 @capacitor/splash-screen，故不配置 SplashScreen 插件。
+    // 启动画面由 android 侧的 AppTheme.NoActionBarLaunch (windowBackground) 提供，
+    // 不会阻塞 WebView 加载；若日后接入该插件，需在 MainActivity 调用
+    // installSplashScreen() 并在主题中设置 postSplashScreenTheme。
     StatusBar: {
       backgroundColor: '#0a0e17',
       style: 'DARK'

@@ -16,7 +16,11 @@
     </style>
 
 
-    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+    <!-- 启动主题：仅作为窗口背景在 WebView 首帧前短暂显示。
+         注意：不要使用 parent="Theme.SplashScreen"（androidx core-splashscreen），
+         它需要在 Activity 中调用 installSplashScreen() 才会移除启动视图；
+         本项目未接入该插件，使用它会导致启动层永久遮挡界面。 -->
+    <style name="AppTheme.NoActionBarLaunch" parent="AppTheme.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash</item>
     </style>
 </resources>

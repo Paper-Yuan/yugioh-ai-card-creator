@@ -2,8 +2,8 @@
  * 游戏王卡片客户端高清渲染引擎 (CardRenderer v2.1 - MDPro3 Style Edition)
  * 采用白羽幸鸟 / OCG 官方 1394×2031 印刷级母版美术素材与 MDPro3 风格字库硬件加速渲染
  * 卡面字体对齐 MDPro3 (开源 Master Duel 风格启动器)：
- *   卡名/标头 = 霞鹜文楷 Medium (对应 MDPro3 简中卡面字体 方正北魏楷书)，
- *   效果文 = 霞鹜文楷 Regular；ATK/DEF 等数字 = 思源黑体 Bold (对应 MDPro3 AtkDef 黑体数字)；
+ *   卡名/标头 = 原作方正楷体（本机安装或本地打包时优先），否则回退思源黑体；
+ *   效果文 = 同上；ATK/DEF 等数字 = 思源黑体 Bold (对应 MDPro3 AtkDef 黑体数字)；
  *   MDPro3 卡名为纯色文字无描边，本渲染器保持一致。
  * 100% 离线脱机，完美兼容 Windows 客户端与 Android APK
  */
@@ -908,14 +908,20 @@ class CardRenderer {
     const isJa = (typeof customFontFamily === 'string' && customFontFamily.includes('jp')) || /[\u3040-\u309F\u30A0-\u30FF]/.test(text);
     const formattedText = isJa ? String(text || '') : this.toYgoText(text);
 
-    let fontSize = 36;
-    let lineHeight = Math.round(fontSize * 1.25);
-    let wrappedLines = [];
-
     const defaultFontFamily = '"ygo-cardtext", "ygo-md-text", "RenderFontChineseSimplified", "FZBeiWeiKaiShu-S19S", sans-serif';
     const fontFam = customFontFamily || (isJa
       ? '"ygo-jp-text", "Yu-Gi-Oh! FOT-Rodin ProN DB", "FOT-Rodin Pro", sans-serif'
       : defaultFontFamily);
+
+    // 效果文本内联注音：`[漢字(ルビ)]` -> 汉字上方绘制小号振假名
+    if (/\[[^\]]*[\(（][^\)）]*[\)）]\]/.test(formattedText)) {
+      this.renderRubyWrappedText(ctx, formattedText, x, startY, maxWidth, maxHeight, isCenterY, fontFam);
+      return;
+    }
+
+    let fontSize = 36;
+    let lineHeight = Math.round(fontSize * 1.25);
+    let wrappedLines = [];
 
     // 自适应缩小字号保证完全容纳，最低 18px，细化步长 fontSize -= 1 保持排版美观
     while (fontSize >= 18) {
@@ -943,6 +949,109 @@ class CardRenderer {
       ctx.fillText(line, x, curY);
       curY += lineHeight;
     }
+  }
+
+  /**
+   * 解析效果文本中的注音标记，返回线性 token 列表。
+   * `[漢字(ルビ)]` -> { base, ruby }；其余每个字符 -> { base, ruby: '' }
+   */
+  parseEffectRubyTokens(text) {
+    const tokens = [];
+    const regex = /\[([^\[\]]*?)[\(（]([^\(\)（）]*?)[\)）]\]|([^\[\]]+)/g;
+    let m;
+    while ((m = regex.exec(String(text || ''))) !== null) {
+      if (m[1] !== undefined) {
+        tokens.push({ base: m[1] || '', ruby: m[2] || '' });
+      } else if (m[3] !== undefined) {
+        for (const ch of m[3]) tokens.push({ base: ch, ruby: '' });
+      }
+    }
+    return tokens;
+  }
+
+  /**
+   * 带内联振假名的效果文本排版 (汉字上方绘制小号注音，对齐官方 OCG 印刷版式)
+   */
+  renderRubyWrappedText(ctx, text, x, startY, maxWidth, maxHeight, isCenterY, fontFam) {
+    const rawTokens = this.parseEffectRubyTokens(text);
+    const hasRuby = rawTokens.some(t => t.ruby);
+    if (!hasRuby) {
+      const plain = rawTokens.map(t => t.base).join('');
+      this.renderAutoWrappedText(ctx, plain, x, startY, maxWidth, maxHeight, isCenterY, fontFam);
+      return;
+    }
+
+    let fontSize = 36;
+    let rubyFontSize = Math.max(11, Math.round(fontSize * 0.42));
+    let lines = [];
+    const lineHeightFor = (fs) => Math.round(fs * 1.62);
+
+    const layout = () => {
+      ctx.font = `${fontSize}px ${fontFam}`;
+      const tokenW = rawTokens.map(t => ({ ...t, w: ctx.measureText(t.base).width }));
+      const out = [];
+      let cur = [];
+      let curW = 0;
+      for (const t of tokenW) {
+        if (t.base === '\n') {
+          out.push(cur);
+          cur = [];
+          curW = 0;
+          continue;
+        }
+        if (curW + t.w > maxWidth && cur.length > 0) {
+          out.push(cur);
+          cur = [];
+          curW = 0;
+        }
+        cur.push(t);
+        curW += t.w;
+      }
+      out.push(cur);
+      return out;
+    };
+
+    while (fontSize >= 18) {
+      lines = layout();
+      if (lines.length * lineHeightFor(fontSize) <= maxHeight) break;
+      fontSize -= 1;
+      rubyFontSize = Math.max(11, Math.round(fontSize * 0.42));
+    }
+
+    const lineHeight = lineHeightFor(fontSize);
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#000000';
+
+    const totalHeight = lines.length * lineHeight;
+    let curY = startY;
+    if (isCenterY && totalHeight < maxHeight) {
+      curY = startY + Math.floor((maxHeight - totalHeight) / 2);
+    }
+
+    // 首行基线：为上方注音预留空间
+    const firstBaseline = curY + Math.round(fontSize * 1.0);
+
+    lines.forEach((line, li) => {
+      const baseline = firstBaseline + li * lineHeight;
+      let cx = x;
+      for (const t of line) {
+        if (t.base === '\n') continue;
+        ctx.font = `${fontSize}px ${fontFam}`;
+        ctx.textAlign = 'left';
+        ctx.fillText(t.base, cx, baseline);
+        if (t.ruby) {
+          ctx.font = `${rubyFontSize}px ${fontFam}`;
+          ctx.textAlign = 'center';
+          ctx.fillText(t.ruby, cx + t.w / 2, baseline - fontSize - 2);
+          ctx.textAlign = 'left';
+        }
+        cx += t.w;
+      }
+    });
+
+    ctx.restore();
   }
 
   calculateWrappedLines(ctx, text, maxWidth) {

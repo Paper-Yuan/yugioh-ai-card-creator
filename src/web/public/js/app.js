@@ -18,6 +18,7 @@ const state = {
     def: 4000,
     linkArrows: [4, 5, 6],
     scale: 1,
+    effectRuby: false, // 是否为日文效果文本注入振假名
     description: '①：只要这张卡在场上表侧表示存在，不受对方卡的效果影响。\n②：一回合一次，可以破坏对方场上所有卡片。\n③：这张卡战斗破坏怪兽送去墓地时，给予对方4000点基本分伤害。'
   },
   effectConfig: {
@@ -869,10 +870,39 @@ function syncPendulumToCard() {
   if (descInput) descInput.value = penTextZh;
 
   state.cardData.pendulumDescription = penTextZh;
-  state.cardData.jaPendulumDescription = penTextJa;
+  state.cardData.jaPendulumDescription = state.cardData.effectRuby
+    ? applyEffectRuby(penTextJa)
+    : penTextJa;
   state.cardData.pendulumEffect = state.pendulumEffect;
   refreshLiveCard();
   compileLuaPreview();
+}
+
+/**
+ * 为日文效果文本注入振假名 (受 state.cardData.effectRuby 开关控制)
+ */
+function applyEffectRuby(jaText) {
+  const srv = window.furiganaService || null;
+  if (!srv || typeof srv.injectEffectFurigana !== 'function') return jaText;
+  if (srv.hasEffectFurigana && srv.hasEffectFurigana(jaText)) return jaText;
+  return srv.injectEffectFurigana(jaText);
+}
+
+/**
+ * 切换「日文效果文注音」开关：重新生成日文效果文本并注入/移除振假名
+ */
+function toggleEffectRuby() {
+  state.cardData.effectRuby = !state.cardData.effectRuby;
+  syncWizardToCardDescription();
+  syncPendulumToCard();
+  const el = document.getElementById('btnEffectRuby');
+  if (el) {
+    el.textContent = state.cardData.effectRuby ? '⚡ 效果文注音：已开启' : '⚡ 效果文注音';
+    el.style.color = state.cardData.effectRuby ? '#34d399' : '#38bdf8';
+  }
+  showNotification(state.cardData.effectRuby
+    ? '已为日文效果文注入振假名（可再次点击关闭）'
+    : '已关闭日文效果文注音');
 }
 
 // ========== 步骤2：效果设计逻辑 (前置规则 + 顺次单效果独立设计向导) ==========
@@ -1058,11 +1088,18 @@ function renderWizardStep() {
     if (jaWrap && jaTextEl) {
       if (isJa) {
         jaWrap.style.display = 'block';
-        const singleTextJa = state.assembler.generateEffectText(curIdx, eff, false, true);
+        let singleTextJa = state.assembler.generateEffectText(curIdx, eff, false, true);
+        if (state.cardData.effectRuby) singleTextJa = applyEffectRuby(singleTextJa);
         jaTextEl.textContent = singleTextJa;
       } else {
         jaWrap.style.display = 'none';
       }
+    }
+    // 同步效果文注音开关按钮状态
+    const rubyBtn = document.getElementById('btnEffectRuby');
+    if (rubyBtn) {
+      rubyBtn.textContent = state.cardData.effectRuby ? '⚡ 效果文注音：已开启' : '⚡ 效果文注音';
+      rubyBtn.style.color = state.cardData.effectRuby ? '#34d399' : '#38bdf8';
     }
   }
 
@@ -1449,7 +1486,9 @@ function syncWizardToCardDescription() {
   const fullDescJa = linesJa.join('\n');
 
   state.cardData.description = fullDescZh;
-  state.cardData.jaDescription = fullDescJa;
+  state.cardData.jaDescription = state.cardData.effectRuby
+    ? applyEffectRuby(fullDescJa)
+    : fullDescJa;
 
   // 界面文本框显示中文（方便用户查看与修改）
   const descEl = document.getElementById('cardDesc');

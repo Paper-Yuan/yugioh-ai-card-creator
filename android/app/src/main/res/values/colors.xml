@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Capacitor / AppCompat 主题引用的应用主色板（styles.xml 中 @color/colorPrimary 等） -->
+    <color name="colorPrimary">#0F172A</color>
+    <color name="colorPrimaryDark">#0A0E17</color>
+    <color name="colorAccent">#F59E0B</color>
+</resources>

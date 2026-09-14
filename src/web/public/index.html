@@ -958,9 +958,10 @@
                 </div>
 
                 <div class="wizard-live-preview mt-2" id="wizardJaEffectTextPreviewWrap" style="display:none;background:rgba(245,158,11,0.06);border:1px dashed rgba(245,158,11,0.3);border-radius:8px;padding:10px 14px;">
-                  <div style="font-size:12px;color:#fbbf24;font-weight:bold;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                  <div style="font-size:12px;color:#fbbf24;font-weight:bold;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                     <span>🇯🇵 卡面实时映射日文 OCG 文本：</span>
                     <span style="font-size:11px;color:#94a3b8;font-weight:normal;">[卡面语言设为日文时将直接打印本段文本]</span>
+                    <button type="button" class="btn-sm btn-outline" id="btnEffectRuby" onclick="toggleEffectRuby()" style="font-size:11px;padding:1px 8px;color:#38bdf8;border-color:#0284c7;margin-left:auto;" title="为日文效果文本汉字添加振假名注音（仅影响卡面日文文本）">⚡ 效果文注音</button>
                   </div>
                   <div id="wizardJaEffectTextPreview" style="color:var(--text-main);font-size:13px;line-height:1.5;font-family:serif;">①：...</div>
                 </div>
