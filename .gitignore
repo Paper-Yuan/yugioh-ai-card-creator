@@ -18,9 +18,39 @@ temp/
 workspace/
 images/
 
-# 卡面素材（体积与版权原因不入库，见 docs/ASSETS.md）
-src/web/public/assets/yugioh/image/
-src/web/public/assets/yugioh/font/
+# ============================================================
+# 卡面素材：只入库可再分发的部分（见 docs/ASSETS.md）
+# ============================================================
+
+# --- 商业字体：不可再分发，排除 ---
+src/web/public/assets/yugioh/font/RenderFontChineseSimplified.ttf
+src/web/public/assets/yugioh/font/FZZYJW.ttf
+src/web/public/assets/yugioh/font/FOT-Rodin Pro.ttf
+# 兼容无空格写法
+src/web/public/assets/yugioh/font/FOT-Rodin*.ttf
+src/web/public/assets/yugioh/font/Yu-Gi-Oh! FOT-Rodin ProN DB.ttf
+src/web/public/assets/yugioh/font/YGOLDDFLeisho3.ttf
+src/web/public/assets/yugioh/font/YGOLDDFGLeisho4.ttf
+src/web/public/assets/yugioh/font/Yu-Gi-Oh-ITC-Stone-Serif-M.ttf
+src/web/public/assets/yugioh/font/AtkDef.ttf
+src/web/public/assets/yugioh/font/ygo-cardkey.ttf
+src/web/public/assets/yugioh/font/ygo-matrix.ttf
+
+# --- Konami / YGOLD 官方素材：不可再分发，排除 ---
+# 特殊卡框（三幻神、Zack 等）
+src/web/public/assets/yugioh/image/card-obelisk.png
+src/web/public/assets/yugioh/image/card-ra.png
+src/web/public/assets/yugioh/image/card-slifer.png
+src/web/public/assets/yugioh/image/card-token-ygold.png
+src/web/public/assets/yugioh/image/card-zack-pendulum.png
+src/web/public/assets/yugioh/image/card-dark-synchro.png
+src/web/public/assets/yugioh/image/demo_card.png
+# 官方工艺素材子目录（罕贵度 / 镭射 / 出框 / 水印 / 特殊框）
+src/web/public/assets/yugioh/image/rare/
+src/web/public/assets/yugioh/image/holo/
+src/web/public/assets/yugioh/image/overframe/
+src/web/public/assets/yugioh/image/watermark/
+src/web/public/assets/yugioh/image/frame/
 
 # Capacitor / Android
 android/.gradle/

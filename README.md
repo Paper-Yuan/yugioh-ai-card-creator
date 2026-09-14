@@ -77,7 +77,7 @@ card_100000001/
 ### 环境要求
 
 - Node.js ≥ 18
-- 首次运行需自行准备卡面素材，否则卡面会缺少背景 / 边框（字体缺失会自动回退到系统字体）。见 [docs/ASSETS.md](docs/ASSETS.md)。
+- 卡面素材已随仓库提供（卡框图片 + 开源字体）；部分商业字体与官方工艺素材需自行准备，见 [docs/ASSETS.md](docs/ASSETS.md)。
 
 ### Web 版
 
@@ -136,7 +136,7 @@ yugioh-ai-card-creator/
 │   │       ├── index.html
 │   │       ├── css/main.css
 │   │       ├── js/                # 前端逻辑（app / card-renderer / library ...）
-│   │       └── assets/yugioh/     # 卡面素材（不入库，见 docs/ASSETS.md）
+│   │       └── assets/yugioh/     # 卡面素材（图片 MIT + OFL 字体，见 docs/ASSETS.md）
 │   ├── script-modules/            # 效果模块库与 Lua 组装引擎
 │   ├── image-generator.ts         # 服务端卡面渲染
 │   ├── cdb-manager.ts             # CDB 读写
@@ -151,7 +151,7 @@ yugioh-ai-card-creator/
 
 ## 已知限制
 
-- **素材未随仓库分发**（体积与版权原因）。新克隆的仓库需要按 [docs/ASSETS.md](docs/ASSETS.md) 准备素材；卡框 / 属性图标 / LINK 箭头等可由脚本下载，而罕贵度 / 出框 / 水印等来自 YGOLD 制卡器的素材需从其[发布页](https://gitee.com/scutlzl/game-king-card-maker)获取后自行放入。
+- **部分素材需自行准备**。卡框 / 图标 / LINK 箭头等图片（MIT）与两款开源字体（OFL）已随仓库提供，克隆后卡面主体即可渲染；商业字体和罕贵度 / 出框 / 水印等 Konami 官方工艺素材因版权原因未入库，需按 [docs/ASSETS.md](docs/ASSETS.md) 自备（缺失时会自动回退，不影响运行）。
 - **AI 功能依赖你自备的 API Key**，生成质量与稳定性取决于所选模型与网络，建议生成后人工校对。
 - 脚本组装覆盖常见效果，**复杂或非标准效果仍需手写 Lua**。
 - 仅为个人 DIY / 学习用途，未做生产级并发与安全加固。

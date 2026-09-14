@@ -1,18 +1,16 @@
 /* ============================================================
-   游戏王 AI 制卡工作室 - 官方 Master Duel 极清正统卡面字库
+   游戏王 AI 制卡工作室 - 卡面字库
    ------------------------------------------------------------
-   对齐官方 Master Duel (MD) 与 MDPro3 正统卡面排版规范：
-   - 官方简中卡面 (卡名 + 效果文 + 种族/魔陷标头): 
-     RenderFontChineseSimplified.ttf (方正北魏楷书 FZBeiWeiKaiShu-S19S)
-     Konami 官方简体中文 Master Duel 与 OCG 正式卡牌唯一指定正统楷体。
-   - ATK / DEF / 灵摆刻度 / LINK 阶级: 
-     AtkDef.ttf (官方专属凝缩高对比数字字库)。
-   - 卡片密码 (Passcode): 
-     ygo-cardkey.ttf (官方底栏等宽数字字库)。
+   默认使用随仓库分发的 SIL OFL 开源字体，保证开箱即可正常渲染：
+   - 卡名 / 效果文 / 标头：霞鹜文楷 LXGW WenKai (OFL)
+   - ATK / DEF / 灵摆刻度 / LINK / 密码等数字：思源黑体 Source Han Sans (OFL)
+   若本机另行安装了方正楷体、Fontworks FOT-Rodin 等原作字体，
+   会通过下方的 local() 与 canvas 回退链优先使用，以获得更贴近官方的字形。
+   素材与授权说明见 docs/ASSETS.md。
    ============================================================ */
 @font-face {
   font-family: 'ygo-cardname';
-  src: url('../assets/yugioh/font/RenderFontChineseSimplified.ttf') format('truetype');
+  src: local('FZBeiWeiKaiShu-S19S'), url('../assets/yugioh/font/LXGWWenKai-Medium.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -20,7 +18,7 @@
 
 @font-face {
   font-family: 'ygo-cardtext';
-  src: url('../assets/yugioh/font/RenderFontChineseSimplified.ttf') format('truetype');
+  src: local('FZBeiWeiKaiShu-S19S'), url('../assets/yugioh/font/LXGWWenKai-Regular.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -28,7 +26,7 @@
 
 @font-face {
   font-family: 'ygo-md-bold';
-  src: url('../assets/yugioh/font/RenderFontChineseSimplified.ttf') format('truetype');
+  src: url('../assets/yugioh/font/SourceHanSansSC-Bold.otf') format('opentype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -36,7 +34,7 @@
 
 @font-face {
   font-family: 'ygo-md-text';
-  src: url('../assets/yugioh/font/RenderFontChineseSimplified.ttf') format('truetype');
+  src: url('../assets/yugioh/font/LXGWWenKai-Regular.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -44,7 +42,7 @@
 
 @font-face {
   font-family: 'ygo-matrix';
-  src: url('../assets/yugioh/font/AtkDef.ttf') format('truetype');
+  src: url('../assets/yugioh/font/SourceHanSansSC-Bold.otf') format('opentype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -52,7 +50,7 @@
 
 @font-face {
   font-family: 'ygo-cardkey';
-  src: url('../assets/yugioh/font/ygo-cardkey.ttf') format('truetype');
+  src: url('../assets/yugioh/font/SourceHanSansSC-Medium.otf') format('opentype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -60,7 +58,7 @@
 
 @font-face {
   font-family: 'ygo-sc';
-  src: url('../assets/yugioh/font/RenderFontChineseSimplified.ttf') format('truetype');
+  src: url('../assets/yugioh/font/LXGWWenKai-Medium.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -68,7 +66,7 @@
 
 @font-face {
   font-family: 'ygo-atk-def';
-  src: url('../assets/yugioh/font/AtkDef.ttf') format('truetype');
+  src: url('../assets/yugioh/font/SourceHanSansSC-Bold.otf') format('opentype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -76,7 +74,7 @@
 
 @font-face {
   font-family: 'ygo-password';
-  src: url('../assets/yugioh/font/ygo-cardkey.ttf') format('truetype');
+  src: url('../assets/yugioh/font/SourceHanSansSC-Medium.otf') format('opentype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -84,16 +82,16 @@
 
 @font-face {
   font-family: 'ygo-link';
-  src: url('../assets/yugioh/font/AtkDef.ttf') format('truetype');
+  src: url('../assets/yugioh/font/SourceHanSansSC-Bold.otf') format('opentype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
-/* 官方正统 OCG 日文卡面专属字库 (100% 取自 LD 制卡器 mold/font 原版字库) */
+/* 日文卡面字库（默认使用 OFL 字体，本机装有原作日文字体时优先使用） */
 @font-face {
   font-family: 'ygo-jp-name';
-  src: url('../assets/yugioh/font/YGOLDDFGLeisho4.ttf') format('truetype');
+  src: local('DFGLeisho4'), url('../assets/yugioh/font/LXGWWenKai-Medium.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -101,7 +99,7 @@
 
 @font-face {
   font-family: 'ygo-jp-ruby';
-  src: url('../assets/yugioh/font/Yu-Gi-Oh! FOT-Rodin ProN DB.ttf') format('truetype');
+  src: local('Yu-Gi-Oh! FOT-Rodin ProN DB'), url('../assets/yugioh/font/LXGWWenKai-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -109,8 +107,7 @@
 
 @font-face {
   font-family: 'ygo-jp-detail';
-  src: url('../assets/yugioh/font/YGOLDDFLeisho3.ttf') format('truetype'),
-       url('../assets/yugioh/font/Yu-Gi-Oh! FOT-Rodin ProN DB.ttf') format('truetype');
+  src: url('../assets/yugioh/font/LXGWWenKai-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -118,8 +115,7 @@
 
 @font-face {
   font-family: 'ygo-jp-text';
-  src: url('../assets/yugioh/font/Yu-Gi-Oh! FOT-Rodin ProN DB.ttf') format('truetype'),
-       url('../assets/yugioh/font/FOT-Rodin Pro.ttf') format('truetype');
+  src: url('../assets/yugioh/font/LXGWWenKai-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
