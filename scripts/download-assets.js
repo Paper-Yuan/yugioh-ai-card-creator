@@ -1,9 +1,10 @@
 /**
- * 从 kooriookami/yugioh-card 拉取可公开获取的卡面素材。
+ * 从 kooriookami/yugioh-card (MIT) 补充拉取可选卡面素材。
  *
- * 注意：本脚本只覆盖该仓库公开的扁平文件（卡框 / 属性图标 / LINK 箭头 / 基础字体等）。
- * rare / holo / overframe / watermark / frame 等子目录素材与部分 TTF 字体来自闭源工具，
- * 无法自动获取，需自行准备 —— 详见 docs/ASSETS.md。
+ * 注意：项目已随仓库提供卡面主体所需的卡框 / 图标 / 箭头与开源字体，通常无需运行本脚本。
+ * 本脚本用于补齐上游仓库中更多的变体素材（如 astral 灵摆、各语言属性图标等）。
+ * 商业字体与 YGOLD 衍生的官方工艺素材不在本脚本范围内，也无法自动获取，
+ * 详见 docs/ASSETS.md。
  */
 import fs from 'fs';
 import path from 'path';
@@ -75,8 +76,8 @@ async function main() {
     await downloadFile(BASE_URL_FONT + font, path.join(DEST_FONT, font));
   }
   console.log('\n完成。');
-  console.log('提醒：rare / holo / overframe / watermark / frame 等子目录素材与部分 TTF 字体');
-  console.log('      来自闭源工具，无法自动获取，请按 docs/ASSETS.md 自行准备。');
+  console.log('提醒：商业字体与 YGOLD 衍生的官方工艺素材无法自动获取，');
+  console.log('      请按 docs/ASSETS.md 的说明自行准备。');
 }
 
 main().catch(err => {
