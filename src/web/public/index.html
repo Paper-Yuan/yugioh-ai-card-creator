@@ -199,7 +199,7 @@
                   <div class="input-field" style="grid-column: 1 / -1;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                       <label style="margin:0;">🎴 字段 / 系列归属 (已纳入官方 595+ 全量字段库)</label>
-                      <button type="button" class="btn-sm btn-outline" onclick="openCustomArchetypeModal()" style="font-size:12px;padding:2px 8px;" title="新增自定义独立系列字段">+ 新建自定义字段</button>
+                      <button type="button" class="btn-sm btn-outline" onclick="navigateTo('card-library')" style="font-size:12px;padding:2px 8px;" title="前往卡牌库管理自定义字段">前往卡牌库管理自定义字段</button>
                     </div>
                     <div class="archetype-input-wrap" style="display:flex;gap:8px;">
                       <input type="text" id="cardArchetype" placeholder="输入搜索或选择官方系列字段 (如：青眼、英雄、俱舍怒威族、刻魔...)" list="archetypeDatalist" oninput="onCardArchetypeInput(this.value)" style="flex:1;">
@@ -827,19 +827,53 @@
                     <div class="input-field">
                       <label>2. 发动代价 (Cost) <span class="req">*</span></label>
                       <select id="wizardCost" onchange="onWizardCostChanged(this.value)">
-                        <option value="none" selected>无代价 (无需支付费用或丢弃)</option>
-                        <option value="pay_lp">支付基本分 (数值自定义)</option>
-                        <option value="discard_self">把手卡的这张卡送去墓地 (手坑舍弃)</option>
-                        <option value="release_self">把场上的这张卡解放 (自身解放)</option>
-                        <option value="discard_one">把 1 张手卡送去墓地</option>
-                        <option value="banish_one_gy">把自己墓地 1 张卡除外</option>
-                        <option value="detach_xyz">去除此卡的 1 个超量素材 (超量怪兽专属)</option>
+                        <optgroup label="基础代价">
+                          <option value="none" selected>无代价 (无需支付费用或丢弃)</option>
+                          <option value="pay_lp">支付基本分 (数值自定义)</option>
+                          <option value="discard_self">把手卡的这张卡送去墓地 (手坑舍弃)</option>
+                          <option value="release_self">把场上的这张卡解放 (自身解放)</option>
+                          <option value="detach_xyz">去除此卡的超量素材 (数量可自定义)</option>
+                        </optgroup>
+                        <optgroup label="手卡 / 墓地 / 场上 (数量与字段可自定义)">
+                          <option value="discard_one">把 1 张手卡送去墓地</option>
+                          <option value="discard_n">把 N 张手卡送去墓地</option>
+                          <option value="banish_one_gy">把自己墓地 1 张卡除外</option>
+                          <option value="banish_gy_n">把自己墓地 N 张卡除外</option>
+                          <option value="banish_hand_n">把手卡 N 张卡除外</option>
+                          <option value="release_monster_n">把自己场上 N 只怪兽解放</option>
+                          <option value="send_to_grave_n">把自己场上 N 张卡送去墓地</option>
+                          <option value="mill_deck_n">从卡组上面把 N 张卡送去墓地</option>
+                        </optgroup>
                       </select>
                     </div>
 
                     <div class="input-field" id="wizardLpCostWrap" style="display:none;">
                       <label>支付基本分数值 (LP)</label>
                       <input type="number" id="wizardCostLpVal" value="1000" min="100" max="8000" step="500" oninput="onWizardFieldChanged('costLp', this.value)">
+                    </div>
+
+                    <div class="input-field" id="wizardCostCountWrap" style="display:none;">
+                      <label>代价数量 (N)</label>
+                      <input type="number" id="wizardCostCount" value="1" min="1" max="10" oninput="onWizardFieldChanged('costCount', this.value)">
+                    </div>
+
+                    <div class="input-field" id="wizardCostFilterArchetypeWrap" style="display:none;grid-column:1/-1;">
+                      <label>代价涉及字段 / 系列 (Setcode，选填)</label>
+                      <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="text" id="wizardCostFilterArchetype" placeholder="例如：青眼（留空则不限字段）" list="archetypeDatalist" oninput="onWizardCostFilterArchetypeInput(this.value)" style="flex:1;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="useCurrentCardArchetypeForCostFilter()" title="套用当前卡片自身的字段 / Setcode">套用本卡字段</button>
+                      </div>
+                      <small id="wizardCostFilterArchetypeHint" style="color:var(--text-muted);">仅用于限定代价涉及的卡（如「把「青眼」怪兽送去墓地」）</small>
+                    </div>
+
+                    <div class="input-field" id="wizardCostFilterTypeWrap" style="display:none;">
+                      <label>代价涉及卡类 (选填)</label>
+                      <select id="wizardCostFilterType" onchange="onWizardFieldChanged('costFilterType', this.value)">
+                        <option value="" selected>无限制</option>
+                        <option value="monster">怪兽卡</option>
+                        <option value="spell">魔法卡</option>
+                        <option value="trap">陷阱卡</option>
+                      </select>
                     </div>
                   </div>
 
@@ -887,8 +921,75 @@
                         <option value="choice_ss_or_search">二选一：从卡组特召怪兽 / 从卡组检索手牌</option>
                         <option value="choice_destroy_or_banish">二选一：破坏场上卡片 / 除外场上卡片</option>
                         <option value="choice_draw_or_burn">二选一：从卡组抽2张卡 / 造成2000点伤害</option>
+                        <option value="choice_free">🆓 二选一 (自由组合：两个分支各自设定动作/字段/数量)</option>
                       </optgroup>
                     </select>
+                  </div>
+
+                  <!-- 4A-bis. 二选一自由组合：两个分支独立配置 -->
+                  <div id="wizardChoiceFreeWrap" class="mb-3" style="display:none;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.22);border-radius:8px;padding:12px 14px;">
+                    <div style="font-size:13px;font-weight:700;color:#c084fc;margin-bottom:8px;">🆓 二选一自由组合（发动时由玩家选择其中 1 个效果处理）</div>
+
+                    <div class="form-grid-2">
+                      <div class="input-field">
+                        <label>分支 1 · 动作</label>
+                        <select id="wizardChoiceAAction" onchange="onChoiceBranchChanged('A','action',this.value)"></select>
+                      </div>
+                      <div class="input-field" id="wizardChoiceAFilterArchetypeWrap">
+                        <label>分支 1 · 字段系列 (选填)</label>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                          <input type="text" id="wizardChoiceAFilterArchetype" placeholder="例如：青眼" list="archetypeDatalist" oninput="onChoiceFilterArchetypeInput('A', this.value)" style="flex:1;">
+                          <button type="button" class="btn btn-outline btn-sm" onclick="useCurrentCardArchetypeForChoiceFilter('A')" title="套用当前卡片字段">本卡字段</button>
+                        </div>
+                        <small id="wizardChoiceAFilterHint" style="color:var(--text-muted);"></small>
+                      </div>
+                    </div>
+                    <div class="form-grid-2">
+                      <div class="input-field" id="wizardChoiceAFilterTypeWrap">
+                        <label>分支 1 · 卡类</label>
+                        <select id="wizardChoiceAFilterType" onchange="onChoiceBranchChanged('A','filterType',this.value)">
+                          <option value="" selected>无限制</option>
+                          <option value="monster">怪兽卡</option>
+                          <option value="spell">魔法卡</option>
+                          <option value="trap">陷阱卡</option>
+                        </select>
+                      </div>
+                      <div class="input-field" id="wizardChoiceACountWrap" style="display:none;">
+                        <label>分支 1 · 数量 / 数值</label>
+                        <input type="number" id="wizardChoiceACount" value="1" min="1" max="10" oninput="onChoiceBranchChanged('A','count',this.value)">
+                      </div>
+                    </div>
+
+                    <div class="form-grid-2" style="margin-top:8px;">
+                      <div class="input-field">
+                        <label>分支 2 · 动作</label>
+                        <select id="wizardChoiceBAction" onchange="onChoiceBranchChanged('B','action',this.value)"></select>
+                      </div>
+                      <div class="input-field" id="wizardChoiceBFilterArchetypeWrap">
+                        <label>分支 2 · 字段系列 (选填)</label>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                          <input type="text" id="wizardChoiceBFilterArchetype" placeholder="例如：青眼" list="archetypeDatalist" oninput="onChoiceFilterArchetypeInput('B', this.value)" style="flex:1;">
+                          <button type="button" class="btn btn-outline btn-sm" onclick="useCurrentCardArchetypeForChoiceFilter('B')" title="套用当前卡片字段">本卡字段</button>
+                        </div>
+                        <small id="wizardChoiceBFilterHint" style="color:var(--text-muted);"></small>
+                      </div>
+                    </div>
+                    <div class="form-grid-2">
+                      <div class="input-field" id="wizardChoiceBFilterTypeWrap">
+                        <label>分支 2 · 卡类</label>
+                        <select id="wizardChoiceBFilterType" onchange="onChoiceBranchChanged('B','filterType',this.value)">
+                          <option value="" selected>无限制</option>
+                          <option value="monster">怪兽卡</option>
+                          <option value="spell">魔法卡</option>
+                          <option value="trap">陷阱卡</option>
+                        </select>
+                      </div>
+                      <div class="input-field" id="wizardChoiceBCountWrap" style="display:none;">
+                        <label>分支 2 · 数量 / 数值</label>
+                        <input type="number" id="wizardChoiceBCount" value="1" min="1" max="10" oninput="onChoiceBranchChanged('B','count',this.value)">
+                      </div>
+                    </div>
+                    <small style="color:var(--text-muted);display:block;margin-top:6px;">分支动作可选：检索 / 堆墓 / 卡组特召 / 手卡or墓地特召 / 破坏 / 除外 / 弹手 / 抽卡 / 造成伤害 / 回复LP / 全灭等。</small>
                   </div>
 
                   <!-- 4B. 筛选与动作参数 (依所选动作动态显示) -->
@@ -1335,6 +1436,22 @@
               <p>暂无卡片，快去制作你的第一张专属王牌吧！</p>
             </div>
           </div>
+
+          <!-- 自定义系列字段管理（唯一入口：卡牌库） -->
+          <div class="glass-card" id="libraryArchetypeCard" style="margin-top:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+              <div>
+                <h3 style="margin:0;">🎴 自定义系列字段管理 (Custom Archetypes)</h3>
+                <p style="font-size:12px;color:var(--text-muted);margin:6px 0 0;">
+                  在此创建专属系列字段，系统自动分配防冲突 Setcode。制卡器内只能选用，不可新建。
+                </p>
+              </div>
+              <button type="button" class="btn btn-sm btn-gold" onclick="openCustomArchetypeModal()">+ 新建自定义字段</button>
+            </div>
+            <div id="libraryArchetypeList" style="display:flex;flex-direction:column;gap:8px;">
+              <!-- 动态加载已保存自制字段 -->
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1384,16 +1501,6 @@
             <p style="font-size:12px;color:var(--text-muted);margin:8px 0 0;">
               说明：AI 生成需通过本地服务端发送请求，因此手机 APK / 纯静态部署下不可用。密钥仅保存在本机浏览器中。
             </p>
-          </div>
-
-          <div class="glass-card" id="settingsCustomArchetypeCard">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-              <h3 style="margin:0;">🎴 自定义系列字段管理 (Custom Archetypes)</h3>
-              <button type="button" class="btn btn-sm btn-gold" onclick="openCustomArchetypeModal()">+ 新建自定义字段</button>
-            </div>
-            <div id="settingsArchetypeList" style="display:flex;flex-direction:column;gap:8px;">
-              <!-- 动态加载已保存自制字段 -->
-            </div>
           </div>
 
           <div class="glass-card">

@@ -1336,6 +1336,35 @@ small {
   display: flex;
 }
 
+/* 居中模态面板（与 .modal-backdrop 搭配：backdrop 负责遮罩与点击关闭，.modal 负责面板） */
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1600;
+  width: min(560px, calc(100vw - 32px));
+  max-height: 88vh;
+  background: var(--bg-pane);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), var(--shadow-gold);
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal.show {
+  display: flex;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 与 .modal 的 translate(-50%,-50%) 居中配合，动画中不丢失居中位移 */
+@keyframes modalPop {
+  from { transform: translate(-50%, -50%) scale(0.95); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
 .modal-container {
   background: var(--bg-pane);
   border: 1px solid rgba(245, 158, 11, 0.25);

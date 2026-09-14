@@ -1058,6 +1058,9 @@ function renderWizardStep() {
   setVal('wizardOppoMonsterCount', eff.oppoMonsterCount || 2);
   setVal('wizardCost', eff.cost || 'none');
   setVal('wizardCostLpVal', eff.costLp || 1000);
+  setVal('wizardCostCount', eff.costCount || 1);
+  setVal('wizardCostFilterArchetype', eff.costFilterArchetype || '');
+  setVal('wizardCostFilterType', eff.costFilterType || '');
   setVal('wizardTarget', eff.target || 'none');
   setVal('wizardAction', eff.action || 'search_deck');
   setVal('wizardFollowup', eff.followup || 'none');
@@ -1069,11 +1072,13 @@ function renderWizardStep() {
   setVal('wizardPunishTarget', eff.punishTarget || 'opponent');
 
   updateWizardTimingVisibility(eff.timing || 'ignition_omit');
+  updateWizardCostParamsVisibility(eff.cost || 'none');
   updateWizardActionParamsVisibility(eff.action || 'search_deck');
+  renderChoiceBranchEditors(eff);
 
   const lpWrap = document.getElementById('wizardLpCostWrap');
   if (lpWrap) {
-    lpWrap.style.display = eff.cost === 'pay_lp' ? 'block' : 'none';
+    lpWrap.style.display = (eff.cost === 'pay_lp' || eff.cost === 'pay_1000') ? 'block' : 'none';
   }
 
   // 4. 生成单效果实时卡文预览 (中文向导显示，日文模式同时展示卡面对应日文副标题)
@@ -1173,21 +1178,72 @@ function onWizardTimingChanged(val) {
   onWizardFieldChanged('timing', val);
 }
 
+// 依所选「发动代价(Cost)」动态显示数量 / 字段 / 卡类控件
+function updateWizardCostParamsVisibility(costVal) {
+  const setDisp = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? 'block' : 'none'; };
+  const needLp = costVal === 'pay_lp' || costVal === 'pay_1000';
+  const needCount = ['discard_n', 'banish_gy_n', 'banish_hand_n', 'release_monster_n', 'send_to_grave_n', 'mill_deck_n', 'detach_xyz'].includes(costVal);
+  const needFilter = ['discard_n', 'banish_gy_n', 'banish_hand_n', 'release_monster_n', 'send_to_grave_n', 'mill_deck_n'].includes(costVal);
+
+  setDisp('wizardLpCostWrap', needLp);
+  setDisp('wizardCostCountWrap', needCount);
+  setDisp('wizardCostFilterArchetypeWrap', needFilter);
+  setDisp('wizardCostFilterTypeWrap', needFilter);
+}
+
+// 代价涉及的字段输入：匹配字段库并保存 setcode
+function onWizardCostFilterArchetypeInput(val) {
+  const clean = (val || '').trim();
+  const curIdx = state.currentWizardIndex || 0;
+  if (!state.wizardEffects[curIdx]) state.wizardEffects[curIdx] = {};
+  const eff = state.wizardEffects[curIdx];
+  eff.costFilterArchetype = clean;
+  const hint = document.getElementById('wizardCostFilterArchetypeHint');
+  const match = typeof findArchetypeMatch === 'function' ? findArchetypeMatch(clean) : null;
+  if (match) {
+    eff.costFilterSetcode = match.hex;
+    eff.costFilterArchetype = match.nameZh;
+    if (hint) hint.innerHTML = `<span style="color:#38bdf8;">✓ 已匹配字段 <b>${escapeHtml(match.nameZh)}</b> [${match.hex}]</span>`;
+  } else {
+    eff.costFilterSetcode = '';
+    if (hint) hint.innerHTML = clean ? '<span style="color:#f59e0b;">未匹配到字段库</span>' : '仅用于限定代价涉及的卡（如「把「青眼」怪兽送去墓地」）';
+  }
+  onWizardFieldChanged('costFilterArchetype', eff.costFilterArchetype);
+}
+
+// 代价一键套用当前卡字段
+function useCurrentCardArchetypeForCostFilter() {
+  const hex = state.cardData.setcode || (document.getElementById('cardSetcode') || {}).value || '';
+  const name = state.cardData.archetype || (document.getElementById('cardArchetype') || {}).value || '';
+  if (!hex) { showNotification('当前卡片尚未设置字段 / Setcode', 'error'); return; }
+  const curIdx = state.currentWizardIndex || 0;
+  if (!state.wizardEffects[curIdx]) state.wizardEffects[curIdx] = {};
+  const eff = state.wizardEffects[curIdx];
+  eff.costFilterSetcode = hex;
+  eff.costFilterArchetype = name;
+  const input = document.getElementById('wizardCostFilterArchetype');
+  if (input) input.value = name;
+  const hint = document.getElementById('wizardCostFilterArchetypeHint');
+  if (hint) hint.innerHTML = `<span style="color:#34d399;">✓ 已套用当前卡字段 <b>${escapeHtml(name || '自定义')}</b> [${hex}]</span>`;
+  onWizardFieldChanged('costFilterArchetype', name);
+}
+
 // 依所选「效果本体(Action)」动态显示筛选与参数控件
 function updateWizardActionParamsVisibility(actionVal) {
   const wrap = document.getElementById('wizardActionParamsWrap');
+  const choiceWrap = document.getElementById('wizardChoiceFreeWrap');
   if (!wrap) return;
 
-  const filterActions = ['search_deck', 'dump_deck', 'special_summon_deck', 'salvage_extra', 'revive_grave', 'destroy_target', 'banish_target', 'to_hand_target'];
+  const filterActions = ['search_deck', 'dump_deck', 'special_summon_deck', 'special_summon_hand', 'salvage_extra', 'revive_grave', 'destroy_target', 'banish_target', 'to_hand_target'];
   const needFilter = filterActions.includes(actionVal);
   const needBurn = actionVal === 'burn_damage';
   const needPunish = actionVal === 'negate_punish';
+  const needChoice = actionVal === 'choice_free';
 
   const setDisp = (id, show) => {
     const el = document.getElementById(id);
     if (el) el.style.display = show ? 'block' : 'none';
   };
-  // revive_grave 以墓地取对象，卡类/字段限制同样生效；但特召来源固定墓地
   setDisp('wrapFilterArchetype', needFilter);
   setDisp('wrapFilterType', needFilter);
   setDisp('wrapBurnValue', needBurn);
@@ -1196,6 +1252,148 @@ function updateWizardActionParamsVisibility(actionVal) {
   setDisp('wrapPunishTarget', needPunish);
 
   wrap.style.display = (needFilter || needBurn || needPunish) ? 'grid' : 'none';
+  if (choiceWrap) {
+    choiceWrap.style.display = needChoice ? 'block' : 'none';
+    if (needChoice) ensureChoiceBranchDefaults();
+  }
+}
+
+// 二选一分支可选动作（供两个分支下拉共用）
+const CHOICE_BRANCH_ACTIONS = [
+  { value: 'search_deck', label: '检索：从卡组把卡加入手牌' },
+  { value: 'dump_deck', label: '堆墓：从卡组把卡送去墓地' },
+  { value: 'special_summon_deck', label: '特召：从卡组把怪兽特殊召唤' },
+  { value: 'special_summon_hand', label: '特召：从手卡把怪兽特殊召唤' },
+  { value: 'revive_grave', label: '苏生：从自己墓地特殊召唤' },
+  { value: 'destroy_target', label: '破坏：对方场上的卡破坏' },
+  { value: 'banish_target', label: '除外：对方场上的卡除外' },
+  { value: 'to_hand_target', label: '弹手：对方场上的卡回到手牌' },
+  { value: 'draw_cards', label: '抽卡：从卡组抽卡（数量可调）' },
+  { value: 'burn_damage', label: '伤害：造成伤害（数值可调）' },
+  { value: 'gain_lp', label: '回复：自己回复基本分（数值可调）' },
+  { value: 'destroy_self_all', label: '自爆：自己场上的卡全部破坏' },
+  { value: 'wipe_oppo_monsters', label: '全灭：对方场上的怪兽全部破坏' },
+  { value: 'wipe_oppo_all', label: '全场灭：对方场上的卡全部破坏' }
+];
+
+// 分支动作是否需要「数量/数值」输入框
+function choiceBranchNeedsCount(action) {
+  return ['draw_cards', 'burn_damage', 'gain_lp'].includes(action);
+}
+// 分支动作是否需要「字段/卡类」筛选
+function choiceBranchNeedsFilter(action) {
+  return ['search_deck', 'dump_deck', 'special_summon_deck', 'special_summon_hand', 'revive_grave', 'destroy_target', 'banish_target', 'to_hand_target'].includes(action);
+}
+
+function ensureChoiceBranchDefaults() {
+  const curIdx = state.currentWizardIndex || 0;
+  if (!state.wizardEffects[curIdx]) state.wizardEffects[curIdx] = {};
+  const eff = state.wizardEffects[curIdx];
+  if (!eff.choiceA) eff.choiceA = { action: 'search_deck' };
+  if (!eff.choiceB) eff.choiceB = { action: 'dump_deck' };
+}
+
+// 初始化二选一分支的下拉与回显
+function renderChoiceBranchEditors(eff) {
+  ensureChoiceBranchDefaults();
+  const fillOptions = (selectId) => {
+    const el = document.getElementById(selectId);
+    if (!el) return;
+    el.innerHTML = CHOICE_BRANCH_ACTIONS.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+  };
+  fillOptions('wizardChoiceAAction');
+  fillOptions('wizardChoiceBAction');
+
+  const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+  setVal('wizardChoiceAAction', eff.choiceA.action || 'search_deck');
+  setVal('wizardChoiceBAction', eff.choiceB.action || 'dump_deck');
+  setVal('wizardChoiceAFilterArchetype', eff.choiceA.filterArchetype || '');
+  setVal('wizardChoiceBFilterArchetype', eff.choiceB.filterArchetype || '');
+  setVal('wizardChoiceAFilterType', eff.choiceA.filterType || '');
+  setVal('wizardChoiceBFilterType', eff.choiceB.filterType || '');
+  setVal('wizardChoiceACount', eff.choiceA.count || eff.choiceA.value || 1);
+  setVal('wizardChoiceBCount', eff.choiceB.count || eff.choiceB.value || 1);
+
+  const setDisp = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? 'block' : 'none'; };
+  setDisp('wizardChoiceACountWrap', choiceBranchNeedsCount(eff.choiceA.action));
+  setDisp('wizardChoiceBCountWrap', choiceBranchNeedsCount(eff.choiceB.action));
+  setDisp('wizardChoiceAFilterArchetypeWrap', choiceBranchNeedsFilter(eff.choiceA.action));
+  setDisp('wizardChoiceBFilterArchetypeWrap', choiceBranchNeedsFilter(eff.choiceB.action));
+  setDisp('wizardChoiceAFilterTypeWrap', choiceBranchNeedsFilter(eff.choiceA.action));
+  setDisp('wizardChoiceBFilterTypeWrap', choiceBranchNeedsFilter(eff.choiceB.action));
+}
+
+// 分支字段变更
+function onChoiceBranchChanged(branch, field, value) {
+  const curIdx = state.currentWizardIndex || 0;
+  if (!state.wizardEffects[curIdx]) state.wizardEffects[curIdx] = {};
+  const eff = state.wizardEffects[curIdx];
+  const key = branch === 'A' ? 'choiceA' : 'choiceB';
+  if (!eff[key]) eff[key] = {};
+  const sub = eff[key];
+
+  if (field === 'count') {
+    const n = parseInt(value) || 1;
+    // 伤害 / 回复用 value，抽卡用 count
+    if (sub.action === 'burn_damage' || sub.action === 'gain_lp') sub.value = n;
+    else sub.count = n;
+  } else {
+    sub[field] = value;
+    // 切换动作时按需重置字段
+    if (field === 'action') {
+      if (!choiceBranchNeedsFilter(value)) { sub.filterArchetype = ''; sub.filterSetcode = ''; sub.filterType = ''; }
+      const setDisp = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? 'block' : 'none'; };
+      setDisp(`wizardChoice${branch}CountWrap`, choiceBranchNeedsCount(value));
+    }
+  }
+
+  if (field === 'action') {
+    renderChoiceBranchEditors(eff);
+  }
+  onWizardFieldChanged(key, sub);
+}
+
+// 分支字段弹窗匹配
+function onChoiceFilterArchetypeInput(branch, val) {
+  const clean = (val || '').trim();
+  const curIdx = state.currentWizardIndex || 0;
+  if (!state.wizardEffects[curIdx]) state.wizardEffects[curIdx] = {};
+  const eff = state.wizardEffects[curIdx];
+  const key = branch === 'A' ? 'choiceA' : 'choiceB';
+  if (!eff[key]) eff[key] = {};
+  const sub = eff[key];
+  sub.filterArchetype = clean;
+
+  const hint = document.getElementById(`wizardChoice${branch}FilterHint`);
+  const match = typeof findArchetypeMatch === 'function' ? findArchetypeMatch(clean) : null;
+  if (match) {
+    sub.filterSetcode = match.hex;
+    sub.filterArchetype = match.nameZh;
+    if (hint) hint.innerHTML = `<span style="color:#38bdf8;">✓ ${escapeHtml(match.nameZh)} [${match.hex}]</span>`;
+  } else {
+    sub.filterSetcode = '';
+    if (hint) hint.innerHTML = clean ? '<span style="color:#f59e0b;">未匹配到字段库</span>' : '';
+  }
+  onWizardFieldChanged(key, sub);
+}
+
+// 分支套用当前卡字段
+function useCurrentCardArchetypeForChoiceFilter(branch) {
+  const hex = state.cardData.setcode || (document.getElementById('cardSetcode') || {}).value || '';
+  const name = state.cardData.archetype || (document.getElementById('cardArchetype') || {}).value || '';
+  if (!hex) { showNotification('当前卡片尚未设置字段 / Setcode', 'error'); return; }
+  const curIdx = state.currentWizardIndex || 0;
+  if (!state.wizardEffects[curIdx]) state.wizardEffects[curIdx] = {};
+  const eff = state.wizardEffects[curIdx];
+  const key = branch === 'A' ? 'choiceA' : 'choiceB';
+  if (!eff[key]) eff[key] = {};
+  eff[key].filterSetcode = hex;
+  eff[key].filterArchetype = name;
+  const input = document.getElementById(`wizardChoice${branch}FilterArchetype`);
+  if (input) input.value = name;
+  const hint = document.getElementById(`wizardChoice${branch}FilterHint`);
+  if (hint) hint.innerHTML = `<span style="color:#34d399;">✓ ${escapeHtml(name || '自定义')} [${hex}]</span>`;
+  onWizardFieldChanged(key, eff[key]);
 }
 
 function onWizardActionChanged(val) {
@@ -1265,8 +1463,7 @@ function onWizardFieldChanged(field, value) {
 }
 
 function onWizardCostChanged(costType) {
-  const lpWrap = document.getElementById('wizardLpCostWrap');
-  if (lpWrap) lpWrap.style.display = costType === 'pay_lp' ? 'block' : 'none';
+  updateWizardCostParamsVisibility(costType);
   onWizardFieldChanged('cost', costType);
 }
 
@@ -1834,7 +2031,7 @@ function navigateTo(pageName) {
   if (pageName === 'card-library' && typeof library !== 'undefined') {
     library.loadCards();
   }
-  if (pageName === 'settings' && typeof renderCustomArchetypeLists === 'function') {
+  if (pageName === 'card-library' && typeof renderCustomArchetypeLists === 'function') {
     renderCustomArchetypeLists();
   }
 }
@@ -2761,17 +2958,17 @@ function renderCustomArchetypeLists() {
     }
   }
 
-  // 2. 渲染设置页面专属管理卡片
-  const settingsList = document.getElementById('settingsArchetypeList');
-  if (settingsList) {
+  // 2. 渲染卡牌库页面专属管理卡片（自定义字段统一在卡牌库管理）
+  const libraryList = document.getElementById('libraryArchetypeList');
+  if (libraryList) {
     if (customArchetypesList.length === 0) {
-      settingsList.innerHTML = `
+      libraryList.innerHTML = `
         <div style="padding:16px;text-align:center;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.15);border-radius:8px;color:#8b949e;font-size:13px;">
-          暂无自定义系列字段。您可以在此处或在制卡器基础面板中点击「+ 新建自定义字段」创建专属系列，系统将自动分配防冲突的专属 Setcode 代码。
+          暂无自定义系列字段。点击下方「+ 新建自定义字段」创建专属系列，系统将自动分配防冲突的 Setcode 代码。
         </div>
       `;
     } else {
-      settingsList.innerHTML = customArchetypesList.map(item => `
+      libraryList.innerHTML = customArchetypesList.map(item => `
         <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
           <div style="display:flex;align-items:center;gap:12px;">
             <span style="font-size:18px;">🏷️</span>

@@ -538,7 +538,7 @@ class ClientScriptAssembler {
 
     lines.push(`  local e${idx}=Effect.CreateEffect(c)`);
     lines.push(`  e${idx}:SetDescription(aux.Stringid(id,${slotIndex}))`);
-    lines.push(`  e${idx}:SetCategory(${this.getCategoryCode(action)})`);
+    lines.push(`  e${idx}:SetCategory(${this.getCategoryCode(action, slot)})`);
 
     const properties = [];
     if (effectType === 'trigger' && !isWhen) {
@@ -699,11 +699,46 @@ class ClientScriptAssembler {
   }
 
   /**
+   * 依 slot 的「代价筛选（字段 / 卡类）」生成代价用的卡片筛选函数。
+   * 仅当用户填写了字段或卡类时才生成；返回 null 表示沿用内置 Card.IsXxx。
+   */
+  buildCostFilter(idx, slot) {
+    const baseMap = {
+      discard_n: 'c:IsDiscardable()',
+      discard_one: 'c:IsDiscardable()',
+      banish_gy_n: 'c:IsAbleToRemoveAsCost()',
+      banish_one_gy: 'c:IsAbleToRemoveAsCost()',
+      banish_hand_n: 'c:IsAbleToRemoveAsCost()',
+      release_monster_n: 'c:IsReleasable()',
+      send_to_grave_n: 'c:IsAbleToGraveAsCost()',
+      mill_deck_n: 'c:IsAbleToGraveAsCost()'
+    };
+    const base = baseMap[slot.cost];
+    if (!base) return null;
+
+    const typeMap = { monster: 'TYPE_MONSTER', spell: 'TYPE_SPELL', trap: 'TYPE_TRAP' };
+    const setcode = String(slot.costFilterSetcode || '').trim();
+    const setcodeExpr = /^0x[0-9a-fA-F]+$/.test(setcode) || /^[0-9]+$/.test(setcode) ? setcode : null;
+    const typeConst = typeMap[slot.costFilterType] || null;
+    if (!setcodeExpr && !typeConst) return null;
+
+    const conds = [base];
+    if (typeConst) conds.push(`c:IsType(${typeConst})`);
+    if (setcodeExpr) conds.push(`c:IsSetCard(${setcodeExpr})`);
+
+    const name = `s.cstflt${idx}`;
+    return {
+      ref: name,
+      lines: [`-- 代价筛选条件 (字段 / 卡类限制)`, `function ${name}(c)`, `  return ${conds.join(' and ')}`, `end`]
+    };
+  }
+
+  /**
    * 依 slot 的「字段 / 系列 (Setcode)」与「卡类」限制生成筛选函数。
    * 返回 { ref, lines } 或 null（null 时调用方沿用内置 Card.IsXxx）。
    * force=true 的动作（如卡组特召）即使没有额外限制也会生成函数，以修正过滤条件。
    */
-  buildActionFilter(idx, slot, action) {
+  buildActionFilter(idx, slot, action, tag) {
     const typeMap = { monster: 'TYPE_MONSTER', spell: 'TYPE_SPELL', trap: 'TYPE_TRAP' };
     const setcode = String(slot.filterSetcode || '').trim();
     const setcodeExpr = /^0x[0-9a-fA-F]+$/.test(setcode) || /^[0-9]+$/.test(setcode) ? setcode : null;
@@ -739,11 +774,190 @@ class ClientScriptAssembler {
     if (setcodeExpr) conds.push(`c:IsSetCard(${setcodeExpr})`);
     if (conds.length === 0) return null;
 
-    const name = `s.flt${idx}`;
+    const name = `s.flt${idx}${tag || ''}`;
     return {
       ref: name,
       lines: [`-- 效果筛选条件 (字段 / 卡类限制)`, `function ${name}(${spec ? spec.params : 'c'})`, `  return ${conds.join(' and ')}`, `end`]
     };
+  }
+
+  /**
+   * 通用「二选一自由组合」分支生成器。
+   * 每个分支是独立配置 { action, filterType, filterSetcode, filterArchetype, count, value, target }，
+   * 返回该分支的可用性表达式、分类码、SetOperationInfo 与效果处理代码。
+   */
+  buildChoiceBranch(idx, tag, sub) {
+    const action = (sub && sub.action) || 'search_deck';
+    const typeMap = { monster: 'TYPE_MONSTER', spell: 'TYPE_SPELL', trap: 'TYPE_TRAP' };
+    const setcode = String((sub && sub.filterSetcode) || '').trim();
+    const setcodeExpr = /^0x[0-9a-fA-F]+$/.test(setcode) || /^[0-9]+$/.test(setcode) ? setcode : null;
+    const typeConst = typeMap[(sub && sub.filterType) || ''] || null;
+    const filterName = `s.cflt${idx}${tag}`;
+    const lines = [];
+
+    // 生成筛选函数（OCGCore 要求传入可调用的 function，不能用表达式字符串）。
+    // params 为筛选函数形参（如 'c' 或 'c,e,tp'），extra 为 Duel.* 调用在 nil 之后追加的实参。
+    const mkFilter = (params, body, extra) => {
+      const conds = [body];
+      if (typeConst) conds.push(`c:IsType(${typeConst})`);
+      if (setcodeExpr) conds.push(`c:IsSetCard(${setcodeExpr})`);
+      lines.push(`-- 二选一分支${tag} 筛选条件`);
+      lines.push(`function ${filterName}(${params})`);
+      lines.push(`  return ${conds.join(' and ')}`);
+      lines.push(`end`);
+      return { ref: filterName, extra: extra || '' };
+    };
+
+    const r = { lines, category: 'CATEGORY_TOHAND', feasible: 'false', setOp: [], op: [] };
+
+    if (action === 'search_deck') {
+      const f = mkFilter('c', 'c:IsAbleToHand()');
+      r.feasible = `Duel.IsExistingMatchingCard(${f.ref},tp,LOCATION_DECK,0,1,nil${f.extra})`;
+      r.category = 'CATEGORY_TOHAND+CATEGORY_SEARCH';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)`];
+      r.op = [
+        `Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)`,
+        `local g=Duel.SelectMatchingCard(tp,${f.ref},tp,LOCATION_DECK,0,1,1,nil${f.extra})`,
+        `if #g>0 then Duel.SendtoHand(g,nil,REASON_EFFECT) Duel.ConfirmCards(1-tp,g) end`
+      ];
+    } else if (action === 'dump_deck') {
+      const f = mkFilter('c', 'c:IsAbleToGrave()');
+      r.feasible = `Duel.IsExistingMatchingCard(${f.ref},tp,LOCATION_DECK,0,1,nil${f.extra})`;
+      r.category = 'CATEGORY_TOGRAVE+CATEGORY_DECKDES';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)`];
+      r.op = [
+        `Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)`,
+        `local g=Duel.SelectMatchingCard(tp,${f.ref},tp,LOCATION_DECK,0,1,1,nil${f.extra})`,
+        `if #g>0 then Duel.SendtoGrave(g,REASON_EFFECT) end`
+      ];
+    } else if (action === 'special_summon_deck' || action === 'revive_grave' || action === 'special_summon_hand') {
+      const loc = action === 'special_summon_deck' ? 'LOCATION_DECK' : (action === 'revive_grave' ? 'LOCATION_GRAVE' : 'LOCATION_HAND');
+      const f = mkFilter('c,e,tp', 'c:IsCanBeSpecialSummoned(e,0,tp,false,false)', ',e,tp');
+      r.feasible = `Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(${f.ref},tp,${loc},0,1,nil${f.extra})`;
+      r.category = 'CATEGORY_SPECIAL_SUMMON';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,${loc})`];
+      r.op = [
+        `if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then`,
+        `  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)`,
+        `  local g=Duel.SelectMatchingCard(tp,${f.ref},tp,${loc},0,1,1,nil${f.extra})`,
+        `  if #g>0 then Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) end`,
+        `end`
+      ];
+    } else if (action === 'destroy_target') {
+      const f = mkFilter('c', 'c:IsDestructable()');
+      r.feasible = `Duel.IsExistingMatchingCard(${f.ref},tp,0,LOCATION_ONFIELD,1,nil${f.extra})`;
+      r.category = 'CATEGORY_DESTROY';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,0)`];
+      r.op = [
+        `Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)`,
+        `local g=Duel.SelectMatchingCard(tp,${f.ref},tp,0,LOCATION_ONFIELD,1,1,nil${f.extra})`,
+        `if #g>0 then Duel.Destroy(g,REASON_EFFECT) end`
+      ];
+    } else if (action === 'banish_target') {
+      const f = mkFilter('c', 'c:IsAbleToRemove()');
+      r.feasible = `Duel.IsExistingMatchingCard(${f.ref},tp,0,LOCATION_ONFIELD,1,nil${f.extra})`;
+      r.category = 'CATEGORY_REMOVE';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,0,0)`];
+      r.op = [
+        `Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)`,
+        `local g=Duel.SelectMatchingCard(tp,${f.ref},tp,0,LOCATION_ONFIELD,1,1,nil${f.extra})`,
+        `if #g>0 then Duel.Remove(g,POS_FACEUP,REASON_EFFECT) end`
+      ];
+    } else if (action === 'to_hand_target') {
+      const f = mkFilter('c', 'c:IsAbleToHand()');
+      r.feasible = `Duel.IsExistingMatchingCard(${f.ref},tp,0,LOCATION_ONFIELD,1,nil${f.extra})`;
+      r.category = 'CATEGORY_TOHAND';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,0)`];
+      r.op = [
+        `Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)`,
+        `local g=Duel.SelectMatchingCard(tp,${f.ref},tp,0,LOCATION_ONFIELD,1,1,nil${f.extra})`,
+        `if #g>0 then Duel.SendtoHand(g,nil,REASON_EFFECT) end`
+      ];
+    } else if (action === 'draw_cards') {
+      const cnt = Math.max(1, parseInt(sub && sub.count) || 1);
+      r.feasible = `Duel.IsPlayerCanDraw(tp,${cnt})`;
+      r.category = 'CATEGORY_DRAW';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,${cnt})`];
+      r.op = [`Duel.Draw(tp,${cnt},REASON_EFFECT)`];
+    } else if (action === 'burn_damage') {
+      const val = Math.max(0, parseInt(sub && sub.value) || 1000);
+      const who = (sub && sub.target === 'self') ? 'tp' : '1-tp';
+      r.feasible = 'true';
+      r.category = 'CATEGORY_DAMAGE';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,${who},${val})`];
+      r.op = [`Duel.Damage(${who},${val},REASON_EFFECT)`];
+    } else if (action === 'gain_lp') {
+      const val = Math.max(0, parseInt(sub && sub.value) || 1000);
+      r.feasible = 'true';
+      r.category = 'CATEGORY_RECOVER';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,${val})`];
+      r.op = [`Duel.Recover(tp,${val},REASON_EFFECT)`];
+    } else if (action === 'destroy_self_all') {
+      r.feasible = `Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,0,1,nil)`;
+      r.category = 'CATEGORY_DESTROY';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,0)`];
+      r.op = [
+        `local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,0,nil)`,
+        `if #g>0 then Duel.Destroy(g,REASON_EFFECT) end`
+      ];
+    } else if (action === 'wipe_oppo_monsters') {
+      r.feasible = `Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_MZONE,1,nil)`;
+      r.category = 'CATEGORY_DESTROY';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,0)`];
+      r.op = [
+        `local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)`,
+        `if #g>0 then Duel.Destroy(g,REASON_EFFECT) end`
+      ];
+    } else if (action === 'wipe_oppo_all') {
+      r.feasible = `Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil)`;
+      r.category = 'CATEGORY_DESTROY';
+      r.setOp = [`Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,0)`];
+      r.op = [
+        `local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_ONFIELD,nil)`,
+        `if #g>0 then Duel.Destroy(g,REASON_EFFECT) end`
+      ];
+    }
+    return r;
+  }
+
+  /** 二选一分支的卡文筛选短语 */
+  getSubFilterPhrase(s, isJa) {
+    const typeNameZh = { monster: '怪兽', spell: '魔法卡', trap: '陷阱卡' }[s.filterType] || '';
+    const typeNameJa = { monster: 'モンスター', spell: '魔法カード', trap: '罠カード' }[s.filterType] || '';
+    const arch = (s.filterArchetype || '').trim() || (s.filterSetcode ? '此系列' : '');
+    const archTxt = arch ? `「${arch}」` : '';
+    if (!archTxt && !typeNameZh) return '';
+    return isJa ? `${archTxt}${typeNameJa}` : `${archTxt}${typeNameZh || '卡'}`;
+  }
+
+  /** 生成「二选一自由组合」单个分支的卡文短语 */
+  getChoiceBranchText(sub, isJa) {
+    const s = sub || {};
+    const fp = this.getSubFilterPhrase(s, isJa);
+    const n = Math.max(1, parseInt(s.count) || 1);
+    const jaNum = { 1: '１', 2: '２', 3: '３', 4: '４', 5: '５', 6: '６' }[n] || String(n);
+    const val = Math.max(0, parseInt(s.value) || 1000);
+    const who = s.target === 'self' ? (isJa ? '自分' : '自己') : (isJa ? '相手' : '对方');
+    // 中文量词：指定怪兽或动作隐含对象为怪兽时用「只」，其余用「张」
+    const monsterDefault = ['special_summon_deck', 'special_summon_hand', 'revive_grave'].includes(s.action || '');
+    const mw = (s.filterType === 'monster' || (!s.filterType && monsterDefault)) ? '只' : '张';
+    const map = {
+      search_deck: isJa ? `デッキから${fp || 'カード'}１枚を手札に加える。` : `从卡组把1${mw}${fp || '卡'}加入手牌。`,
+      dump_deck: isJa ? `デッキから${fp || 'カード'}１枚を墓地へ送る。` : `从卡组把1${mw}${fp || '卡'}送去墓地。`,
+      special_summon_deck: isJa ? `デッキから${fp || 'モンスター'}１体を特殊召喚する。` : `从卡组把1只${fp || '怪兽'}特殊召唤。`,
+      special_summon_hand: isJa ? `手札から${fp || 'モンスター'}１体を特殊召喚する。` : `从手卡把1只${fp || '怪兽'}特殊召唤。`,
+      revive_grave: isJa ? `自分の墓地から${fp || 'モンスター'}１体を特殊召喚する。` : `从自己墓地选1只${fp || '怪兽'}特殊召唤。`,
+      destroy_target: isJa ? `相手フィールドの${fp || 'カード'}１枚を破壊する。` : `破坏对方场上1${mw}${fp || '卡'}。`,
+      banish_target: isJa ? `相手フィールドの${fp || 'カード'}１枚を除外する。` : `把对方场上1${mw}${fp || '卡'}除外。`,
+      to_hand_target: isJa ? `相手フィールドの${fp || 'カード'}１枚を持ち主の手札に戻す。` : `让对方场上1${mw}${fp || '卡'}回到持有者手牌。`,
+      draw_cards: isJa ? `デッキから${jaNum}枚ドローする。` : `从卡组抽${n}张卡。`,
+      burn_damage: isJa ? `${who}に${val}ダメージを与える。` : `给${who}造成${val}点伤害。`,
+      gain_lp: isJa ? `自分は${val}ＬＰ回復する。` : `自己回复${val}点基本分。`,
+      destroy_self_all: isJa ? '自分フィールドのカードを全て破壊する。' : '自己场上的卡全部破坏。',
+      wipe_oppo_monsters: isJa ? '相手フィールドのモンスターを全て破壊する。' : '对方场上的怪兽全部破坏。',
+      wipe_oppo_all: isJa ? '相手フィールドのカードを全て破壊する。' : '对方场上的卡全部破坏。'
+    };
+    return map[s.action || 'search_deck'] || (isJa ? '効果を適用する。' : '进行效果处理。');
   }
 
   generateActivatedLogic(idx, slot, sym, cardData) {
@@ -826,31 +1040,71 @@ class ClientScriptAssembler {
       }
     }
 
-    // 2. Cost
+    // 2. Cost（支持数量与字段/卡类自定义）
     if (slot.cost && slot.cost !== 'none') {
+      const costCount = Math.max(1, parseInt(slot.costCount) || 1);
+      const cflt = this.buildCostFilter(idx, slot);
+      // 筛选函数必须定义在顶层，切勿嵌入 cost 函数体内
+      if (cflt) parts.push(...cflt.lines);
+      const cf = cflt ? cflt.ref : null;
       parts.push(`-- 效果${sym} 发动代价`);
       parts.push(`function s.cost${idx}(e,tp,eg,ep,ev,re,r,rp,chk)`);
+
       if (slot.cost === 'discard_self') {
         parts.push(`  if chk==0 then return e:GetHandler():IsDiscardable() end`);
         parts.push(`  Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)`);
       } else if (slot.cost === 'release_self') {
         parts.push(`  if chk==0 then return e:GetHandler():IsReleasable() end`);
         parts.push(`  Duel.Release(e:GetHandler(),REASON_COST)`);
-      } else if (slot.cost === 'discard_one') {
-        parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end`);
-        parts.push(`  Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,nil)`);
+      } else if (slot.cost === 'discard_one' || slot.cost === 'discard_n') {
+        const raw = slot.cost === 'discard_one' ? 1 : costCount;
+        const f = cf || 'Card.IsDiscardable';
+        parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(${f},tp,LOCATION_HAND,0,${raw},nil) end`);
+        parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)`);
+        parts.push(`  Duel.DiscardHand(tp,${f},${raw},${raw},REASON_COST+REASON_DISCARD,nil)`);
       } else if (slot.cost === 'pay_1000' || slot.cost === 'pay_lp') {
         const lpVal = parseInt(slot.costLp) || 1000;
         parts.push(`  if chk==0 then return Duel.CheckLPCost(tp,${lpVal}) end`);
         parts.push(`  Duel.PayLPCost(tp,${lpVal})`);
       } else if (slot.cost === 'detach_xyz') {
-        parts.push(`  if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end`);
-        parts.push(`  e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)`);
-      } else if (slot.cost === 'banish_one_gy') {
-        parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE,0,1,nil) end`);
+        parts.push(`  if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,${costCount},REASON_COST) end`);
+        parts.push(`  e:GetHandler():RemoveOverlayCard(tp,${costCount},${costCount},REASON_COST)`);
+      } else if (slot.cost === 'banish_one_gy' || slot.cost === 'banish_gy_n') {
+        const raw = slot.cost === 'banish_one_gy' ? 1 : costCount;
+        const f = cf || 'Card.IsAbleToRemoveAsCost';
+        parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(${f},tp,LOCATION_GRAVE,0,${raw},nil) end`);
         parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)`);
-        parts.push(`  local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE,0,1,1,nil)`);
+        parts.push(`  local g=Duel.SelectMatchingCard(tp,${f},tp,LOCATION_GRAVE,0,${raw},${raw},nil)`);
         parts.push(`  Duel.Remove(g,POS_FACEUP,REASON_COST)`);
+      } else if (slot.cost === 'release_monster_n') {
+        const f = cf || 'aux.TRUE';
+        parts.push(`  if chk==0 then return Duel.CheckReleaseGroup(tp,${f},${costCount},nil) end`);
+        parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)`);
+        parts.push(`  local g=Duel.SelectReleaseGroup(tp,${f},${costCount},${costCount},nil)`);
+        parts.push(`  Duel.Release(g,REASON_COST)`);
+      } else if (slot.cost === 'send_to_grave_n') {
+        const f = cf || 'Card.IsAbleToGraveAsCost';
+        parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(${f},tp,LOCATION_ONFIELD,0,${costCount},nil) end`);
+        parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)`);
+        parts.push(`  local g=Duel.SelectMatchingCard(tp,${f},tp,LOCATION_ONFIELD,0,${costCount},${costCount},nil)`);
+        parts.push(`  Duel.SendtoGrave(g,REASON_COST)`);
+      } else if (slot.cost === 'banish_hand_n') {
+        const f = cf || 'Card.IsAbleToRemoveAsCost';
+        parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(${f},tp,LOCATION_HAND,0,${costCount},nil) end`);
+        parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)`);
+        parts.push(`  local g=Duel.SelectMatchingCard(tp,${f},tp,LOCATION_HAND,0,${costCount},${costCount},nil)`);
+        parts.push(`  Duel.Remove(g,POS_FACEUP,REASON_COST)`);
+      } else if (slot.cost === 'mill_deck_n') {
+        if (cf) {
+          // 指定字段/卡类时，从卡组挑选并送去墓地作为代价
+          parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(${cf},tp,LOCATION_DECK,0,${costCount},nil) end`);
+          parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)`);
+          parts.push(`  local g=Duel.SelectMatchingCard(tp,${cf},tp,LOCATION_DECK,0,${costCount},${costCount},nil)`);
+          parts.push(`  Duel.SendtoGrave(g,REASON_COST)`);
+        } else {
+          parts.push(`  if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,${costCount}) end`);
+          parts.push(`  Duel.DiscardDeck(tp,${costCount},REASON_COST)`);
+        }
       }
       parts.push(`end`);
     }
@@ -949,6 +1203,24 @@ class ClientScriptAssembler {
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_EXTRA)`);
     } else if (action === 'immune_all' || action === 'atk_boost') {
       parts.push(`  if chk==0 then return true end`);
+    } else if (action === 'choice_free') {
+      const subA = slot.choiceA || { action: 'search_deck' };
+      const subB = slot.choiceB || { action: 'dump_deck' };
+      const bA = this.buildChoiceBranch(idx, 'A', subA);
+      const bB = this.buildChoiceBranch(idx, 'B', subB);
+      parts.unshift(...bA.lines, ...bB.lines);
+      parts.push(`  local b1=${bA.feasible}`);
+      parts.push(`  local b2=${bB.feasible}`);
+      parts.push(`  if chk==0 then return b1 or b2 end`);
+      parts.push(`  local op=Duel.SelectEffect(tp,{b1,aux.Stringid(id,1)},{b2,aux.Stringid(id,2)})`);
+      parts.push(`  e:SetLabel(op)`);
+      parts.push(`  if op==1 then`);
+      parts.push(`    e:SetCategory(${bA.category})`);
+      for (const l of bA.setOp) parts.push(`    ${l}`);
+      parts.push(`  else`);
+      parts.push(`    e:SetCategory(${bB.category})`);
+      for (const l of bB.setOp) parts.push(`    ${l}`);
+      parts.push(`  end`);
     } else if (action === 'special_summon_self') {
       parts.push(`  if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0`);
       parts.push(`    and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end`);
@@ -1040,7 +1312,18 @@ class ClientScriptAssembler {
     // 4. Operation
     parts.push(`-- 效果${sym} 效果连锁处理`);
     parts.push(`function s.op${idx}(e,tp,eg,ep,ev,re,r,rp)`);
-    if (action === 'destroy_target') {
+    if (action === 'choice_free') {
+      const subA = slot.choiceA || { action: 'search_deck' };
+      const subB = slot.choiceB || { action: 'dump_deck' };
+      const bA = this.buildChoiceBranch(idx, 'A', subA);
+      const bB = this.buildChoiceBranch(idx, 'B', subB);
+      parts.push(`  local op=e:GetLabel()`);
+      parts.push(`  if op==1 then`);
+      for (const l of bA.op) parts.push(`    ${l}`);
+      parts.push(`  else`);
+      for (const l of bB.op) parts.push(`    ${l}`);
+      parts.push(`  end`);
+    } else if (action === 'destroy_target') {
       parts.push(`  local tc=Duel.GetFirstTarget()`);
       parts.push(`  if tc and tc:IsRelateToEffect(e) then`);
       parts.push(`    Duel.Destroy(tc,REASON_EFFECT)`);
@@ -1251,12 +1534,29 @@ class ClientScriptAssembler {
     return parts.join('\n');
   }
 
-  getCategoryCode(action) {
+  getCategoryCode(action, slot) {
     switch (action) {
       case 'choice_search_or_dump': return 'CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TOGRAVE';
       case 'choice_ss_or_search': return 'CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND+CATEGORY_SEARCH';
       case 'choice_destroy_or_banish': return 'CATEGORY_DESTROY+CATEGORY_REMOVE';
       case 'choice_draw_or_burn': return 'CATEGORY_DRAW+CATEGORY_DAMAGE';
+      case 'choice_free': {
+        // 两个分支的实际类别由取对象时 e:SetCategory 覆写；此处取并集便于脚本阅读与初值
+        const codes = new Set();
+        for (const sub of [(slot && slot.choiceA), (slot && slot.choiceB)]) {
+          const a = (sub && sub.action) || 'search_deck';
+          if (a === 'special_summon_deck' || a === 'special_summon_hand' || a === 'revive_grave') codes.add('CATEGORY_SPECIAL_SUMMON');
+          else if (a === 'draw_cards') codes.add('CATEGORY_DRAW');
+          else if (a === 'burn_damage') codes.add('CATEGORY_DAMAGE');
+          else if (a === 'gain_lp') codes.add('CATEGORY_RECOVER');
+          else if (a === 'banish_target') codes.add('CATEGORY_REMOVE');
+          else if (a === 'to_hand_target') codes.add('CATEGORY_TOHAND');
+          else if (a === 'destroy_self_all' || a === 'wipe_oppo_monsters' || a === 'wipe_oppo_all' || a === 'destroy_target') codes.add('CATEGORY_DESTROY');
+          else if (a === 'dump_deck') { codes.add('CATEGORY_TOGRAVE'); codes.add('CATEGORY_DECKDES'); }
+          else { codes.add('CATEGORY_TOHAND'); codes.add('CATEGORY_SEARCH'); }
+        }
+        return [...codes].join('+') || 'CATEGORY_TOHAND+CATEGORY_SEARCH';
+      }
       case 'search_deck': return 'CATEGORY_TOHAND+CATEGORY_SEARCH';
       case 'salvage_extra': return 'CATEGORY_TOHAND+CATEGORY_SEARCH';
       case 'to_hand_target': return 'CATEGORY_TOHAND';
@@ -1313,6 +1613,10 @@ class ClientScriptAssembler {
         strings.push(mainDesc);
         strings.push(isJa ? 'デッキから２枚ドロー' : '从卡组抽2张卡');
         strings.push(isJa ? '相手に２０００ダメージ' : '造成2000点伤害');
+      } else if (action === 'choice_free') {
+        strings.push(isJa ? '効果を選択して発動' : '选择效果发动');
+        strings.push(`●${this.getChoiceBranchText(slot.choiceA, isJa).replace(/。$/, '')}`);
+        strings.push(`●${this.getChoiceBranchText(slot.choiceB, isJa).replace(/。$/, '')}`);
       } else {
         if (slot.name && slot.name.trim()) {
           mainDesc = slot.name.trim();
@@ -1528,6 +1832,10 @@ class ClientScriptAssembler {
   getCostClause(slot, hasTarget, isJa) {
     const cost = slot.cost;
     if (!cost || cost === 'none') return '';
+    const n = Math.max(1, parseInt(slot.costCount) || 1);
+    const cn = String(n);
+    const jaNum = { 1: '１', 2: '２', 3: '３', 4: '４', 5: '５', 6: '６', 7: '７', 8: '８', 9: '９', 10: '１０' }[n] || cn;
+    const fp = this.getCostFilterPhrase(slot, isJa);
     if (isJa) {
       if (cost === 'discard_self') return hasTarget ? '手札のこのカードを墓地へ送り、' : '手札のこのカードを墓地へ送って発動できる。';
       if (cost === 'release_self') return hasTarget ? 'フィールドのこのカードをリリースし、' : 'フィールドのこのカードをリリースして発動できる。';
@@ -1536,8 +1844,25 @@ class ClientScriptAssembler {
         return hasTarget ? `${lp}ＬＰを払い、` : `${lp}ＬＰを払って発動できる。`;
       }
       if (cost === 'discard_one') return hasTarget ? '手札を１枚墓地へ送り、' : '手札を１枚墓地へ送って発動できる。';
-      if (cost === 'detach_xyz') return hasTarget ? 'このカードのＸ素材を１つ取り除き、' : 'このカードのＸ素材を１つ取り除いて発動できる。';
+      if (cost === 'discard_n') return hasTarget ? `手札から${fp}${jaNum}枚を墓地へ送り、` : `手札から${fp}${jaNum}枚を墓地へ送って発動できる。`;
+      if (cost === 'detach_xyz') return hasTarget ? `このカードのＸ素材を${jaNum}つ取り除き、` : `このカードのＸ素材を${jaNum}つ取り除いて発動できる。`;
       if (cost === 'banish_one_gy') return hasTarget ? '自分の墓地のカード１枚を除外し、' : '自分の墓地のカード１枚を除外して発動できる。';
+      if (cost === 'banish_gy_n') return hasTarget ? `自分の墓地から${fp}${jaNum}枚を除外し、` : `自分の墓地から${fp}${jaNum}枚を除外して発動できる。`;
+      if (cost === 'banish_hand_n') return hasTarget ? `手札から${fp}${jaNum}枚を除外し、` : `手札から${fp}${jaNum}枚を除外して発動できる。`;
+      if (cost === 'release_monster_n') {
+        const body = `自分フィールドの${fp || 'モンスター'}${jaNum}体をリリースし`;
+        return hasTarget ? `${body}、` : `${body}て発動できる。`;
+      }
+      if (cost === 'send_to_grave_n') {
+        const body = `自分フィールドの${fp || 'カード'}${jaNum}枚を墓地へ送`;
+        return hasTarget ? `${body}り、` : `${body}って発動できる。`;
+      }
+      if (cost === 'mill_deck_n') {
+        const fpJa = this.getCostFilterPhrase(slot, true);
+        return hasTarget
+          ? (fpJa ? `デッキから${fpJa}${jaNum}枚を墓地へ送り、` : `デッキの上から${jaNum}枚を墓地へ送り、`)
+          : (fpJa ? `デッキから${fpJa}${jaNum}枚を墓地へ送って発動できる。` : `デッキの上から${jaNum}枚を墓地へ送って発動できる。`);
+      }
       return '';
     }
     if (cost === 'discard_self') return hasTarget ? '把手卡的这张卡送去墓地，' : '把手卡的这张卡送去墓地才能发动。';
@@ -1547,9 +1872,50 @@ class ClientScriptAssembler {
       return hasTarget ? `支付${lp}基本分，` : `支付${lp}基本分才能发动。`;
     }
     if (cost === 'discard_one') return hasTarget ? '把1张手卡送去墓地，' : '把1张手卡送去墓地才能发动。';
-    if (cost === 'detach_xyz') return hasTarget ? '去除此卡的1个超量素材，' : '去除此卡的1个超量素材才能发动。';
+    if (cost === 'discard_n') {
+      const body = fp ? `从手卡把${n}张${fp}送去墓地` : `把${n}张手卡送去墓地`;
+      return hasTarget ? `${body}，` : `${body}才能发动。`;
+    }
+    if (cost === 'detach_xyz') return hasTarget ? `去除此卡的${n}个超量素材，` : `去除此卡的${n}个超量素材才能发动。`;
     if (cost === 'banish_one_gy') return hasTarget ? '把自己墓地1张卡除外，' : '把自己墓地1张卡除外才能发动。';
+    if (cost === 'banish_gy_n') {
+      const body = fp ? `把自己墓地${n}张${fp}除外` : `把自己墓地${n}张卡除外`;
+      return hasTarget ? `${body}，` : `${body}才能发动。`;
+    }
+    if (cost === 'banish_hand_n') {
+      const body = fp ? `从手卡把${n}张${fp}除外` : `把${n}张手卡除外`;
+      return hasTarget ? `${body}，` : `${body}才能发动。`;
+    }
+    if (cost === 'release_monster_n') {
+      const body = fp ? `把自己场上${n}只${fp}解放` : `把自己场上${n}只怪兽解放`;
+      return hasTarget ? `${body}，` : `${body}才能发动。`;
+    }
+    if (cost === 'send_to_grave_n') {
+      const body = fp ? `把自己场上${n}张${fp}送去墓地` : `把自己场上${n}张卡送去墓地`;
+      return hasTarget ? `${body}，` : `${body}才能发动。`;
+    }
+    if (cost === 'mill_deck_n') {
+      const fpZh = this.getCostFilterPhrase(slot, false);
+      return hasTarget
+        ? (fpZh ? `从卡组把${n}张${fpZh}送去墓地，` : `从卡组上面把${n}张卡送去墓地，`)
+        : (fpZh ? `从卡组把${n}张${fpZh}送去墓地才能发动。` : `从卡组上面把${n}张卡送去墓地才能发动。`);
+    }
     return '';
+  }
+
+  /**
+   * 生成代价筛选的卡文短语（如「「青眼」怪兽」「魔法卡」）
+   */
+  getCostFilterPhrase(slot, isJa, fallbackZh = '卡', fallbackJa = 'カード') {
+    const typeNameZh = { monster: '怪兽', spell: '魔法卡', trap: '陷阱卡' }[slot.costFilterType] || '';
+    const typeNameJa = { monster: 'モンスター', spell: '魔法カード', trap: '罠カード' }[slot.costFilterType] || '';
+    const arch = (slot.costFilterArchetype || '').trim() || (slot.costFilterSetcode ? '此系列' : '');
+    const archZh = arch ? `「${arch}」` : '';
+    const archJa = arch ? `「${arch}」` : '';
+    if (!archZh && !typeNameZh) return '';
+    return isJa
+      ? `${archJa}${typeNameJa || fallbackJa}`
+      : `${archZh}${typeNameZh || '卡'}`;
   }
 
   /**
@@ -1595,6 +1961,14 @@ class ClientScriptAssembler {
     const hasTarget = slot.target && slot.target !== 'none';
     const fp = this.getFilterPhrase(slot, isJa);
     const fpMonster = this.getFilterPhrase(slot, isJa, '怪兽');
+    // 二选一自由组合：由两个子分支各自生成卡文
+    if (action === 'choice_free') {
+      const tA = this.getChoiceBranchText(slot.choiceA, isJa);
+      const tB = this.getChoiceBranchText(slot.choiceB, isJa);
+      return isJa
+        ? `以下の効果から１つを選択して発動できる。●${tA}●${tB}`
+        : `从以下效果选择1个发动。●${tA}●${tB}`;
+    }
     if (isJa) {
       if (action === 'search_deck') return `デッキから${fp || 'カード'}１枚を手札に加える。`;
       if (action === 'special_summon_self') return 'このカードを手札から特殊召喚する。';
