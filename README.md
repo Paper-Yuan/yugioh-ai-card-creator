@@ -151,7 +151,7 @@ yugioh-ai-card-creator/
 
 ## 已知限制
 
-- **素材未随仓库分发**（体积与版权原因）。新克隆的仓库需要按 [docs/ASSETS.md](docs/ASSETS.md) 准备素材；其中卡框 / 罕贵度 / 出框 / 水印等部分素材来自闭源工具，无法由脚本自动获取。
+- **素材未随仓库分发**（体积与版权原因）。新克隆的仓库需要按 [docs/ASSETS.md](docs/ASSETS.md) 准备素材；卡框 / 属性图标 / LINK 箭头等可由脚本下载，而罕贵度 / 出框 / 水印等来自 YGOLD 制卡器的素材需从其[发布页](https://gitee.com/scutlzl/game-king-card-maker)获取后自行放入。
 - **AI 功能依赖你自备的 API Key**，生成质量与稳定性取决于所选模型与网络，建议生成后人工校对。
 - 脚本组装覆盖常见效果，**复杂或非标准效果仍需手写 Lua**。
 - 仅为个人 DIY / 学习用途，未做生产级并发与安全加固。
@@ -166,8 +166,8 @@ yugioh-ai-card-creator/
 1. **[ygopro-scripting-workflow](https://code.moenext.com/nanahira/ygopro-scripting-workflow)** — 作者 nanahira
    参考了 YGOPro 脚本的编写工作流与脚本规范，效果模块与 Lua 模板的组织方式受其启发。
 
-2. **[game-king-card-maker](https://gitee.com/scutlzl/game-king-card-maker)** — 作者 scutlzl（YGOLD 制卡器）
-   参考了卡面工艺（罕贵度、镭射、出框、水印等）与素材的组织方式。
+2. **[game-king-card-maker](https://gitee.com/scutlzl/game-king-card-maker)** — 作者 scutlzl（YGOLD 制卡器的发布页）
+   参考了卡面工艺（罕贵度、镭射、出框、水印等）与素材的组织方式；罕贵度 / 出框 / 水印等素材可从该页下载的 YGOLD 工具中获取。
 
 3. **[kooriookami/yugioh-card](https://github.com/kooriookami/yugioh-card)** — 作者 kooriookami
    参考了卡框、属性图标、LINK 箭头等素材与卡面渲染的实现思路；`scripts/download-assets.js` 从该项目拉取可公开获取的素材。

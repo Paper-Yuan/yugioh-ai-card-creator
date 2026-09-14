@@ -44,12 +44,21 @@ node scripts/download-assets.js
 
 ## 无法自动获取的部分
 
-以下素材来自 **YGOLD 制卡器**（闭源工具，不做公开分发），本项目仅参考其素材组织方式，需要你**自行提供**：
+以下素材来自 **YGOLD 制卡器**（第三方工具，未开源），本项目仅参考其素材组织方式，需要你**自行准备**：
 
 - `image/rare/`、`image/holo/`、`image/overframe/`、`image/watermark/`、`image/frame/` 各子目录
 - 部分 TTF 字体（`RenderFontChineseSimplified.ttf`、`AtkDef.ttf`、`FOT-Rodin Pro.ttf`、`YGOLDDFLeisho*.ttf` 等）
 
-你可以自行准备等效素材放入对应目录与文件名，渲染代码按**固定文件名**加载，替换时保持文件名一致即可。
+YGOLD 制卡器可从其发布页下载：
+
+- https://gitee.com/scutlzl/game-king-card-maker
+
+从其中取得所需素材后，按上表的目录与文件名放入对应位置即可；渲染代码按**固定文件名**加载，替换时保持文件名一致。请遵守该工具自身的授权与使用条款。
+
+## 相关参考项目
+
+- YGOPro 脚本编写工作流：https://code.moenext.com/nanahira/ygopro-scripting-workflow
+- 卡面素材与渲染参考：https://github.com/kooriookami/yugioh-card
 
 ## 开源字体
 
