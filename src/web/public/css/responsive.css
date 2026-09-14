@@ -85,9 +85,9 @@
 
   /* 1. 顶栏精简与触控标准 */
   .studio-header {
-    height: 54px;
-    padding: 0 10px;
-    gap: 6px;
+    height: 58px;
+    padding: 0 12px;
+    gap: 8px;
     background: rgba(10, 14, 26, 0.95);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(245, 158, 11, 0.2);
@@ -95,19 +95,17 @@
 
   .header-brand {
     gap: 6px;
+    flex: 0 0 auto;
   }
 
   .brand-logo-eye {
-    font-size: 18px;
+    font-size: 20px;
   }
 
-  .brand-title {
-    font-size: 13px;
-    font-weight: 700;
-    max-width: 110px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  /* 左上角只保留标识，隐藏文字标题，把横向空间让给右侧按键 */
+  .brand-title,
+  .brand-info {
+    display: none;
   }
 
   .brand-version {
@@ -119,32 +117,58 @@
     display: none;
   }
 
+  /* 右侧按键获得更多空间，排布更松弛 */
   .header-actions {
-    gap: 4px;
+    gap: 6px;
     margin-left: auto;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .header-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 手机端切换为精简标签，避免撑破顶栏 */
+  .btn-lbl-full {
+    display: none;
+  }
+
+  .btn-lbl-short {
+    display: inline;
   }
 
   .header-actions .btn-top-gold,
   .header-actions .btn-top-outline,
   .header-actions .btn-top-icon {
-    padding: 4px 8px;
-    font-size: 11px;
-    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 12px;
+    min-height: 40px;
+    flex: 0 0 auto;
+  }
+
+  .header-actions .btn-top-icon {
+    width: 40px;
+    padding: 0;
   }
 
   /* 手机专属顶栏配置快捷按钮 */
   .mobile-ui-cfg-btn {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     background: rgba(56, 189, 248, 0.12);
     color: #38bdf8;
     border: 1px solid rgba(56, 189, 248, 0.3);
     border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 11px;
+    padding: 8px 12px;
+    font-size: 12.5px;
     font-weight: 600;
-    min-height: 36px;
+    min-height: 40px;
+    flex: 0 0 auto;
     cursor: pointer;
   }
 
@@ -154,7 +178,7 @@
 
   /* 2. 主容器间距与 iOS Safe Area */
   .app-container {
-    padding-top: 58px;
+    padding-top: 62px;
     padding-bottom: calc(76px + env(safe-area-inset-bottom, 16px));
   }
 
@@ -165,7 +189,7 @@
   /* 3. 手机端顶部吸顶微缩卡片胶囊 (Sticky Mini Card Pill) */
   .mobile-sticky-card-pill {
     position: sticky;
-    top: 54px;
+    top: 58px;
     z-index: 90;
     display: flex;
     align-items: center;
@@ -355,7 +379,7 @@
   body.mobile-mode-split .studio-workspace {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 54px - calc(56px + env(safe-area-inset-bottom, 0px)));
+    height: calc(100vh - 58px - calc(56px + env(safe-area-inset-bottom, 0px)));
     overflow: hidden;
   }
   body.mobile-mode-split .studio-preview-pane {
@@ -919,6 +943,51 @@
   }
   body.mobile-flow-active .step-nav-toolbar {
     display: none !important; /* 统一由吸底操作栏接管 */
+  }
+
+  /* 4. 步骤4 导出/打包：改为横条状，每行一个，压缩高度 */
+  .export-options-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .export-tile {
+    padding: 10px 14px;
+    gap: 12px;
+    min-height: 0;
+    border-radius: 10px;
+  }
+
+  .export-tile .tile-icon {
+    font-size: 20px;
+    line-height: 1;
+    flex: 0 0 auto;
+  }
+
+  .export-tile .tile-info {
+    min-width: 0;
+  }
+
+  .export-tile .tile-info h4 {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .export-tile .tile-info p {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* 横条右侧的下载按钮收窄，避免撑高整条 */
+  .export-tile > .btn-sm {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    min-height: 34px;
+    white-space: nowrap;
   }
 }
 

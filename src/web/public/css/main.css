@@ -328,6 +328,11 @@ body {
   gap: 10px;
 }
 
+/* 顶栏按键的完整/精简标签：桌面端用完整标签，手机端切精简标签 */
+.btn-lbl-short {
+  display: none;
+}
+
 .btn-top-gold {
   background: linear-gradient(135deg, var(--gold-primary), #d97706);
   color: #000;
