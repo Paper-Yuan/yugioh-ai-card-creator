@@ -133,14 +133,16 @@
 
               <!-- 多卡卡包工程管理器 (仅在此处出现，不占用后续效果与配图页面) -->
               <div class="card-set-manager-bar mb-3" id="cardSetBar" style="background:rgba(15,23,42,0.85);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:10px 14px;">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:16px;">🎴</span>
-                    <span style="font-weight:600;font-size:14px;color:#f8fafc;">卡包系列工程:</span>
+                <div class="card-set-bar-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+                  <div class="card-set-bar-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <span class="card-set-bar-label">
+                      <span style="font-size:16px;">🎴</span>
+                      <span class="card-set-bar-label-text" style="font-weight:600;font-size:14px;color:#f8fafc;">卡包系列工程:</span>
+                      <span id="cardSetCountBadge" style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:12px;padding:2px 6px;border-radius:4px;">1 张卡</span>
+                    </span>
                     <input type="text" id="cardSetNameInput" value="自定义扩展系列 #1" onchange="onSetNameChanged(this.value)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:4px;padding:2px 8px;font-size:13px;width:170px;">
-                    <span id="cardSetCountBadge" style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:12px;padding:2px 6px;border-radius:4px;">1 张卡</span>
                   </div>
-                  <div style="display:flex;gap:6px;">
+                  <div class="card-set-bar-actions" style="display:flex;gap:6px;flex-wrap:wrap;">
                     <button type="button" class="btn-sm btn-outline" onclick="addNewCardToSet()" title="添加一张新卡至此卡包">+ 添加新卡</button>
                     <button type="button" class="btn-sm btn-outline" onclick="cloneCurrentCard()" title="克隆当前卡片数据并自动分配卡密">📑 克隆本卡</button>
                     <button type="button" class="btn-sm btn-gold" onclick="downloadMdpro3Package(true)" title="一键将卡包全部卡片打包为 MDPro3 扩展包">📱 导出整包 .ypk</button>
@@ -536,10 +538,15 @@
                       </label>
                     </div>
                     <div id="wrapRuleAliasInput" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
-                      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                        <label style="font-size:13px;color:#cbd5e1;">视作的目标卡名：</label>
-                        <input type="text" id="ruleAliasName" placeholder="例如：青眼白龙、暗黑骑士 盖亚、海、光之黄金柜" style="flex:1;min-width:180px;" oninput="onRuleTextsChanged()">
-                        <input type="number" id="ruleAliasId" placeholder="对应密码 (选填)" style="width:130px;" oninput="onRuleTextsChanged()">
+                      <div class="form-grid-2" style="gap:12px;">
+                        <div class="input-field" style="margin-bottom:0;">
+                          <label>视作的目标卡名</label>
+                          <input type="text" id="ruleAliasName" placeholder="例如：青眼白龙、暗黑骑士 盖亚" oninput="onRuleTextsChanged()">
+                        </div>
+                        <div class="input-field" style="margin-bottom:0;">
+                          <label>对应密码 (选填)</label>
+                          <input type="number" id="ruleAliasId" placeholder="例如：89631139" oninput="onRuleTextsChanged()">
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -678,19 +685,23 @@
                       </label>
                     </div>
                     <div id="wrapRuleSummonProc" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
-                      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                        <label style="font-size:13px;color:#cbd5e1;">召唤方式：</label>
-                        <select id="ruleProcSummonType" class="form-select" style="width:170px;" onchange="onRuleTextsChanged()">
-                          <option value="fusion">融合召唤</option>
-                          <option value="synchro">同调召唤</option>
-                          <option value="xyz">超量召唤</option>
-                          <option value="link">连接召唤</option>
-                          <option value="ritual">仪式召唤</option>
-                        </select>
-                        <label style="font-size:13px;color:#cbd5e1;">素材数量：</label>
-                        <input type="number" id="ruleProcMaterialCount" value="2" min="1" max="8" style="width:80px;" oninput="onRuleTextsChanged()">
+                      <div class="form-grid-2" style="gap:12px;">
+                        <div class="input-field" style="margin-bottom:0;">
+                          <label>召唤方式</label>
+                          <select id="ruleProcSummonType" class="form-select" onchange="onRuleTextsChanged()">
+                            <option value="fusion">融合召唤</option>
+                            <option value="synchro">同调召唤</option>
+                            <option value="xyz">超量召唤</option>
+                            <option value="link">连接召唤</option>
+                            <option value="ritual">仪式召唤</option>
+                          </select>
+                        </div>
+                        <div class="input-field" style="margin-bottom:0;">
+                          <label>素材数量</label>
+                          <input type="number" id="ruleProcMaterialCount" value="2" min="1" max="8" oninput="onRuleTextsChanged()">
+                        </div>
                       </div>
-                      <small style="color:var(--text-muted);display:block;margin-top:6px;">
+                      <small style="color:var(--text-muted);display:block;margin-top:8px;">
                         默认依怪兽种类自动判断；素材筛选留空为「不限」，需要限定素材时可在脚本中补填 filter。
                       </small>
                     </div>
@@ -699,40 +710,51 @@
                   <!-- 规则变更：种类 / 属性 / 种族 / 等级 -->
                   <div class="rule-box" data-rule-scope="monster" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
                     <div style="font-weight:600;color:#f8fafc;font-size:13px;margin-bottom:8px;">🧬 规则上的种类 / 属性 / 种族 / 等级变更</div>
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                      <select id="ruleAddMonsterType" class="form-select" style="width:180px;" onchange="onRuleTextsChanged()">
-                        <option value="">— 追加怪兽种类 (不追加) —</option>
-                        <option value="effect">规则上也当作效果怪兽</option>
-                        <option value="fusion">规则上也当作融合怪兽</option>
-                        <option value="synchro">规则上也当作同调怪兽</option>
-                        <option value="xyz">规则上也当作超量怪兽</option>
-                        <option value="link">规则上也当作连接怪兽</option>
-                        <option value="ritual">规则上也当作仪式怪兽</option>
-                      </select>
-                      <select id="ruleAttribute" class="form-select" style="width:170px;" onchange="onRuleTextsChanged()">
-                        <option value="">— 变更属性 (不变更) —</option>
-                        <option value="dark">规则上当作暗属性</option>
-                        <option value="light">规则上当作光属性</option>
-                        <option value="earth">规则上当作地属性</option>
-                        <option value="water">规则上当作水属性</option>
-                        <option value="fire">规则上当作炎属性</option>
-                        <option value="wind">规则上当作风属性</option>
-                        <option value="divine">规则上当作神属性</option>
-                      </select>
-                      <select id="ruleRace" class="form-select" style="width:190px;" onchange="onRuleTextsChanged()">
-                        <option value="">— 追加种族 (不追加) —</option>
-                        <option value="warrior">规则上也当作战士族</option>
-                        <option value="spellcaster">规则上也当作魔法师族</option>
-                        <option value="fairy">规则上也当作天使族</option>
-                        <option value="fiend">规则上也当作恶魔族</option>
-                        <option value="zombie">规则上也当作不死族</option>
-                        <option value="machine">规则上也当作机械族</option>
-                        <option value="dragon">规则上也当作龙族</option>
-                        <option value="cyberse">规则上也当作电子界族</option>
-                        <option value="illusion">规则上也当作幻想魔族</option>
-                      </select>
-                      <label style="font-size:13px;color:#cbd5e1;">变更等级：</label>
-                      <input type="number" id="ruleLevel" value="" min="1" max="12" placeholder="留空不变" style="width:90px;" oninput="onRuleTextsChanged()">
+                    <div class="form-grid-2" style="gap:12px;">
+                      <div class="input-field" style="margin-bottom:0;">
+                        <label>追加怪兽种类</label>
+                        <select id="ruleAddMonsterType" class="form-select" onchange="onRuleTextsChanged()">
+                          <option value="">— 不追加 —</option>
+                          <option value="effect">规则上也当作效果怪兽</option>
+                          <option value="fusion">规则上也当作融合怪兽</option>
+                          <option value="synchro">规则上也当作同调怪兽</option>
+                          <option value="xyz">规则上也当作超量怪兽</option>
+                          <option value="link">规则上也当作连接怪兽</option>
+                          <option value="ritual">规则上也当作仪式怪兽</option>
+                        </select>
+                      </div>
+                      <div class="input-field" style="margin-bottom:0;">
+                        <label>变更属性</label>
+                        <select id="ruleAttribute" class="form-select" onchange="onRuleTextsChanged()">
+                          <option value="">— 不变更 —</option>
+                          <option value="dark">规则上当作暗属性</option>
+                          <option value="light">规则上当作光属性</option>
+                          <option value="earth">规则上当作地属性</option>
+                          <option value="water">规则上当作水属性</option>
+                          <option value="fire">规则上当作炎属性</option>
+                          <option value="wind">规则上当作风属性</option>
+                          <option value="divine">规则上当作神属性</option>
+                        </select>
+                      </div>
+                      <div class="input-field" style="margin-bottom:0;">
+                        <label>追加种族</label>
+                        <select id="ruleRace" class="form-select" onchange="onRuleTextsChanged()">
+                          <option value="">— 不追加 —</option>
+                          <option value="warrior">规则上也当作战士族</option>
+                          <option value="spellcaster">规则上也当作魔法师族</option>
+                          <option value="fairy">规则上也当作天使族</option>
+                          <option value="fiend">规则上也当作恶魔族</option>
+                          <option value="zombie">规则上也当作不死族</option>
+                          <option value="machine">规则上也当作机械族</option>
+                          <option value="dragon">规则上也当作龙族</option>
+                          <option value="cyberse">规则上也当作电子界族</option>
+                          <option value="illusion">规则上也当作幻想魔族</option>
+                        </select>
+                      </div>
+                      <div class="input-field" style="margin-bottom:0;">
+                        <label>变更等级</label>
+                        <input type="number" id="ruleLevel" value="" min="1" max="12" placeholder="留空不变" oninput="onRuleTextsChanged()">
+                      </div>
                     </div>
                   </div>
 
@@ -1006,7 +1028,7 @@
 
                     <div class="input-field" id="wizardCostFilterArchetypeWrap" style="display:none;grid-column:1/-1;">
                       <label>代价涉及字段 / 系列 (Setcode，选填)</label>
-                      <div style="display:flex;gap:8px;align-items:center;">
+                      <div class="input-inline-row" style="display:flex;gap:8px;align-items:center;">
                         <input type="text" id="wizardCostFilterArchetype" placeholder="例如：青眼（留空则不限字段）" list="archetypeDatalist" oninput="onWizardCostFilterArchetypeInput(this.value)" style="flex:1;">
                         <button type="button" class="btn btn-outline btn-sm" onclick="useCurrentCardArchetypeForCostFilter()" title="套用当前卡片自身的字段 / Setcode">套用本卡字段</button>
                       </div>
@@ -1084,7 +1106,7 @@
                       </div>
                       <div class="input-field" id="wizardChoiceAFilterArchetypeWrap">
                         <label>分支 1 · 字段系列 (选填)</label>
-                        <div style="display:flex;gap:6px;align-items:center;">
+                        <div class="input-inline-row" style="display:flex;gap:6px;align-items:center;">
                           <input type="text" id="wizardChoiceAFilterArchetype" placeholder="例如：青眼" list="archetypeDatalist" oninput="onChoiceFilterArchetypeInput('A', this.value)" style="flex:1;">
                           <button type="button" class="btn btn-outline btn-sm" onclick="useCurrentCardArchetypeForChoiceFilter('A')" title="套用当前卡片字段">本卡字段</button>
                         </div>
@@ -1114,7 +1136,7 @@
                       </div>
                       <div class="input-field" id="wizardChoiceBFilterArchetypeWrap">
                         <label>分支 2 · 字段系列 (选填)</label>
-                        <div style="display:flex;gap:6px;align-items:center;">
+                        <div class="input-inline-row" style="display:flex;gap:6px;align-items:center;">
                           <input type="text" id="wizardChoiceBFilterArchetype" placeholder="例如：青眼" list="archetypeDatalist" oninput="onChoiceFilterArchetypeInput('B', this.value)" style="flex:1;">
                           <button type="button" class="btn btn-outline btn-sm" onclick="useCurrentCardArchetypeForChoiceFilter('B')" title="套用当前卡片字段">本卡字段</button>
                         </div>
@@ -1143,7 +1165,7 @@
                   <div id="wizardActionParamsWrap" class="form-grid-2 mb-3" style="display:none;background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.18);border-radius:8px;padding:10px 14px;">
                     <div class="input-field" id="wrapFilterArchetype">
                       <label>检索/特召 字段系列 (Setcode)</label>
-                      <div style="display:flex;gap:8px;align-items:center;">
+                      <div class="input-inline-row" style="display:flex;gap:8px;align-items:center;">
                         <input type="text" id="wizardFilterArchetype" placeholder="例如：青眼（留空则不限字段）" list="archetypeDatalist" oninput="onWizardFilterArchetypeInput(this.value)" style="flex:1;">
                         <button type="button" class="btn btn-outline btn-sm" onclick="useCurrentCardArchetypeForFilter()" title="套用当前卡片自身的字段 / Setcode">套用本卡字段</button>
                       </div>

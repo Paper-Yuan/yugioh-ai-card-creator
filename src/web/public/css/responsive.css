@@ -144,14 +144,14 @@
   .header-actions .btn-top-gold,
   .header-actions .btn-top-outline,
   .header-actions .btn-top-icon {
-    padding: 7px 10px;
-    font-size: 12px;
-    min-height: 40px;
+    padding: 5px 9px;
+    font-size: 11.5px;
+    min-height: 34px;
     flex: 0 0 auto;
   }
 
   .header-actions .btn-top-icon {
-    width: 40px;
+    width: 34px;
     padding: 0;
   }
 
@@ -159,15 +159,15 @@
   .mobile-ui-cfg-btn {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     background: rgba(56, 189, 248, 0.12);
     color: #38bdf8;
     border: 1px solid rgba(56, 189, 248, 0.3);
     border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 12.5px;
+    padding: 5px 9px;
+    font-size: 11.5px;
     font-weight: 600;
-    min-height: 40px;
+    min-height: 34px;
     flex: 0 0 auto;
     cursor: pointer;
   }
@@ -547,7 +547,7 @@
   }
 
   .btn {
-    min-height: 46px;
+    min-height: 42px;
     border-radius: 12px;
     touch-action: manipulation;
     font-weight: 600;
@@ -555,29 +555,100 @@
   }
 
   .btn-sm {
-    min-height: 42px;
-    padding: 8px 14px;
-    font-size: 13px;
-    border-radius: 10px;
+    min-height: 36px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    border-radius: 9px;
   }
 
   .type-card-btn {
-    min-height: 50px;
-    padding: 12px 16px;
+    min-height: 46px;
+    padding: 10px 14px;
     border-radius: 12px;
   }
 
   .trait-chip {
-    min-height: 44px;
-    padding: 10px 14px;
-    font-size: 13px;
+    min-height: 40px;
+    padding: 9px 12px;
+    font-size: 12.5px;
     border-radius: 10px;
   }
 
   .card-set-manager-bar {
-    padding: 14px 16px;
+    padding: 12px 14px;
     border-radius: 14px;
     margin-bottom: 16px;
+  }
+
+  /* 卡包工程条：手机端改为「标识一行 / 输入一行 / 按钮一行」的松弛纵向堆叠 */
+  .card-set-bar-row {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 10px;
+  }
+
+  .card-set-bar-title {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* 标签行：标识 + 标题 + 数量徽标同处一行 */
+  .card-set-bar-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .card-set-bar-label-text {
+    font-size: 13px !important;
+    color: var(--text-muted) !important;
+  }
+
+  .card-set-bar-title #cardSetNameInput {
+    width: 100% !important;
+    min-height: 42px;
+    padding: 8px 12px !important;
+    font-size: 15px !important;
+    border-radius: 10px !important;
+  }
+
+  .card-set-bar-actions {
+    width: 100%;
+    gap: 8px !important;
+  }
+
+  .card-set-bar-actions .btn-sm {
+    flex: 1 1 auto;
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  /* 输入框 + 辅助按钮（如「套用本卡字段」）：手机端按钮换到下一行，
+     让输入框独占一行，符合「标识/文本一行、填入功能在下」的排布 */
+  .input-inline-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  /* 覆盖内联的 flex:1（列方向下会压缩高度），改为固定自然高度 */
+  .input-inline-row > input,
+  .input-inline-row > select {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-height: 46px;
+  }
+
+  .input-inline-row > .btn,
+  .input-inline-row > .btn-sm {
+    flex: 0 0 auto !important;
+    width: 100%;
+    min-height: 40px;
   }
 
   /* 8. 移动端专属 UI 配置弹窗 (Modal) */
