@@ -431,7 +431,10 @@ class ClientScriptAssembler {
    * 规则：不进连锁、无代价、不取对象、无 operation 链
    */
   assembleContinuousEffect(lines, logicFunctions, slot, idx, sym) {
-    const subType = slot.subType || 'immune_all';
+    // 允许用「效果本体(Action)」指定常驻子类型：immune_all / atk_boost
+    let subType = slot.subType || 'immune_all';
+    if (slot.action === 'immune_all') subType = 'immune_all';
+    if (slot.action === 'atk_boost') subType = 'atk_boost_1000';
     const range = slot.range === 'grave' ? 'LOCATION_GRAVE' : slot.range === 'szone' ? 'LOCATION_SZONE' : 'LOCATION_MZONE';
 
     lines.push(`  local e${idx}=Effect.CreateEffect(c)`);
@@ -679,8 +682,8 @@ class ClientScriptAssembler {
   }
 
   isTargetingAction(action, target) {
-    if (target === 'none') return false;
-    return ['destroy_target', 'banish_target', 'to_hand_target', 'revive_grave', 'negate_target_monster'].includes(action);
+    if (target === 'none' && action !== 'negate_punish') return false;
+    return ['destroy_target', 'banish_target', 'to_hand_target', 'revive_grave', 'negate_target_monster', 'negate_punish'].includes(action);
   }
 
   needsCondition(slot) {
@@ -695,8 +698,59 @@ class ClientScriptAssembler {
     return false;
   }
 
+  /**
+   * 依 slot 的「字段 / 系列 (Setcode)」与「卡类」限制生成筛选函数。
+   * 返回 { ref, lines } 或 null（null 时调用方沿用内置 Card.IsXxx）。
+   * force=true 的动作（如卡组特召）即使没有额外限制也会生成函数，以修正过滤条件。
+   */
+  buildActionFilter(idx, slot, action) {
+    const typeMap = { monster: 'TYPE_MONSTER', spell: 'TYPE_SPELL', trap: 'TYPE_TRAP' };
+    const setcode = String(slot.filterSetcode || '').trim();
+    const setcodeExpr = /^0x[0-9a-fA-F]+$/.test(setcode) || /^[0-9]+$/.test(setcode) ? setcode : null;
+    const typeConst = typeMap[slot.filterType] || null;
+
+    const specs = {
+      search_deck: { params: 'c', base: ['c:IsAbleToHand()'] },
+      dump_deck: { params: 'c', base: ['c:IsAbleToGrave()'] },
+      special_summon_deck: {
+        params: 'c,e,tp',
+        base: ['c:IsCanBeSpecialSummoned(e,0,tp,false,false)'],
+        addMonsterWhenNoType: true,
+        force: true
+      },
+      salvage_extra: {
+        params: 'c',
+        base: ['c:IsFaceup()', 'c:IsAbleToHand()'],
+        addPendulumWhenNoType: true,
+        force: true
+      },
+      revive_grave: { params: 'c,e,tp', base: ['c:IsCanBeSpecialSummoned(e,0,tp,false,false)'] }
+    };
+    const spec = specs[action];
+    const isTargetAction = ['destroy_target', 'banish_target', 'to_hand_target'].includes(action);
+    if (!spec && !(isTargetAction && (setcodeExpr || typeConst))) return null;
+    if (spec && !spec.force && !setcodeExpr && !typeConst) return null;
+
+    const conds = spec ? [...spec.base] : [];
+    const needType = !typeConst;
+    if (typeConst) conds.push(`c:IsType(${typeConst})`);
+    if (spec && spec.addMonsterWhenNoType && needType) conds.push('c:IsType(TYPE_MONSTER)');
+    if (spec && spec.addPendulumWhenNoType && needType) conds.push('c:IsType(TYPE_PENDULUM)');
+    if (setcodeExpr) conds.push(`c:IsSetCard(${setcodeExpr})`);
+    if (conds.length === 0) return null;
+
+    const name = `s.flt${idx}`;
+    return {
+      ref: name,
+      lines: [`-- 效果筛选条件 (字段 / 卡类限制)`, `function ${name}(${spec ? spec.params : 'c'})`, `  return ${conds.join(' and ')}`, `end`]
+    };
+  }
+
   generateActivatedLogic(idx, slot, sym, cardData) {
     const parts = [];
+    const actionFilter = this.buildActionFilter(idx, slot, slot.action || 'destroy_target');
+    if (actionFilter) parts.push(...actionFilter.lines);
+    const fref = actionFilter ? actionFilter.ref : null;
     const timing = slot.timing || (slot.effectType === 'trigger' ? (slot.event || 'summon_both') : (slot.effectType === 'quick' ? (slot.quickTiming || 'quick_free') : 'ignition_omit'));
     let effectType = slot.effectType;
     if (!effectType) {
@@ -805,32 +859,38 @@ class ClientScriptAssembler {
     parts.push(`-- 效果${sym} 发动检查与取对象`);
     parts.push(`function s.tg${idx}(e,tp,eg,ep,ev,re,r,rp,chk,chkc)`);
     if (action === 'destroy_target') {
-      parts.push(`  if chkc then return chkc:IsOnField() end`);
-      parts.push(`  if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end`);
+      const f = fref || 'aux.TRUE';
+      parts.push(`  if chkc then return ${fref ? `${fref}(chkc)` : 'chkc:IsOnField()'} end`);
+      parts.push(`  if chk==0 then return Duel.IsExistingTarget(${f},tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end`);
       parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)`);
-      parts.push(`  local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)`);
+      parts.push(`  local g=Duel.SelectTarget(tp,${f},tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)`);
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)`);
     } else if (action === 'banish_target') {
-      parts.push(`  if chkc then return chkc:IsAbleToRemove() and chkc:IsControler(1-tp) end`);
-      parts.push(`  if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil) end`);
+      const f = fref || 'Card.IsAbleToRemove';
+      parts.push(`  if chkc then return ${fref ? `${fref}(chkc)` : 'chkc:IsAbleToRemove()'} and chkc:IsControler(1-tp) end`);
+      parts.push(`  if chk==0 then return Duel.IsExistingTarget(${f},tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil) end`);
       parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)`);
-      parts.push(`  local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,1,nil)`);
+      parts.push(`  local g=Duel.SelectTarget(tp,${f},tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,1,nil)`);
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)`);
     } else if (action === 'to_hand_target') {
-      parts.push(`  if chkc then return chkc:IsOnField() and chkc:IsAbleToHand() end`);
-      parts.push(`  if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end`);
+      const f = fref || 'Card.IsAbleToHand';
+      parts.push(`  if chkc then return ${fref ? `${fref}(chkc)` : 'chkc:IsOnField() and chkc:IsAbleToHand()'} end`);
+      parts.push(`  if chk==0 then return Duel.IsExistingTarget(${f},tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end`);
       parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)`);
-      parts.push(`  local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)`);
+      parts.push(`  local g=Duel.SelectTarget(tp,${f},tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)`);
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)`);
     } else if (action === 'revive_grave') {
-      parts.push(`  if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsCanBeSpecialSummoned(e,0,tp,false,false) end`);
+      const f = fref || 'Card.IsCanBeSpecialSummoned';
+      const ex = fref ? ',e,tp' : ',e,0,tp,false,false';
+      parts.push(`  if chkc then return chkc:IsLocation(LOCATION_GRAVE)${fref ? ` and ${fref}(chkc,e,tp)` : ` and chkc:IsCanBeSpecialSummoned(e,0,tp,false,false)`} end`);
       parts.push(`  if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0`);
-      parts.push(`    and Duel.IsExistingTarget(Card.IsCanBeSpecialSummoned,tp,LOCATION_GRAVE,0,1,nil,e,0,tp,false,false) end`);
+      parts.push(`    and Duel.IsExistingTarget(${f},tp,LOCATION_GRAVE,0,1,nil${ex}) end`);
       parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)`);
-      parts.push(`  local g=Duel.SelectTarget(tp,Card.IsCanBeSpecialSummoned,tp,LOCATION_GRAVE,0,1,1,nil,e,0,tp,false,false)`);
+      parts.push(`  local g=Duel.SelectTarget(tp,${f},tp,LOCATION_GRAVE,0,1,1,nil${ex})`);
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)`);
     } else if (action === 'search_deck') {
-      parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_DECK,0,1,nil) end`);
+      const f = fref || 'Card.IsAbleToHand';
+      parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(${f},tp,LOCATION_DECK,0,1,nil) end`);
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)`);
     } else if (action === 'draw_cards') {
       parts.push(`  if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end`);
@@ -865,17 +925,51 @@ class ClientScriptAssembler {
       parts.push(`  Duel.SetTargetPlayer(1-tp)`);
       parts.push(`  Duel.SetTargetParam(dam)`);
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)`);
+    } else if (action === 'burn_damage') {
+      const burnVal = parseInt(slot.burnValue) || 1000;
+      const burnTarget = slot.burnTargetPlayer === 'self' ? 'tp' : '1-tp';
+      parts.push(`  if chk==0 then return true end`);
+      parts.push(`  Duel.SetTargetPlayer(${burnTarget})`);
+      parts.push(`  Duel.SetTargetParam(${burnVal})`);
+      parts.push(`  Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,${burnTarget},${burnVal})`);
+    } else if (action === 'destroy_self_all') {
+      parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,0,1,nil) end`);
+      parts.push(`  local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,0,nil)`);
+      parts.push(`  Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)`);
+    } else if (action === 'negate_punish') {
+      parts.push(`  Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)`);
+      parts.push(`  Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,1)`);
+    } else if (action === 'special_summon_hand') {
+      parts.push(`  if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0`);
+      parts.push(`    and Duel.IsExistingMatchingCard(Card.IsCanBeSpecialSummoned,tp,LOCATION_HAND,0,1,nil,e,0,tp,false,false) end`);
+      parts.push(`  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)`);
+    } else if (action === 'salvage_extra') {
+      const f = fref || 'Card.IsAbleToHand';
+      parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(${f},tp,LOCATION_EXTRA,0,1,nil) end`);
+      parts.push(`  Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_EXTRA)`);
+    } else if (action === 'immune_all' || action === 'atk_boost') {
+      parts.push(`  if chk==0 then return true end`);
     } else if (action === 'special_summon_self') {
       parts.push(`  if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0`);
       parts.push(`    and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end`);
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)`);
     } else if (action === 'dump_deck') {
-      parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_DECK,0,1,nil) end`);
+      const f = fref || 'Card.IsAbleToGrave';
+      parts.push(`  if chk==0 then return Duel.IsExistingMatchingCard(${f},tp,LOCATION_DECK,0,1,nil) end`);
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)`);
     } else if (action === 'special_summon_deck') {
+      const f = fref || 'Card.IsCanBeSpecialSummoned';
+      const ex = fref ? ',e,tp' : ',e,0,tp,false,false';
       parts.push(`  if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0`);
-      parts.push(`    and Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_DECK,0,1,nil,e,tp) end`);
+      parts.push(`    and Duel.IsExistingMatchingCard(${f},tp,LOCATION_DECK,0,1,nil${ex}) end`);
       parts.push(`  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)`);
+    } else if (action === 'negate_punish') {
+      parts.push(`  if chkc then return chkc:IsOnField() end`);
+      parts.push(`  if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil) end`);
+      parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)`);
+      parts.push(`  local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,nil)`);
+      parts.push(`  Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)`);
+      parts.push(`  Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,1)`);
     } else if (action === 'negate_target_monster') {
       parts.push(`  if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() end`);
       parts.push(`  if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end`);
@@ -967,8 +1061,9 @@ class ClientScriptAssembler {
       parts.push(`    Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)`);
       parts.push(`  end`);
     } else if (action === 'search_deck') {
+      const f = fref || 'Card.IsAbleToHand';
       parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)`);
-      parts.push(`  local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,LOCATION_DECK,0,1,1,nil)`);
+      parts.push(`  local g=Duel.SelectMatchingCard(tp,${f},tp,LOCATION_DECK,0,1,1,nil)`);
       parts.push(`  if #g>0 then`);
       parts.push(`    Duel.SendtoHand(g,nil,REASON_EFFECT)`);
       parts.push(`    Duel.ConfirmCards(1-tp,g)`);
@@ -1000,21 +1095,67 @@ class ClientScriptAssembler {
     } else if (action === 'burn_battle_destroy') {
       parts.push(`  local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)`);
       parts.push(`  Duel.Damage(p,d,REASON_EFFECT)`);
+    } else if (action === 'burn_damage') {
+      parts.push(`  local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)`);
+      parts.push(`  Duel.Damage(p,d,REASON_EFFECT)`);
+    } else if (action === 'destroy_self_all') {
+      parts.push(`  local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,0,nil)`);
+      parts.push(`  if #g>0 then`);
+      parts.push(`    Duel.Destroy(g,REASON_EFFECT)`);
+      parts.push(`  end`);
+    } else if (action === 'negate_punish') {
+      const req = parseInt(slot.punishDiscardCount) || 2;
+      const tgtName = slot.punishTarget === 'self' ? 'tp' : '1-tp';
+      parts.push(`  local tc=Duel.GetFirstTarget()`);
+      parts.push(`  if not (tc and tc:IsRelateToEffect(e)) then return end`);
+      parts.push(`  local b=Duel.IsExistingMatchingCard(Card.IsDiscardable,${tgtName},LOCATION_HAND,0,${req},nil)`);
+      parts.push(`  local op=0`);
+      parts.push(`  if b then`);
+      parts.push(`    op=Duel.SelectEffect(${tgtName},{true,aux.Stringid(id,0)},{false,aux.Stringid(id,1)})`);
+      parts.push(`  end`);
+      parts.push(`  Duel.BreakEffect()`);
+      parts.push(`  if op==1 then`);
+      parts.push(`    Duel.DiscardHand(${tgtName},Card.IsDiscardable,${req},${req},REASON_EFFECT+REASON_DISCARD,nil)`);
+      parts.push(`    Duel.Draw(tp,1,REASON_EFFECT)`);
+      parts.push(`    Duel.Draw(1-tp,1,REASON_EFFECT)`);
+      parts.push(`  else`);
+      parts.push(`    Duel.Destroy(tc,REASON_EFFECT)`);
+      parts.push(`  end`);
+    } else if (action === 'special_summon_hand') {
+      parts.push(`  if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end`);
+      parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)`);
+      parts.push(`  local g=Duel.SelectMatchingCard(tp,Card.IsCanBeSpecialSummoned,tp,LOCATION_HAND,0,1,1,nil,e,0,tp,false,false)`);
+      parts.push(`  if #g>0 then`);
+      parts.push(`    Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)`);
+      parts.push(`  end`);
+    } else if (action === 'salvage_extra') {
+      const f = fref || 'Card.IsAbleToHand';
+      parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)`);
+      parts.push(`  local g=Duel.SelectMatchingCard(tp,${f},tp,LOCATION_EXTRA,0,1,1,nil)`);
+      parts.push(`  if #g>0 then`);
+      parts.push(`    Duel.SendtoHand(g,nil,REASON_EFFECT)`);
+      parts.push(`    Duel.ConfirmCards(1-tp,g)`);
+      parts.push(`  end`);
+    } else if (action === 'immune_all' || action === 'atk_boost') {
+      // 常驻型动作：实际效果在 assembleContinuousEffect 中登记，这里无需连锁处理
     } else if (action === 'special_summon_self') {
       parts.push(`  local c=e:GetHandler()`);
       parts.push(`  if c:IsRelateToEffect(e) then`);
       parts.push(`    Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)`);
       parts.push(`  end`);
     } else if (action === 'dump_deck') {
+      const f = fref || 'Card.IsAbleToGrave';
       parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)`);
-      parts.push(`  local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_DECK,0,1,1,nil)`);
+      parts.push(`  local g=Duel.SelectMatchingCard(tp,${f},tp,LOCATION_DECK,0,1,1,nil)`);
       parts.push(`  if #g>0 then`);
       parts.push(`    Duel.SendtoGrave(g,REASON_EFFECT)`);
       parts.push(`  end`);
     } else if (action === 'special_summon_deck') {
+      const f = fref || 'Card.IsCanBeSpecialSummoned';
+      const ex = fref ? ',e,tp' : ',e,0,tp,false,false';
       parts.push(`  if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end`);
       parts.push(`  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)`);
-      parts.push(`  local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_DECK,0,1,1,nil,e,tp)`);
+      parts.push(`  local g=Duel.SelectMatchingCard(tp,${f},tp,LOCATION_DECK,0,1,1,nil${ex})`);
       parts.push(`  if #g>0 then`);
       parts.push(`    Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)`);
       parts.push(`  end`);
@@ -1117,23 +1258,29 @@ class ClientScriptAssembler {
       case 'choice_destroy_or_banish': return 'CATEGORY_DESTROY+CATEGORY_REMOVE';
       case 'choice_draw_or_burn': return 'CATEGORY_DRAW+CATEGORY_DAMAGE';
       case 'search_deck': return 'CATEGORY_TOHAND+CATEGORY_SEARCH';
+      case 'salvage_extra': return 'CATEGORY_TOHAND+CATEGORY_SEARCH';
       case 'to_hand_target': return 'CATEGORY_TOHAND';
       case 'special_summon_self':
       case 'special_summon_hand':
+      case 'special_summon_deck':
       case 'revive_grave': return 'CATEGORY_SPECIAL_SUMMON';
       case 'negate_and_destroy': return 'CATEGORY_NEGATE+CATEGORY_DESTROY';
       case 'negate_activation': return 'CATEGORY_NEGATE';
+      case 'negate_punish': return 'CATEGORY_DESTROY+CATEGORY_DRAW';
       case 'banish_target': return 'CATEGORY_REMOVE';
       case 'destroy_target':
+      case 'destroy_self_all':
       case 'wipe_oppo_all':
       case 'wipe_oppo_monsters':
       case 'wipe_oppo_spells': return 'CATEGORY_DESTROY';
       case 'draw_cards': return 'CATEGORY_DRAW';
-      case 'burn_battle_destroy': return 'CATEGORY_DAMAGE';
+      case 'burn_battle_destroy':
+      case 'burn_damage': return 'CATEGORY_DAMAGE';
       case 'dump_deck': return 'CATEGORY_TOGRAVE+CATEGORY_DECKDES';
-      case 'special_summon_deck': return 'CATEGORY_SPECIAL_SUMMON';
       case 'negate_target_monster': return 'CATEGORY_DISABLE';
       case 'p_destroy_search': return 'CATEGORY_DESTROY+CATEGORY_TOHAND+CATEGORY_SEARCH';
+      case 'immune_all':
+      case 'atk_boost': return '0';
       default: return 'CATEGORY_DESTROY';
     }
   }
@@ -1181,6 +1328,14 @@ class ClientScriptAssembler {
           mainDesc = isJa ? 'デッキからドロー' : '从卡组抽卡';
         } else if (action === 'dump_deck') {
           mainDesc = isJa ? 'デッキから墓地へ送る' : '从卡组送去墓地';
+        } else if (action === 'salvage_extra') {
+          mainDesc = isJa ? 'ＥＸデッキから手札に加える' : '从额外卡组加入手牌';
+        } else if (action === 'burn_damage') {
+          mainDesc = isJa ? 'ダメージを与える' : '造成伤害';
+        } else if (action === 'destroy_self_all') {
+          mainDesc = isJa ? '自分フィールドのカードを破壊' : '破坏自己场上的卡';
+        } else if (action === 'negate_punish') {
+          mainDesc = isJa ? '相手の選択により処理が変化' : '对方可选择处理方式';
         } else if (action === 'negate_and_destroy' || action === 'negate_activation') {
           mainDesc = isJa ? '発動を無効にする' : '无效卡片发动';
         } else {
@@ -1397,8 +1552,25 @@ class ClientScriptAssembler {
     return '';
   }
 
+  /**
+   * 生成「字段 / 卡类」筛选的卡文短语，如「青眼」怪兽 / 「ブルーアイズ」モンスター / 魔法卡。
+   * 无筛选时返回空串。
+   */
+  getFilterPhrase(slot, isJa, fallbackZh = '卡') {
+    const typeNameZh = { monster: '怪兽', spell: '魔法卡', trap: '陷阱卡' }[slot.filterType] || '';
+    const typeNameJa = { monster: 'モンスター', spell: '魔法カード', trap: '罠カード' }[slot.filterType] || '';
+    const arch = (slot.filterArchetype || '').trim() || (slot.filterSetcode ? '此系列' : '');
+    const archZh = arch ? `「${arch}」` : '';
+    const archJa = arch ? `「${arch}」` : '';
+    if (!archZh && !typeNameZh) return '';
+    return isJa ? `${archJa}${typeNameJa}` : `${archZh}${typeNameZh || fallbackZh}`;
+  }
+
   getTargetClause(slot, isJa) {
     const target = slot.target;
+    if (slot.action === 'negate_punish') {
+      return isJa ? '相手フィールドのカード１枚を対象として発動できる。' : '以对方场上1张卡为对象才能发动。';
+    }
     if (!target || target === 'none') return '';
     if (isJa) {
       if (target === 'target_field_card') return 'フィールドのカード１枚を対象として発動できる。';
@@ -1421,8 +1593,10 @@ class ClientScriptAssembler {
   getActionClause(slot, isJa) {
     const action = slot.action || 'destroy_target';
     const hasTarget = slot.target && slot.target !== 'none';
+    const fp = this.getFilterPhrase(slot, isJa);
+    const fpMonster = this.getFilterPhrase(slot, isJa, '怪兽');
     if (isJa) {
-      if (action === 'search_deck') return 'デッキからカード１枚を手札に加える。';
+      if (action === 'search_deck') return `デッキから${fp || 'カード'}１枚を手札に加える。`;
       if (action === 'special_summon_self') return 'このカードを手札から特殊召喚する。';
       if (action === 'special_summon_hand') return '手札からモンスター１体を特殊召喚する。';
       if (action === 'revive_grave') return hasTarget ? 'そのモンスターを自分フィールドに特殊召喚する。' : '自分または相手の墓地のモンスター１体を自分フィールドに特殊召喚する。';
@@ -1431,20 +1605,32 @@ class ClientScriptAssembler {
       if (action === 'banish_target') return hasTarget ? 'そのカードを除外する。' : '相手フィールドのカード１枚を除外する。';
       if (action === 'negate_and_destroy') return 'その発動を無効にし破壊する。';
       if (action === 'negate_activation') return 'その発動を無効にする。';
-      if (action === 'dump_deck') return 'デッキからカード１枚を墓地へ送る。';
-      if (action === 'special_summon_deck') return 'デッキからモンスター１体を特殊召喚する。';
+      if (action === 'dump_deck') return `デッキから${fp || 'カード'}１枚を墓地へ送る。`;
+      if (action === 'special_summon_deck') return `デッキから${fp || 'モンスター'}１体を特殊召喚する。`;
       if (action === 'negate_target_monster') return 'そのモンスターの効果をターン終了時まで無効にする。';
       if (action === 'p_destroy_search') return 'このカードを破壊し、デッキからカード１枚を手札に加える。';
       if (action === 'draw_cards') return 'デッキから２枚ドローする。';
       if (action === 'wipe_oppo_all') return '相手フィールドのカードを全て破壊する。';
       if (action === 'wipe_oppo_monsters') return '相手フィールドのモンスターを全て破壊する。';
       if (action === 'wipe_oppo_spells') return '相手フィールドの魔法・罠カードを全て破壊する。';
-      if (action === 'burn_battle_destroy' || action === 'burn_damage') return '相手に１０００ダメージを与える。';
+      if (action === 'burn_battle_destroy') return '相手に１０００ダメージを与える。';
+      if (action === 'burn_damage') {
+        const v = parseInt(slot.burnValue) || 1000;
+        const who = slot.burnTargetPlayer === 'self' ? '自分' : '相手';
+        return `${who}に${v}ダメージを与える。`;
+      }
+      if (action === 'destroy_self_all') return '自分フィールドのカードを全て破壊する。';
+      if (action === 'negate_punish') {
+        const n = parseInt(slot.punishDiscardCount) || 2;
+        const tgt = slot.punishTarget === 'self' ? '自分' : '相手';
+        return `${tgt}は手札を${n}枚捨てる事で、そのカードを破壊する代わりにお互いが１枚ドローする。`;
+      }
+      if (action === 'salvage_extra') return 'ＥＸデッキから表側表示のモンスター１体を手札に加える。';
       if (action === 'immune_all') return '相手のカードの効果を受けない。';
       if (action === 'atk_boost') return 'このカードの攻撃力・守備力は１０００アップする。';
       return '効果を適用する。';
     }
-    if (action === 'search_deck') return '从卡组把1张卡加入手牌。';
+    if (action === 'search_deck') return `从卡组把1${fp && slot.filterType === 'monster' ? '只' : '张'}${fp || '卡'}加入手牌。`;
     if (action === 'special_summon_self') return '这张卡从手卡特殊召唤。';
     if (action === 'special_summon_hand') return '从手卡把1只怪兽特殊召唤。';
     if (action === 'revive_grave') return hasTarget ? '那只怪兽在自己场上特殊召唤。' : '以自己或对方墓地1只怪兽为对象才能发动。那只怪兽在自己场上特殊召唤。';
@@ -1453,15 +1639,26 @@ class ClientScriptAssembler {
     if (action === 'banish_target') return hasTarget ? '那张卡除外。' : '以对方场上1张卡为对象才能发动。那张卡除外。';
     if (action === 'negate_and_destroy') return '那个发动无效并破坏。';
     if (action === 'negate_activation') return '那个发动无效。';
-    if (action === 'dump_deck') return '从卡组把1张卡送去墓地。';
-    if (action === 'special_summon_deck') return '从卡组把1只怪兽特殊召唤。';
-    if (action === 'negate_target_monster') return '那只怪兽的效果直到回合结束时无效。';
+    if (action === 'dump_deck') return `从卡组把1${fp && slot.filterType === 'monster' ? '只' : '张'}${fp || '卡'}送去墓地。`;
+    if (action === 'special_summon_deck') return `从卡组把1只${fpMonster || '怪兽'}特殊召唤。`;    if (action === 'negate_target_monster') return '那只怪兽的效果直到回合结束时无效。';
     if (action === 'p_destroy_search') return '把这张卡破坏，从卡组把1张卡加入手牌。';
     if (action === 'draw_cards') return '从卡组抽2张卡。';
     if (action === 'wipe_oppo_all') return '对方场上的卡全部破坏。';
     if (action === 'wipe_oppo_monsters') return '对方场上的怪兽全部破坏。';
     if (action === 'wipe_oppo_spells') return '对方场上的魔法·陷阱卡全部破坏。';
-    if (action === 'burn_battle_destroy' || action === 'burn_damage') return '给对方造成1000点伤害。';
+    if (action === 'burn_battle_destroy') return '给对方造成1000点伤害。';
+    if (action === 'burn_damage') {
+      const v = parseInt(slot.burnValue) || 1000;
+      const who = slot.burnTargetPlayer === 'self' ? '自己' : '对方';
+      return `给${who}造成${v}点伤害。`;
+    }
+    if (action === 'destroy_self_all') return '自己场上的卡全部破坏。';
+    if (action === 'negate_punish') {
+      const n = parseInt(slot.punishDiscardCount) || 2;
+      const tgt = slot.punishTarget === 'self' ? '自己' : '对方';
+      return `${tgt}可以丢弃${n}张手卡，让这张卡破坏的效果变为双方各抽1张卡。`;
+    }
+    if (action === 'salvage_extra') return `从额外卡组把1${fp && slot.filterType === 'monster' ? '只' : '张'}${fp || '表侧表示的怪兽'}加入手牌。`;
     if (action === 'immune_all') return '不受对方卡的效果影响。';
     if (action === 'atk_boost') return '这张卡的攻击力·守备力上升1000。';
     return '进行效果处理。';
@@ -1543,7 +1740,7 @@ class ClientScriptAssembler {
 
     const timing = slot.timing || (slot.effectType === 'trigger' ? (slot.event || 'summon_both') : (slot.effectType === 'quick' ? (slot.quickTiming || 'quick_free') : 'ignition_omit'));
     const isWhen = slot.timingMode === 'when';
-    const hasTarget = slot.target && slot.target !== 'none';
+    const hasTarget = (slot.target && slot.target !== 'none') || slot.action === 'negate_punish';
     const hasCost = slot.cost && slot.cost !== 'none';
     const hasTargetOrCost = hasTarget || hasCost;
 

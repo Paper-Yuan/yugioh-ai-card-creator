@@ -1031,8 +1031,15 @@ function renderWizardStep() {
   setVal('wizardTarget', eff.target || 'none');
   setVal('wizardAction', eff.action || 'search_deck');
   setVal('wizardFollowup', eff.followup || 'none');
+  setVal('wizardFilterArchetype', eff.filterArchetype || '');
+  setVal('wizardFilterType', eff.filterType || '');
+  setVal('wizardBurnValue', eff.burnValue || 1000);
+  setVal('wizardBurnTarget', eff.burnTargetPlayer || 'opponent');
+  setVal('wizardPunishCount', eff.punishDiscardCount || 2);
+  setVal('wizardPunishTarget', eff.punishTarget || 'opponent');
 
   updateWizardTimingVisibility(eff.timing || 'ignition_omit');
+  updateWizardActionParamsVisibility(eff.action || 'search_deck');
 
   const lpWrap = document.getElementById('wizardLpCostWrap');
   if (lpWrap) {
@@ -1127,6 +1134,82 @@ function onWizardTimingChanged(val) {
 
   updateWizardTimingVisibility(val);
   onWizardFieldChanged('timing', val);
+}
+
+// 依所选「效果本体(Action)」动态显示筛选与参数控件
+function updateWizardActionParamsVisibility(actionVal) {
+  const wrap = document.getElementById('wizardActionParamsWrap');
+  if (!wrap) return;
+
+  const filterActions = ['search_deck', 'dump_deck', 'special_summon_deck', 'salvage_extra', 'revive_grave', 'destroy_target', 'banish_target', 'to_hand_target'];
+  const needFilter = filterActions.includes(actionVal);
+  const needBurn = actionVal === 'burn_damage';
+  const needPunish = actionVal === 'negate_punish';
+
+  const setDisp = (id, show) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? 'block' : 'none';
+  };
+  // revive_grave 以墓地取对象，卡类/字段限制同样生效；但特召来源固定墓地
+  setDisp('wrapFilterArchetype', needFilter);
+  setDisp('wrapFilterType', needFilter);
+  setDisp('wrapBurnValue', needBurn);
+  setDisp('wrapBurnTarget', needBurn);
+  setDisp('wrapPunishCount', needPunish);
+  setDisp('wrapPunishTarget', needPunish);
+
+  wrap.style.display = (needFilter || needBurn || needPunish) ? 'grid' : 'none';
+}
+
+function onWizardActionChanged(val) {
+  updateWizardActionParamsVisibility(val);
+  onWizardFieldChanged('action', val);
+}
+
+// 检索/特召的字段输入：匹配官方或自定义字段库，取回 Setcode 并保存
+function onWizardFilterArchetypeInput(val) {
+  const clean = (val || '').trim();
+  const curIdx = state.currentWizardIndex || 0;
+  if (!state.wizardEffects[curIdx]) state.wizardEffects[curIdx] = {};
+  const eff = state.wizardEffects[curIdx];
+  eff.filterArchetype = clean;
+
+  const hint = document.getElementById('wizardFilterArchetypeHint');
+  const match = typeof findArchetypeMatch === 'function' ? findArchetypeMatch(clean) : null;
+  if (match) {
+    eff.filterSetcode = match.hex;
+    eff.filterArchetype = match.nameZh;
+    if (hint) hint.innerHTML = `<span style="color:#38bdf8;">✓ 已匹配字段 <b>${escapeHtml(match.nameZh)}</b> [${match.hex}]</span>`;
+  } else {
+    eff.filterSetcode = '';
+    if (hint) {
+      hint.innerHTML = clean
+        ? `<span style="color:#f59e0b;">未匹配到字段库，可改用下方「当前卡字段」按钮或留空</span>`
+        : '留空则不限字段';
+    }
+  }
+
+  onWizardFieldChanged('filterArchetype', eff.filterArchetype);
+}
+
+// 一键套用当前卡片自身的字段（Setcode）
+function useCurrentCardArchetypeForFilter() {
+  const curIdx = state.currentWizardIndex || 0;
+  if (!state.wizardEffects[curIdx]) state.wizardEffects[curIdx] = {};
+  const eff = state.wizardEffects[curIdx];
+  const hex = state.cardData.setcode || (document.getElementById('cardSetcode') || {}).value || '';
+  const name = state.cardData.archetype || (document.getElementById('cardArchetype') || {}).value || '';
+  if (!hex) {
+    showNotification('当前卡片尚未设置字段 / Setcode', 'error');
+    return;
+  }
+  eff.filterSetcode = hex;
+  eff.filterArchetype = name;
+  const input = document.getElementById('wizardFilterArchetype');
+  if (input) input.value = name;
+  const hint = document.getElementById('wizardFilterArchetypeHint');
+  if (hint) hint.innerHTML = `<span style="color:#34d399;">✓ 已套用当前卡字段 <b>${escapeHtml(name || '自定义')}</b> [${hex}]</span>`;
+  onWizardFieldChanged('filterArchetype', name);
 }
 
 function onWizardFieldChanged(field, value) {

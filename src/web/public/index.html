@@ -860,21 +860,26 @@
                   <!-- 4. 效果本体 (Effect Body / Action) -->
                   <div class="input-field mb-3">
                     <label>4. 效果本体 (Action) <span class="req">*</span></label>
-                    <select id="wizardAction" onchange="onWizardFieldChanged('action', this.value)">
+                    <select id="wizardAction" onchange="onWizardActionChanged(this.value)">
                       <option value="search_deck" selected>检索：从卡组把卡片加入手牌</option>
                       <option value="special_summon_self">特召：这张卡从手卡特殊召唤</option>
                       <option value="special_summon_hand">特召：从手卡把 1 只怪兽特殊召唤</option>
+                      <option value="special_summon_deck">特召：从卡组把 1 只怪兽特殊召唤</option>
                       <option value="revive_grave">苏生：所选墓地怪兽在自己场上特殊召唤</option>
                       <option value="destroy_target">点破：所选对象破坏</option>
                       <option value="banish_target">除外：所选对象除外</option>
                       <option value="to_hand_target">弹手：所选对象回到手牌</option>
+                      <option value="dump_deck">堆墓：从卡组把 1 张卡送去墓地</option>
+                      <option value="salvage_extra">回收：从额外卡组把 1 只怪兽加入手牌</option>
                       <option value="wipe_oppo_monsters">全灭：对方场上的怪兽全部破坏</option>
                       <option value="wipe_oppo_spells">清后场：对方场上的魔法·陷阱卡全部破坏</option>
                       <option value="wipe_oppo_all">大开辟全场灭：对方场上的卡全部破坏</option>
+                      <option value="destroy_self_all">自爆：自己场上的卡全部破坏</option>
                       <option value="negate_and_destroy">打断反制：那个发动无效并破坏</option>
                       <option value="negate_activation">纯反制：那个发动无效</option>
+                      <option value="negate_punish">威吓：对方可弃 N 张手卡改为双方抽1张（否则破坏）</option>
                       <option value="draw_cards">补充：从卡组抽 2 张卡</option>
-                      <option value="burn_damage">追伤：给对方造成 1000 点伤害</option>
+                      <option value="burn_damage">追伤：给对方造成指定数值伤害</option>
                       <option value="immune_all">永续全抗：不受对方卡的效果影响</option>
                       <option value="atk_boost">永续增幅：攻击力·守备力上升 1000</option>
                       <optgroup label="🎯 二选一 / 多选一选项效果 (支持 YGOPro 弹窗精准文字)">
@@ -884,6 +889,52 @@
                         <option value="choice_draw_or_burn">二选一：从卡组抽2张卡 / 造成2000点伤害</option>
                       </optgroup>
                     </select>
+                  </div>
+
+                  <!-- 4B. 筛选与动作参数 (依所选动作动态显示) -->
+                  <div id="wizardActionParamsWrap" class="form-grid-2 mb-3" style="display:none;background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.18);border-radius:8px;padding:10px 14px;">
+                    <div class="input-field" id="wrapFilterArchetype">
+                      <label>检索/特召 字段系列 (Setcode)</label>
+                      <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="text" id="wizardFilterArchetype" placeholder="例如：青眼（留空则不限字段）" list="archetypeDatalist" oninput="onWizardFilterArchetypeInput(this.value)" style="flex:1;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="useCurrentCardArchetypeForFilter()" title="套用当前卡片自身的字段 / Setcode">套用本卡字段</button>
+                      </div>
+                      <small id="wizardFilterArchetypeHint" style="color:var(--text-muted);">匹配官方 595 字段库或自定义字段，自动取得 Setcode</small>
+                    </div>
+                    <div class="input-field" id="wrapFilterType">
+                      <label>检索/特召 卡类限制</label>
+                      <select id="wizardFilterType" onchange="onWizardFieldChanged('filterType', this.value)">
+                        <option value="" selected>无限制</option>
+                        <option value="monster">怪兽卡</option>
+                        <option value="spell">魔法卡</option>
+                        <option value="trap">陷阱卡</option>
+                      </select>
+                    </div>
+                    <div class="input-field" id="wrapBurnValue" style="display:none;">
+                      <label>伤害数值</label>
+                      <input type="number" id="wizardBurnValue" value="1000" min="100" max="8000" step="100" oninput="onWizardFieldChanged('burnValue', this.value)">
+                    </div>
+                    <div class="input-field" id="wrapBurnTarget" style="display:none;">
+                      <label>伤害对象</label>
+                      <select id="wizardBurnTarget" onchange="onWizardFieldChanged('burnTargetPlayer', this.value)">
+                        <option value="opponent" selected>对方</option>
+                        <option value="self">自己</option>
+                      </select>
+                    </div>
+                    <div class="input-field" id="wrapPunishCount" style="display:none;">
+                      <label>需舍弃手卡数量</label>
+                      <input type="number" id="wizardPunishCount" value="2" min="1" max="6" oninput="onWizardFieldChanged('punishDiscardCount', this.value)">
+                    </div>
+                    <div class="input-field" id="wrapPunishTarget" style="display:none;">
+                      <label>由谁选择是否弃卡</label>
+                      <select id="wizardPunishTarget" onchange="onWizardFieldChanged('punishTarget', this.value)">
+                        <option value="opponent" selected>对方</option>
+                        <option value="self">自己</option>
+                      </select>
+                    </div>
+                    <div class="input-field" id="wrapFilterHint" style="grid-column:1/-1;">
+                      <small id="wizardFilterHintText" style="color:var(--text-muted);">字段与卡类限制会同时作用于卡文描述与 Lua 筛选条件。</small>
+                    </div>
                   </div>
 
                   <!-- 5. （处理后的动作）(Follow-up Action) -->
