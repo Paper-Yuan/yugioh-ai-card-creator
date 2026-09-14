@@ -1,6 +1,6 @@
 {
   "name": "yugioh-ai-card-creator",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "本地运行的游戏王 DIY 制卡工具：卡面渲染 + YGOPro/MDPro3 脚本与卡包导出，可选接入大模型 API",
   "main": "electron/main.cjs",
   "type": "module",

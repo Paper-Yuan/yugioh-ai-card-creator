@@ -5,7 +5,7 @@
 > 本项目是个人向的制卡辅助工具，不是官方产品，也不追求"完整复刻"任何商业制卡软件。功能以本机自用为主，覆盖面有限，可参考下方[已知限制](#已知限制)。
 > 使用中遇到问题或有改进想法，欢迎[提 Issue](https://github.com/Paper-Yuan/yugioh-ai-card-creator/issues)（见[反馈与贡献](#反馈与贡献)）。
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![Version](https://img.shields.io/badge/version-2.0.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
 

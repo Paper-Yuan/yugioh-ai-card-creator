@@ -1,9 +1,13 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const APP_VERSION = require('../package.json').version;
 
 console.log('========================================================');
-console.log('游戏王 AI 制卡工作室 - 双端发布独立打包系统 (v2.0.0)');
+console.log(`游戏王 AI 制卡工作室 - 双端发布独立打包系统 (v${APP_VERSION})`);
 console.log('========================================================\n');
 
 // 1. 确保 release 目录就绪
@@ -26,7 +30,7 @@ fs.cpSync('dist/web/public', 'android/app/src/main/assets/public', { recursive: 
 execSync('cd android && gradlew.bat assembleDebug', { stdio: 'inherit' });
 
 const apkSrc = 'android/app/build/outputs/apk/debug/app-debug.apk';
-const apkDest = 'release/游戏王AI制卡器-v2.0.0.apk';
+const apkDest = `release/游戏王AI制卡器-v${APP_VERSION}.apk`;
 if (fs.existsSync(apkSrc)) {
   fs.copyFileSync(apkSrc, apkDest);
   const apkSizeMb = (fs.statSync(apkDest).size / 1024 / 1024).toFixed(2);
@@ -41,14 +45,14 @@ const csc = 'C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe';
 const binDir = 'release/windows-bin';
 const payloadDir = 'release/temp-payload';
 const zipPath = 'release/payload.zip';
-const finalExeVersion = 'release/游戏王AI制卡器-v2.0.0.exe';
+const finalExeVersion = `release/游戏王AI制卡器-v${APP_VERSION}.exe`;
 const finalExeCommon = 'release/游戏王AI制卡器.exe';
 const portableDir = 'release/游戏王AI制卡器-便携版';
-const portableZip = 'release/游戏王AI制卡器-v2.0.0-便携版.zip';
+const portableZip = `release/游戏王AI制卡器-v${APP_VERSION}-便携版.zip`;
 
 // 清理旧安装包与临时目录
-if (fs.existsSync('release/游戏王AI制卡器-v2.0.0-Setup.exe')) {
-  try { fs.unlinkSync('release/游戏王AI制卡器-v2.0.0-Setup.exe'); } catch (e) {}
+if (fs.existsSync(`release/游戏王AI制卡器-v${APP_VERSION}-Setup.exe`)) {
+  try { fs.unlinkSync(`release/游戏王AI制卡器-v${APP_VERSION}-Setup.exe`); } catch (e) {}
 }
 if (fs.existsSync(portableDir)) {
   fs.rmSync(portableDir, { recursive: true, force: true });
