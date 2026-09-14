@@ -1,0 +1,185 @@
+# yugioh-ai-card-creator（游戏王 AI 制卡器）
+
+一个本地运行的游戏王 DIY 制卡工具：在浏览器里完成卡片编辑与卡面渲染，并导出 YGOPro / MDPro3 可直接使用的 Lua 脚本、卡图、CDB 数据库与 `.ypk` 扩展包。可选接入大模型 API 来辅助生成卡片信息与脚本。
+
+> 本项目是个人向的制卡辅助工具，不是官方产品，也不追求"完整复刻"任何商业制卡软件。功能以本机自用为主，覆盖面有限，可参考下方[已知限制](#已知限制)。
+
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
+
+---
+
+## 功能
+
+### 制卡主流程
+
+四步式编辑：**基本信息 → 效果脚本 → 卡图 → 预览导出**。支持怪兽 / 魔法 / 陷阱三大类，含仪式、融合、同调、超量、连接、灵摆以及复合框型。
+
+### 卡面渲染
+
+对齐 MDPro3 与官方卡面的排版思路，前端 Canvas 渲染：
+
+- 属性图标、等级 / 阶级 / LINK 箭头、ATK / DEF、卡片密码
+- 罕贵度工艺（UR / SER / PSER / GR / DT 等）、镭射 / 全息、卡名烫金
+- 水印、出框（Overframe）效果
+- 卡图构图微调（缩放、位移、画幅模式）
+
+> 卡面还原度取决于所放置的素材，详见 [docs/ASSETS.md](docs/ASSETS.md)。
+
+### 效果脚本
+
+- **图形化**：内置 12 个可配置效果模块（特召、检索、破坏、抽卡、扣血 / 回血、无效、除外、攻守变化、送墓等），用 Handlebars 模板组装为 Lua
+- **手写**：独立的脚本设计器，含基础 / 怪兽 / 魔法模板、代码统计与语法校验
+- 生成脚本按 YGOPro 规范组织（`local s,id,o=GetID()`、`s.initial_effect` 等）
+
+### 日文 OCG 适配
+
+- 上部文本按 OCG 标头格式生成（种族 / 召唤分类 / 能力 / 效果）
+- 卡名与效果文的一键振假名注音
+
+### 卡包工程与导出
+
+- 多卡组成卡包工程，统一管理字段（Setcode）
+- 导出整包 `.ypk`（MDPro3 扩展包）、CDB 数据库、单卡 ZIP
+- 单卡 ZIP 结构：
+
+```
+card_100000001/
+├── script/c100000001.lua
+├── images/artwork.png
+├── images/100000001_卡名.png
+└── 100000001.cdb
+```
+
+### 防重校验
+
+可读取本机 YGOPro 的 `cards.cdb`（或手动载入），检查 Passcode 与官方卡是否冲突。
+
+### AI 辅助（可选）
+
+在设置中配置 **OpenAI / Claude / 智谱 GLM / 自定义端点**，用于：
+
+- 根据自然语言描述生成卡片基本信息与效果
+- 推荐合适的效果模块
+- 生成 Lua 脚本草稿
+
+需要填入自己的 API Key。本项目**不包含 AI 生图**，卡图需自行上传。
+
+### 卡牌库
+
+基于浏览器 LocalStorage 的本地卡片管理：搜索、按类型 / 字段筛选、排序、详情查看、JSON 批量导入导出。
+
+---
+
+## 快速开始
+
+### 环境要求
+
+- Node.js ≥ 18
+- 首次运行需自行准备卡面素材，否则卡面会缺少背景 / 边框（字体缺失会自动回退到系统字体）。见 [docs/ASSETS.md](docs/ASSETS.md)。
+
+### Web 版
+
+```bash
+npm install
+npm run web
+```
+
+打开 http://localhost:3000
+
+### 桌面版（Electron）
+
+```bash
+npm install
+npm run build
+npm run package:win     # 产物在 release/
+```
+
+### Android 版（Capacitor）
+
+```bash
+npm run build:mobile
+npx cap sync android
+npx cap open android
+```
+
+### 常用脚本
+
+| 命令 | 说明 |
+| --- | --- |
+| `npm run web` | 启动 Web 服务（开发） |
+| `npm run web:dev` | 启动并监听文件变化 |
+| `npm run build` | TypeScript 编译 + 复制前端资源到 `dist/` |
+| `npm run package:win` | 打包 Windows 桌面应用 |
+| `npm run build:mobile` | 构建移动端资源 |
+
+---
+
+## 技术栈
+
+- **后端**：TypeScript + Express + Node.js
+- **卡面渲染**：浏览器 Canvas（前端）/ `@napi-rs/canvas`（服务端）
+- **脚本组装**：Handlebars 模板
+- **数据库**：`sql.js`（读写 CDB）
+- **打包**：archiver / jszip
+- **桌面 / 移动**：Electron、Capacitor（Android）
+
+## 项目结构
+
+```
+yugioh-ai-card-creator/
+├── src/
+│   ├── web/
+│   │   ├── server.ts              # Express 服务与 API
+│   │   └── public/
+│   │       ├── index.html
+│   │       ├── css/main.css
+│   │       ├── js/                # 前端逻辑（app / card-renderer / library ...）
+│   │       └── assets/yugioh/     # 卡面素材（不入库，见 docs/ASSETS.md）
+│   ├── script-modules/            # 效果模块库与 Lua 组装引擎
+│   ├── image-generator.ts         # 服务端卡面渲染
+│   ├── cdb-manager.ts             # CDB 读写
+│   ├── ai-generator.ts            # AI 生成
+│   └── desktop/                   # C# 启动器 / 安装向导
+├── electron/                      # Electron 主进程
+├── scripts/                       # 资源下载 / 提取 / 打包脚本
+└── docs/
+```
+
+---
+
+## 已知限制
+
+- **素材未随仓库分发**（体积与版权原因）。新克隆的仓库需要按 [docs/ASSETS.md](docs/ASSETS.md) 准备素材；其中卡框 / 罕贵度 / 出框 / 水印等部分素材来自闭源工具，无法由脚本自动获取。
+- **AI 功能依赖你自备的 API Key**，生成质量与稳定性取决于所选模型与网络，建议生成后人工校对。
+- 脚本组装覆盖常见效果，**复杂或非标准效果仍需手写 Lua**。
+- 仅为个人 DIY / 学习用途，未做生产级并发与安全加固。
+- 移动端为横屏适配，功能与桌面端基本一致但交互有简化。
+
+---
+
+## 致谢
+
+本项目的实现参考了以下三个开源项目，特此感谢原作者：
+
+1. **[ygopro-scripting-workflow](https://code.moenext.com/nanahira/ygopro-scripting-workflow)** — 作者 nanahira
+   参考了 YGOPro 脚本的编写工作流与脚本规范，效果模块与 Lua 模板的组织方式受其启发。
+
+2. **[game-king-card-maker](https://gitee.com/scutlzl/game-king-card-maker)** — 作者 scutlzl（YGOLD 制卡器）
+   参考了卡面工艺（罕贵度、镭射、出框、水印等）与素材的组织方式。
+
+3. **[kooriookami/yugioh-card](https://github.com/kooriookami/yugioh-card)** — 作者 kooriookami
+   参考了卡框、属性图标、LINK 箭头等素材与卡面渲染的实现思路；`scripts/download-assets.js` 从该项目拉取可公开获取的素材。
+
+此外还使用了 [LXGW WenKai（霞鹜文楷，OFL）](https://github.com/lxgw/LxgwWenKai)、[思源黑体（OFL）](https://github.com/adobe-fonts/source-han-sans) 等开源字体。
+
+---
+
+## 免责声明
+
+本项目仅供个人学习与 DIY 制卡使用，与 Konami 及《游戏王》官方无任何关联。项目涉及的《游戏王》卡框、图标、字体等素材版权归各自权利人所有，请勿用于商业用途；使用本工具生成的内容由使用者自行负责。
+
+## 开源协议
+
+代码部分采用 [MIT](LICENSE) 协议开源。第三方素材不适用该协议，其权利归各自所有者。

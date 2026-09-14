@@ -1,0 +1,113 @@
+{
+  "name": "yugioh-ai-card-creator",
+  "version": "2.0.0",
+  "description": "本地运行的游戏王 DIY 制卡工具：卡面渲染 + YGOPro/MDPro3 脚本与卡包导出，可选接入大模型 API",
+  "main": "electron/main.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc && node -e \"const fs=require('fs'); fs.mkdirSync('dist/web/public', {recursive:true}); fs.cpSync('src/web/public', 'dist/web/public', {recursive:true});\"",
+    "start": "node dist/index.js",
+    "web": "tsx src/web/server.ts",
+    "web:dev": "tsx watch src/web/server.ts",
+    "web:prod": "node dist/web/server.js",
+    "electron": "electron .",
+    "package:win": "npm run build && electron-builder --win --x64",
+    "package:dir": "npm run build && electron-builder --dir",
+    "package:mac": "npm run build && electron-builder --mac",
+    "package:linux": "npm run build && electron-builder --linux",
+    "build:mobile": "npm run build && npm run copy:mobile",
+    "copy:mobile": "mkdir -p dist/web/public && cp -r src/web/public/* dist/web/public/",
+    "cap:add:android": "npx cap add android",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "test": "echo \"Tests coming soon\" && exit 0"
+  },
+  "keywords": [
+    "yugioh",
+    "card",
+    "ai",
+    "generator",
+    "script-editor",
+    "electron",
+    "capacitor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/haptics": "^5.0.8",
+    "@capacitor/share": "^5.0.8",
+    "@capacitor/status-bar": "^5.0.8",
+    "@napi-rs/canvas": "^1.0.9",
+    "archiver": "^7.0.1",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "handlebars": "^4.7.8",
+    "jszip": "^3.10.2",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.47.1",
+    "sql.js": "^1.10.3"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^5.5.1",
+    "@capacitor/cli": "^5.5.1",
+    "@capacitor/core": "^5.5.1",
+    "@types/archiver": "^6.0.2",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.12.7",
+    "@types/sql.js": "^1.4.9",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
+  },
+  "build": {
+    "appId": "com.yugioh.cardcreator",
+    "productName": "游戏王AI制卡器",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "游戏王AI制卡器",
+      "perMachine": false,
+      "allowElevation": true
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "assets/icon.png",
+      "category": "Utility"
+    }
+  }
+}

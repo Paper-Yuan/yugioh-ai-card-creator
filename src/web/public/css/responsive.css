@@ -1,0 +1,973 @@
+/* ============================================================
+   游戏王 AI 制卡工作室 - 移动端与触控屏幕深度自适应系统 (Mobile UX System)
+   对齐 WCAG 2.1 AA 规范：
+   - 触控目标尺寸 ≥ 44×44px
+   - 对比度 ≥ 4.5:1
+   - 支持 iOS Safe Area (刘海屏与底栏手势条)
+   - 支持单手分页、上下分屏、长卷轴三种自选布局
+   - 内置吸顶微型卡图胶囊、数值触控步进器与移动端专属配置面板
+   ============================================================ */
+
+/* 默认在宽屏电脑端严格隐藏手机端特化 UI 和设置 */
+@media (min-width: 769px) {
+  .mobile-bottom-nav,
+  .mobile-sticky-card-pill,
+  .mobile-ui-cfg-btn,
+  .mobile-flow-tracker,
+  .mobile-flow-action-bar,
+  .mobile-settings-modal,
+  .mobile-only-feature,
+  .mobile-preview-fab {
+    display: none !important;
+  }
+
+  .btn-desktop-exit {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    background: rgba(218, 54, 51, 0.12);
+    border: 1px solid rgba(248, 81, 73, 0.35);
+    color: #f85149;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-desktop-exit:hover {
+    background: rgba(218, 54, 51, 0.25);
+    border-color: #f85149;
+    color: #ff7b72;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(248, 81, 73, 0.2);
+  }
+}
+
+/* ============================================================
+   平板与中等屏幕 (<= 1180px)
+   ============================================================ */
+@media (max-width: 1180px) {
+  .studio-workspace {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .studio-preview-pane {
+    position: static;
+    max-width: 360px;
+    margin: 0 auto 20px auto;
+  }
+
+  .preview-card-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .quick-action-bar {
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .mobile-preview-fab {
+    display: flex;
+  }
+}
+
+/* ============================================================
+   手机与触控手持设备 (<= 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+  .btn-desktop-exit {
+    display: none !important;
+  }
+
+  /* 1. 顶栏精简与触控标准 */
+  .studio-header {
+    height: 54px;
+    padding: 0 10px;
+    gap: 6px;
+    background: rgba(10, 14, 26, 0.95);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .header-brand {
+    gap: 6px;
+  }
+
+  .brand-logo-eye {
+    font-size: 18px;
+  }
+
+  .brand-title {
+    font-size: 13px;
+    font-weight: 700;
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .brand-version {
+    display: none;
+  }
+
+  /* 顶栏步骤圆圈：手机端隐藏，转由底部专属单手吸底导航接管 */
+  .header-steps-bar {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  .header-actions .btn-top-gold,
+  .header-actions .btn-top-outline,
+  .header-actions .btn-top-icon {
+    padding: 4px 8px;
+    font-size: 11px;
+    min-height: 36px;
+  }
+
+  /* 手机专属顶栏配置快捷按钮 */
+  .mobile-ui-cfg-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    min-height: 36px;
+    cursor: pointer;
+  }
+
+  .mobile-ui-cfg-btn:active {
+    background: rgba(56, 189, 248, 0.25);
+  }
+
+  /* 2. 主容器间距与 iOS Safe Area */
+  .app-container {
+    padding-top: 58px;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 16px));
+  }
+
+  .main-content {
+    padding: 12px 14px;
+  }
+
+  /* 3. 手机端顶部吸顶微缩卡片胶囊 (Sticky Mini Card Pill) */
+  .mobile-sticky-card-pill {
+    position: sticky;
+    top: 54px;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(16, 22, 38, 0.94);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  .mobile-sticky-card-pill:active {
+    transform: scale(0.98);
+    background: rgba(26, 36, 60, 0.96);
+  }
+
+  .sticky-pill-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .sticky-attr-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    background: #6366f1;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+  }
+  .sticky-attr-badge.attr-16 { background: #eab308; } /* 光 */
+  .sticky-attr-badge.attr-32 { background: #8b5cf6; } /* 暗 */
+  .sticky-attr-badge.attr-1  { background: #b45309; } /* 地 */
+  .sticky-attr-badge.attr-2  { background: #0284c7; } /* 水 */
+  .sticky-attr-badge.attr-4  { background: #dc2626; } /* 炎 */
+  .sticky-attr-badge.attr-8  { background: #10b981; } /* 风 */
+  .sticky-attr-badge.attr-64 { background: #d97706; } /* 神 */
+
+  .sticky-pill-title-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .sticky-card-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f8fafc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sticky-pill-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #94a3b8;
+  }
+
+  .sticky-pill-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .sticky-inspect-badge {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+
+  /* 4. 底部单手吸底触控导航条 (Mobile Bottom Nav) */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: rgba(10, 14, 26, 0.96);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    min-height: 48px;
+    min-width: 44px;
+    color: #94a3b8;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.1s ease;
+    padding: 4px 0;
+  }
+
+  .mobile-nav-item:active {
+    transform: scale(0.92);
+    color: #f59e0b;
+  }
+
+  .mobile-nav-icon {
+    font-size: 18px;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .mobile-nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  .mobile-nav-item.active {
+    color: #f59e0b;
+  }
+
+  .mobile-nav-item.active .mobile-nav-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+  }
+
+  .mobile-nav-item.highlight {
+    color: #38bdf8;
+  }
+
+  /* 5. 布局架构三种模式切换 (Tabs / Scroll / Split) */
+
+  /* 模式 A: 手机分页触控模式 (tabs - 默认) */
+  body.mobile-mode-tabs .studio-workspace {
+    display: block;
+  }
+  body.mobile-mode-tabs .studio-preview-pane {
+    display: none; /* 卡面由吸顶胶囊 + 底部大图抽屉接管，最大化保留编辑空间 */
+  }
+  body.mobile-mode-tabs .step-section {
+    display: none;
+  }
+  body.mobile-mode-tabs .step-section.active {
+    display: block;
+    animation: mobileFadeIn 0.2s ease-out;
+  }
+
+  /* 模式 B: 长卷轴模式 (scroll) */
+  body.mobile-mode-scroll .studio-workspace {
+    display: block;
+  }
+  body.mobile-mode-scroll .step-section {
+    display: block !important;
+    margin-bottom: 20px;
+  }
+  body.mobile-mode-scroll .step-nav-toolbar {
+    display: none;
+  }
+
+  /* 模式 C: 上下实时分屏模式 (split) */
+  body.mobile-mode-split .studio-workspace {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 54px - calc(56px + env(safe-area-inset-bottom, 0px)));
+    overflow: hidden;
+  }
+  body.mobile-mode-split .studio-preview-pane {
+    display: flex;
+    flex: 0 0 36vh;
+    max-height: 36vh;
+    margin: 0;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+  }
+  body.mobile-mode-split .preview-card-frame {
+    transform: scale(0.65);
+    transform-origin: center top;
+  }
+  body.mobile-mode-split .quick-action-bar {
+    display: none;
+  }
+  body.mobile-mode-split .studio-editor-pane {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 30px;
+  }
+  body.mobile-mode-split .mobile-sticky-card-pill {
+    display: none !important; /* 分屏模式自带卡面，隐藏吸顶小窗 */
+  }
+
+  /* 6. 表单网格松弛化排版与单列统一步局 (一行只出现一个内容填入) */
+  .form-grid-2,
+  .form-grid-3 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-bottom: 18px !important;
+    width: 100% !important;
+  }
+
+  /* 统一卡面基础输入项：单列全宽，充裕留白 */
+  .step-section#step1-content .input-field {
+    width: 100% !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* 密码输入框在手机端纵向堆叠，单列布局 */
+  .id-input-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .id-input-wrap input {
+    width: 100% !important;
+    min-height: 48px !important;
+  }
+  .id-input-wrap .id-action-btns {
+    display: flex !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .id-input-wrap .id-action-btns .btn-sm {
+    flex: 1 !important;
+    min-height: 42px !important;
+  }
+
+  /* 字段与代码在手机端纵向堆叠，一行一个 */
+  .archetype-input-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .archetype-input-wrap input {
+    width: 100% !important;
+    min-height: 48px !important;
+  }
+
+  /* 卡片三大主类型切换器：手机端严格一行一个大按钮 */
+  .main-type-selector {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .main-type-selector .type-card-btn {
+    width: 100% !important;
+    min-height: 52px !important;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+  }
+
+  /* 悬浮卡图预览按钮：必须浮在底部操作栏之上，严禁被下一步按钮遮挡 */
+  .mobile-preview-fab {
+    display: flex !important;
+    position: fixed !important;
+    bottom: calc(78px + env(safe-area-inset-bottom, 12px)) !important;
+    right: 16px !important;
+    z-index: 1005 !important;
+    padding: 10px 16px !important;
+    border-radius: 28px !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(245, 158, 11, 0.4) !important;
+  }
+
+  /* 7. 表单与控件触控友好标准与松弛质感 (Relaxed Form Controls) */
+  .glass-card {
+    padding: 20px 16px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+  }
+
+  .card-section-title {
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .card-section-title h3 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  .input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .input-field label {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #cbd5e1;
+    letter-spacing: 0.2px;
+  }
+
+  .input-field input,
+  .input-field select,
+  .input-field textarea {
+    font-size: 16px !important; /* 强制 16px，严禁 iOS Safari 点击缩放页面 */
+    min-height: 48px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+    color: #f8fafc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .input-field input:focus,
+  .input-field select:focus,
+  .input-field textarea:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    background: rgba(22, 33, 56, 0.85);
+    outline: none;
+  }
+
+  .btn {
+    min-height: 46px;
+    border-radius: 12px;
+    touch-action: manipulation;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-sm {
+    min-height: 42px;
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .type-card-btn {
+    min-height: 50px;
+    padding: 12px 16px;
+    border-radius: 12px;
+  }
+
+  .trait-chip {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .card-set-manager-bar {
+    padding: 14px 16px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+
+  /* 8. 移动端专属 UI 配置弹窗 (Modal) */
+  .mobile-settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .mobile-settings-modal.active {
+    display: flex;
+    animation: mobileSheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mobile-settings-dialog {
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    background: #0f1523;
+    border-top: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 18px 18px 0 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+  }
+
+  .mobile-settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .mobile-settings-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-settings-body {
+    padding: 16px 18px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mobile-opt-group {
+    background: rgba(22, 29, 46, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+
+  .mobile-opt-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f59e0b;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mobile-opt-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .mobile-radio-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .mobile-radio-card {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 8px;
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .mobile-radio-card input {
+    display: none;
+  }
+
+  .mobile-radio-card .icon {
+    font-size: 20px;
+  }
+
+  .mobile-radio-card .label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #cbd5e1;
+  }
+
+  .mobile-radio-card:has(input:checked) {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.12);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+  }
+
+  .mobile-radio-card:has(input:checked) .label {
+    color: #f59e0b;
+  }
+
+  .mobile-toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .mobile-toggle-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .mobile-toggle-info h5 {
+    margin: 0 0 2px 0;
+    font-size: 13px;
+    color: #f8fafc;
+  }
+
+  .mobile-toggle-info p {
+    margin: 0;
+    font-size: 11px;
+    color: #94a3b8;
+  }
+
+  .mobile-settings-footer {
+    display: flex;
+    gap: 10px;
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px)) 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: #0b0f19;
+  }
+
+  .mobile-settings-footer .btn {
+    flex: 1;
+  }
+
+  /* 9. 抽屉全屏沉浸模式强化 (Drawer Fullscreen Style) */
+  .mobile-card-drawer.style-fullscreen {
+    height: 94vh;
+    max-height: 94vh;
+    border-radius: 20px 20px 0 0;
+  }
+  .mobile-card-drawer.style-fullscreen #mobileDrawerCanvas {
+    max-height: 64vh;
+    width: auto;
+  }
+
+  /* 10. 手机端多页面依次递进设计流 (Mobile Sequential Multi-Step Flow) */
+  body.mobile-flow-active #mobileBottomNav {
+    display: none !important; /* 由吸底流动操作栏完全替代 */
+  }
+
+  body.mobile-flow-active .header-steps-bar {
+    display: none !important;
+  }
+
+  body.mobile-flow-active .mobile-flow-tracker {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
+  }
+
+  .flow-tracker-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .flow-tracker-badge {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.12);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    white-space: nowrap;
+    letter-spacing: 0.4px;
+  }
+
+  .flow-tracker-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f8fafc;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.2px;
+  }
+
+  .flow-tracker-dots {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 6px 2px 2px 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .flow-tracker-dots::-webkit-scrollbar {
+    display: none;
+  }
+
+  .flow-tracker-dots .dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(30, 41, 59, 0.7);
+    color: #94a3b8;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+    min-height: 32px;
+  }
+
+  .flow-tracker-dots .dot .dot-inner {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #64748b;
+  }
+
+  .flow-tracker-dots .dot.active {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #f59e0b;
+    color: #f59e0b;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  }
+  .flow-tracker-dots .dot.active .dot-inner {
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b;
+  }
+
+  .flow-tracker-dots .dot.completed {
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.1);
+  }
+  .flow-tracker-dots .dot.completed .dot-inner {
+    background: #10b981;
+  }
+
+  /* 底部吸底流动式操作栏 */
+  body.mobile-flow-active .mobile-flow-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px;
+    background: rgba(10, 14, 26, 0.95);
+    backdrop-filter: blur(24px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .mobile-flow-btn-prev {
+    flex: 0 0 auto;
+    min-width: 96px;
+    min-height: 46px;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 0 14px;
+    border-radius: 12px;
+    touch-action: manipulation;
+  }
+
+  .mobile-flow-btn-inspect {
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+    font-size: 19px;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .mobile-flow-btn-inspect:active {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #f59e0b;
+    transform: scale(0.94);
+  }
+
+  .mobile-flow-btn-next {
+    flex: 1 1 auto;
+    min-height: 46px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 16px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+
+  /* 移动端流转激活时的表单内多余元素精简 */
+  body.mobile-flow-active #stepByStepWizardCard .wizard-nav-chips {
+    display: none !important;
+  }
+  body.mobile-flow-active #stepByStepWizardCard .wizard-footer-actions {
+    display: none !important; /* 统一由吸底操作栏接管 */
+  }
+  body.mobile-flow-active .step-nav-toolbar {
+    display: none !important; /* 统一由吸底操作栏接管 */
+  }
+}
+
+/* ============================================================
+   关键帧动画
+   ============================================================ */
+@keyframes mobileSheetUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes mobileFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Android 端性能优化 - 2026-09-14
+   ============================================================ */
+/* 为动画元素添加 will-change 提示，提升移动端渲染性能 */
+.mobile-sticky-card-pill,
+.mobile-flow-action-bar {
+  will-change: transform;
+}
+
+.trait-chip:hover,
+.trait-chip:active,
+.btn:active,
+.btn:hover {
+  will-change: transform, background-color;
+}
+
+/* 移动端滚动优化 */
+@media (max-width: 768px) {
+  .studio-workspace,
+  .card-set-manager-bar,
+  #cardSetTabsList {
+    -webkit-overflow-scrolling: touch;
+  }
+}

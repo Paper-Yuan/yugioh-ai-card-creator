@@ -1,0 +1,3572 @@
+[
+  {
+    "hex": "0x1",
+    "code": 1,
+    "nameZh": "正义盟军",
+    "nameJa": "A・O・J"
+  },
+  {
+    "hex": "0x2",
+    "code": 2,
+    "nameZh": "次世代",
+    "nameJa": "ジェネクス"
+  },
+  {
+    "hex": "0x1002",
+    "code": 4098,
+    "nameZh": "真次世代",
+    "nameJa": "レアル·ジェネクス"
+  },
+  {
+    "hex": "0x3",
+    "code": 3,
+    "nameZh": "魅惑的女王",
+    "nameJa": "魅惑の女王"
+  },
+  {
+    "hex": "0x4",
+    "code": 4,
+    "nameZh": "亚马逊",
+    "nameJa": "アマゾネス"
+  },
+  {
+    "hex": "0x5",
+    "code": 5,
+    "nameZh": "秘仪之力",
+    "nameJa": "アルカナフォース"
+  },
+  {
+    "hex": "0x6",
+    "code": 6,
+    "nameZh": "暗黑界",
+    "nameJa": "暗黒界"
+  },
+  {
+    "hex": "0x7",
+    "code": 7,
+    "nameZh": "古代的机械",
+    "nameJa": "アンティーク・ギア"
+  },
+  {
+    "hex": "0x8",
+    "code": 8,
+    "nameZh": "英雄",
+    "nameJa": "HERO"
+  },
+  {
+    "hex": "0x3008",
+    "code": 12296,
+    "nameZh": "元素英雄",
+    "nameJa": "E・HERO"
+  },
+  {
+    "hex": "0x5008",
+    "code": 20488,
+    "nameZh": "幻影英雄",
+    "nameJa": "V・HERO"
+  },
+  {
+    "hex": "0x6008",
+    "code": 24584,
+    "nameZh": "邪心英雄",
+    "nameJa": "E-HERO"
+  },
+  {
+    "hex": "0xa008",
+    "code": 40968,
+    "nameZh": "假面英雄",
+    "nameJa": "M・HERO"
+  },
+  {
+    "hex": "0xc008",
+    "code": 49160,
+    "nameZh": "命运英雄",
+    "nameJa": "D-HERO"
+  },
+  {
+    "hex": "0x9",
+    "code": 9,
+    "nameZh": "新宇",
+    "nameJa": "ネオス"
+  },
+  {
+    "hex": "0xa",
+    "code": 10,
+    "nameZh": "入魔",
+    "nameJa": "ヴェルズ"
+  },
+  {
+    "hex": "0x100a",
+    "code": 4106,
+    "nameZh": "侵入魔鬼",
+    "nameJa": "インヴェルズ"
+  },
+  {
+    "hex": "0xb",
+    "code": 11,
+    "nameZh": "永火",
+    "nameJa": "インフェルニティ"
+  },
+  {
+    "hex": "0xc",
+    "code": 12,
+    "nameZh": "外星",
+    "nameJa": "エーリアン"
+  },
+  {
+    "hex": "0xd",
+    "code": 13,
+    "nameZh": "剑士",
+    "nameJa": "セイバー"
+  },
+  {
+    "hex": "0x100d",
+    "code": 4109,
+    "nameZh": "X-剑士",
+    "nameJa": "X－セイバー"
+  },
+  {
+    "hex": "0x400d",
+    "code": 16397,
+    "nameZh": "元素灵剑士",
+    "nameJa": "エレメントセイバー"
+  },
+  {
+    "hex": "0xe",
+    "code": 14,
+    "nameZh": "电气",
+    "nameJa": "エレキ"
+  },
+  {
+    "hex": "0xf",
+    "code": 15,
+    "nameZh": "扰乱",
+    "nameJa": "おジャマ"
+  },
+  {
+    "hex": "0x10",
+    "code": 16,
+    "nameZh": "薰风",
+    "nameJa": "ガスタ"
+  },
+  {
+    "hex": "0x11",
+    "code": 17,
+    "nameZh": "机巧",
+    "nameJa": "カラクリ"
+  },
+  {
+    "hex": "0x12",
+    "code": 18,
+    "nameZh": "青蛙",
+    "nameJa": "ガエル"
+  },
+  {
+    "hex": "0x13",
+    "code": 19,
+    "nameZh": "机皇",
+    "nameJa": "機皇"
+  },
+  {
+    "hex": "0x3013",
+    "code": 12307,
+    "nameZh": "机皇帝",
+    "nameJa": "機皇帝"
+  },
+  {
+    "hex": "0x5013",
+    "code": 20499,
+    "nameZh": "机皇神",
+    "nameJa": "機皇神"
+  },
+  {
+    "hex": "0x6013",
+    "code": 24595,
+    "nameZh": "机皇兵",
+    "nameJa": "機皇兵"
+  },
+  {
+    "hex": "0x15",
+    "code": 21,
+    "nameZh": "巨大战舰",
+    "nameJa": "巨大戦艦"
+  },
+  {
+    "hex": "0x16",
+    "code": 22,
+    "nameZh": "机人",
+    "nameJa": "ロイド"
+  },
+  {
+    "hex": "0x1016",
+    "code": 4118,
+    "nameZh": "交通机人",
+    "nameJa": "ビークロイド"
+  },
+  {
+    "hex": "0x2016",
+    "code": 8214,
+    "nameZh": "疾行机人",
+    "nameJa": "スピードロイド"
+  },
+  {
+    "hex": "0x17",
+    "code": 23,
+    "nameZh": "同调",
+    "nameJa": "シンクロ"
+  },
+  {
+    "hex": "0x1017",
+    "code": 4119,
+    "nameZh": "同调士",
+    "nameJa": "シンクロン"
+  },
+  {
+    "hex": "0x2017",
+    "code": 8215,
+    "nameZh": "同调龙",
+    "nameJa": "シンクロ・ドラゴン"
+  },
+  {
+    "hex": "0x18",
+    "code": 24,
+    "nameZh": "云魔物",
+    "nameJa": "雲魔物"
+  },
+  {
+    "hex": "0x19",
+    "code": 25,
+    "nameZh": "剑斗",
+    "nameJa": "グラディアル"
+  },
+  {
+    "hex": "0x1019",
+    "code": 4121,
+    "nameZh": "剑斗兽",
+    "nameJa": "剣闘獣"
+  },
+  {
+    "hex": "0x1a",
+    "code": 26,
+    "nameZh": "黑蝎",
+    "nameJa": "黒蠍"
+  },
+  {
+    "hex": "0x1b",
+    "code": 27,
+    "nameZh": "幻兽",
+    "nameJa": "幻獣"
+  },
+  {
+    "hex": "0x101b",
+    "code": 4123,
+    "nameZh": "幻兽机",
+    "nameJa": "幻獣機"
+  },
+  {
+    "hex": "0x1c",
+    "code": 28,
+    "nameZh": "死之信息",
+    "nameJa": "死のメッセージ"
+  },
+  {
+    "hex": "0x1d",
+    "code": 29,
+    "nameZh": "核成",
+    "nameJa": "コアキメイル"
+  },
+  {
+    "hex": "0x1e",
+    "code": 30,
+    "nameZh": "茧状体",
+    "nameJa": "C（コクーン）"
+  },
+  {
+    "hex": "0x1f",
+    "code": 31,
+    "nameZh": "新空间侠",
+    "nameJa": "N（ネオスペーシアン）"
+  },
+  {
+    "hex": "0x20",
+    "code": 32,
+    "nameZh": "紫炎",
+    "nameJa": "紫炎"
+  },
+  {
+    "hex": "0x21",
+    "code": 33,
+    "nameZh": "地缚",
+    "nameJa": "地縛"
+  },
+  {
+    "hex": "0x1021",
+    "code": 4129,
+    "nameZh": "地缚神",
+    "nameJa": "地縛神"
+  },
+  {
+    "hex": "0x22",
+    "code": 34,
+    "nameZh": "朱罗纪",
+    "nameJa": "ジュラック"
+  },
+  {
+    "hex": "0x23",
+    "code": 35,
+    "nameZh": "罪",
+    "nameJa": "Sin"
+  },
+  {
+    "hex": "0x24",
+    "code": 36,
+    "nameZh": "废铁",
+    "nameJa": "スクラップ"
+  },
+  {
+    "hex": "0x25",
+    "code": 37,
+    "nameZh": "链",
+    "nameJa": "C（チェーン）"
+  },
+  {
+    "hex": "0x26",
+    "code": 38,
+    "nameZh": "变形斗士",
+    "nameJa": "D（ディフォーマー）"
+  },
+  {
+    "hex": "0x27",
+    "code": 39,
+    "nameZh": "科技属",
+    "nameJa": "TG（テックジーナス）"
+  },
+  {
+    "hex": "0x28",
+    "code": 40,
+    "nameZh": "电池人",
+    "nameJa": "電池メン"
+  },
+  {
+    "hex": "0x29",
+    "code": 41,
+    "nameZh": "龙骑兵团",
+    "nameJa": "ドラグニティ"
+  },
+  {
+    "hex": "0x2a",
+    "code": 42,
+    "nameZh": "自然",
+    "nameJa": "ナチュル"
+  },
+  {
+    "hex": "0x2b",
+    "code": 43,
+    "nameZh": "忍者",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x2c",
+    "code": 44,
+    "nameZh": "炎狱",
+    "nameJa": "フレムベル"
+  },
+  {
+    "hex": "0x2e",
+    "code": 46,
+    "nameZh": "守墓",
+    "nameJa": "墓守"
+  },
+  {
+    "hex": "0x2f",
+    "code": 47,
+    "nameZh": "冰结界",
+    "nameJa": "氷結界"
+  },
+  {
+    "hex": "0x30",
+    "code": 48,
+    "nameZh": "大日",
+    "nameJa": "ヴァイロン"
+  },
+  {
+    "hex": "0x31",
+    "code": 49,
+    "nameZh": "命运女郎",
+    "nameJa": "フォーチュンレディ"
+  },
+  {
+    "hex": "0x32",
+    "code": 50,
+    "nameZh": "火山",
+    "nameJa": "ヴォルカニック"
+  },
+  {
+    "hex": "0x33",
+    "code": 51,
+    "nameZh": "黑羽",
+    "nameJa": "BF（ブラックフェザー）"
+  },
+  {
+    "hex": "0x1033",
+    "code": 4147,
+    "nameZh": "强袭黑羽",
+    "nameJa": "A BF（アサルト ブラックフェザー）"
+  },
+  {
+    "hex": "0x34",
+    "code": 52,
+    "nameZh": "宝玉",
+    "nameJa": "宝玉"
+  },
+  {
+    "hex": "0x1034",
+    "code": 4148,
+    "nameZh": "宝玉兽",
+    "nameJa": "宝玉獣"
+  },
+  {
+    "hex": "0x2034",
+    "code": 8244,
+    "nameZh": "究极宝玉神",
+    "nameJa": "究極宝玉神"
+  },
+  {
+    "hex": "0x5034",
+    "code": 20532,
+    "nameZh": "高等宝玉兽",
+    "nameJa": "A宝玉獣"
+  },
+  {
+    "hex": "0x35",
+    "code": 53,
+    "nameZh": "魔轰神",
+    "nameJa": "魔轟神"
+  },
+  {
+    "hex": "0x36",
+    "code": 54,
+    "nameZh": "机甲",
+    "nameJa": "マシンナーズ"
+  },
+  {
+    "hex": "0x37",
+    "code": 55,
+    "nameZh": "霞之谷",
+    "nameJa": "霞の谷"
+  },
+  {
+    "hex": "0x38",
+    "code": 56,
+    "nameZh": "光道",
+    "nameJa": "ライトロード"
+  },
+  {
+    "hex": "0x39",
+    "code": 57,
+    "nameZh": "熔岩",
+    "nameJa": "ラヴァル"
+  },
+  {
+    "hex": "0x3a",
+    "code": 58,
+    "nameZh": "遗式",
+    "nameJa": "リチュア"
+  },
+  {
+    "hex": "0x3b",
+    "code": 59,
+    "nameZh": "真红眼",
+    "nameJa": "レッドアイズ"
+  },
+  {
+    "hex": "0x3c",
+    "code": 60,
+    "nameZh": "爬虫妖",
+    "nameJa": "レプティレス"
+  },
+  {
+    "hex": "0x103d",
+    "code": 4157,
+    "nameZh": "六武众",
+    "nameJa": "六武衆"
+  },
+  {
+    "hex": "0x203d",
+    "code": 8253,
+    "nameZh": "六武式",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x903d",
+    "code": 36925,
+    "nameZh": "影六武众",
+    "nameJa": "影六武衆"
+  },
+  {
+    "hex": "0x3e",
+    "code": 62,
+    "nameZh": "异虫",
+    "nameJa": "ワーム"
+  },
+  {
+    "hex": "0x3f",
+    "code": 63,
+    "nameZh": "救世",
+    "nameJa": "セイヴァー"
+  },
+  {
+    "hex": "0x40",
+    "code": 64,
+    "nameZh": "被封印",
+    "nameJa": "封印されし"
+  },
+  {
+    "hex": "0x41",
+    "code": 65,
+    "nameZh": "LV",
+    "nameJa": "LV（レベル）"
+  },
+  {
+    "hex": "0x42",
+    "code": 66,
+    "nameZh": "极星",
+    "nameJa": "極星"
+  },
+  {
+    "hex": "0x3042",
+    "code": 12354,
+    "nameZh": "极星天",
+    "nameJa": "極星天"
+  },
+  {
+    "hex": "0x5042",
+    "code": 20546,
+    "nameZh": "极星宝",
+    "nameJa": "極星宝"
+  },
+  {
+    "hex": "0x6042",
+    "code": 24642,
+    "nameZh": "极星兽",
+    "nameJa": "極星獣"
+  },
+  {
+    "hex": "0xa042",
+    "code": 41026,
+    "nameZh": "极星灵",
+    "nameJa": "極星霊"
+  },
+  {
+    "hex": "0x43",
+    "code": 67,
+    "nameZh": "废品",
+    "nameJa": "ジャンク"
+  },
+  {
+    "hex": "0x44",
+    "code": 68,
+    "nameZh": "代行者",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x45",
+    "code": 69,
+    "nameZh": "恶魔",
+    "nameJa": "デーモン"
+  },
+  {
+    "hex": "0x1045",
+    "code": 4165,
+    "nameZh": "红莲魔|恶魔",
+    "nameJa": "レッド・デーモン"
+  },
+  {
+    "hex": "0x46",
+    "code": 70,
+    "nameZh": "融合",
+    "nameJa": "融合/フュージョン"
+  },
+  {
+    "hex": "0x1046",
+    "code": 4166,
+    "nameZh": "融合龙",
+    "nameJa": "フュージョン・ドラゴン"
+  },
+  {
+    "hex": "0x47",
+    "code": 71,
+    "nameZh": "宝石",
+    "nameJa": "ジェム"
+  },
+  {
+    "hex": "0x1047",
+    "code": 4167,
+    "nameZh": "宝石骑士",
+    "nameJa": "ジェムナイト"
+  },
+  {
+    "hex": "0x48",
+    "code": 72,
+    "nameZh": "No.",
+    "nameJa": "No.（ナンバーズ）"
+  },
+  {
+    "hex": "0x1048",
+    "code": 4168,
+    "nameZh": "混沌No.",
+    "nameJa": "CNo."
+  },
+  {
+    "hex": "0x2048",
+    "code": 8264,
+    "nameZh": "No.99",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x49",
+    "code": 73,
+    "nameZh": "铳士",
+    "nameJa": "銃士"
+  },
+  {
+    "hex": "0x4a",
+    "code": 74,
+    "nameZh": "时械神",
+    "nameJa": "時械神"
+  },
+  {
+    "hex": "0x4b",
+    "code": 75,
+    "nameZh": "极神",
+    "nameJa": "極神"
+  },
+  {
+    "hex": "0x4c",
+    "code": 76,
+    "nameZh": "落穴",
+    "nameJa": "落とし穴"
+  },
+  {
+    "hex": "0x304e",
+    "code": 12366,
+    "nameZh": "进化虫",
+    "nameJa": "エヴォルド"
+  },
+  {
+    "hex": "0x504e",
+    "code": 20558,
+    "nameZh": "进化帝",
+    "nameJa": "エヴォルカイザー"
+  },
+  {
+    "hex": "0x604e",
+    "code": 24654,
+    "nameZh": "进化龙",
+    "nameJa": "エヴォルダー"
+  },
+  {
+    "hex": "0x104f",
+    "code": 4175,
+    "nameZh": "/爆裂体",
+    "nameJa": "／バスター"
+  },
+  {
+    "hex": "0x50",
+    "code": 80,
+    "nameZh": "蛇毒",
+    "nameJa": "ヴェノム"
+  },
+  {
+    "hex": "0x1050",
+    "code": 4176,
+    "nameZh": "凶饿毒|蛇毒",
+    "nameJa": "スターヴ・ヴェノム"
+  },
+  {
+    "hex": "0x51",
+    "code": 81,
+    "nameZh": "零件",
+    "nameJa": "ガジェット"
+  },
+  {
+    "hex": "0x52",
+    "code": 82,
+    "nameZh": "守护者",
+    "nameJa": "ガーディアン"
+  },
+  {
+    "hex": "0x1052",
+    "code": 4178,
+    "nameZh": "门之守护神|守护者",
+    "nameJa": "ゲート・ガーディアン"
+  },
+  {
+    "hex": "0x2052",
+    "code": 8274,
+    "nameZh": "法理守护者",
+    "nameJa": "ローガーディアン"
+  },
+  {
+    "hex": "0x53",
+    "code": 83,
+    "nameZh": "星圣",
+    "nameJa": "セイクリッド"
+  },
+  {
+    "hex": "0x54",
+    "code": 84,
+    "nameZh": "我我我",
+    "nameJa": "ガガガ"
+  },
+  {
+    "hex": "0x55",
+    "code": 85,
+    "nameZh": "光子",
+    "nameJa": "フォトン"
+  },
+  {
+    "hex": "0x56",
+    "code": 86,
+    "nameZh": "甲虫装机",
+    "nameJa": "甲虫装機"
+  },
+  {
+    "hex": "0x57",
+    "code": 87,
+    "nameZh": "共鸣者",
+    "nameJa": "リゾネーター"
+  },
+  {
+    "hex": "0x58",
+    "code": 88,
+    "nameZh": "发条",
+    "nameJa": "ゼンマイ"
+  },
+  {
+    "hex": "0x59",
+    "code": 89,
+    "nameZh": "隆隆隆",
+    "nameJa": "ゴゴゴ"
+  },
+  {
+    "hex": "0x5a",
+    "code": 90,
+    "nameZh": "企鹅",
+    "nameJa": "ペンギン"
+  },
+  {
+    "hex": "0x5b",
+    "code": 91,
+    "nameZh": "番茄小子",
+    "nameJa": "トマボー"
+  },
+  {
+    "hex": "0x5c",
+    "code": 92,
+    "nameZh": "斯芬克斯",
+    "nameJa": "スフィンクス"
+  },
+  {
+    "hex": "0x60",
+    "code": 96,
+    "nameZh": "竹光",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x61",
+    "code": 97,
+    "nameZh": "忍法",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x62",
+    "code": 98,
+    "nameZh": "卡通",
+    "nameJa": "トゥーン"
+  },
+  {
+    "hex": "0x63",
+    "code": 99,
+    "nameZh": "反应机",
+    "nameJa": "リアクター"
+  },
+  {
+    "hex": "0x64",
+    "code": 100,
+    "nameZh": "鹰身",
+    "nameJa": "ハーピィ"
+  },
+  {
+    "hex": "0x65",
+    "code": 101,
+    "nameZh": "侵略的",
+    "nameJa": "侵略の"
+  },
+  {
+    "hex": "0x66",
+    "code": 102,
+    "nameZh": "战士",
+    "nameJa": "ウォリアー"
+  },
+  {
+    "hex": "0x1066",
+    "code": 4198,
+    "nameZh": "音响战士",
+    "nameJa": "音響戦士"
+  },
+  {
+    "hex": "0x2066",
+    "code": 8294,
+    "nameZh": "磁石战士",
+    "nameJa": "マグネット・ウォリアー"
+  },
+  {
+    "hex": "0x6066",
+    "code": 24678,
+    "nameZh": "磁石战士Σ",
+    "nameJa": "磁石の戦士Σ"
+  },
+  {
+    "hex": "0x69",
+    "code": 105,
+    "nameZh": "圣刻",
+    "nameJa": "聖刻"
+  },
+  {
+    "hex": "0x6a",
+    "code": 106,
+    "nameZh": "幻蝶刺客",
+    "nameJa": "幻蝶の刺客"
+  },
+  {
+    "hex": "0x6b",
+    "code": 107,
+    "nameZh": "保镖",
+    "nameJa": "バウンサー"
+  },
+  {
+    "hex": "0x6d",
+    "code": 109,
+    "nameZh": "魔人",
+    "nameJa": "魔人（まじん）"
+  },
+  {
+    "hex": "0x6e",
+    "code": 110,
+    "nameZh": "魔导",
+    "nameJa": "魔導"
+  },
+  {
+    "hex": "0x106e",
+    "code": 4206,
+    "nameZh": "魔导书",
+    "nameJa": "魔導書"
+  },
+  {
+    "hex": "0x6f",
+    "code": 111,
+    "nameZh": "英豪",
+    "nameJa": "ヒロイック"
+  },
+  {
+    "hex": "0x106f",
+    "code": 4207,
+    "nameZh": "英豪挑战者",
+    "nameJa": "H・C"
+  },
+  {
+    "hex": "0x206f",
+    "code": 8303,
+    "nameZh": "英豪冠军",
+    "nameJa": "H－C"
+  },
+  {
+    "hex": "0x70",
+    "code": 112,
+    "nameZh": "先史遗产",
+    "nameJa": "先史遺産"
+  },
+  {
+    "hex": "0x71",
+    "code": 113,
+    "nameZh": "魔偶甜点",
+    "nameJa": "マドルチェ"
+  },
+  {
+    "hex": "0x72",
+    "code": 114,
+    "nameZh": "齿轮齿轮",
+    "nameJa": "ギアギア"
+  },
+  {
+    "hex": "0x1072",
+    "code": 4210,
+    "nameZh": "齿轮齿轮人",
+    "nameJa": "ギアギアーノ"
+  },
+  {
+    "hex": "0x73",
+    "code": 115,
+    "nameZh": "超量",
+    "nameJa": "エクシーズ"
+  },
+  {
+    "hex": "0x1073",
+    "code": 4211,
+    "nameZh": "混沌超量",
+    "nameJa": "CX（カオスエクシーズ）"
+  },
+  {
+    "hex": "0x2073",
+    "code": 8307,
+    "nameZh": "超量龙",
+    "nameJa": "エクシーズ・ドラゴン"
+  },
+  {
+    "hex": "0x4073",
+    "code": 16499,
+    "nameZh": "铠装超量",
+    "nameJa": "アーマード・エクシーズ"
+  },
+  {
+    "hex": "0x74",
+    "code": 116,
+    "nameZh": "水精鳞",
+    "nameJa": "水精鱗"
+  },
+  {
+    "hex": "0x75",
+    "code": 117,
+    "nameZh": "深渊",
+    "nameJa": "アビス"
+  },
+  {
+    "hex": "0x76",
+    "code": 118,
+    "nameZh": "纹章兽",
+    "nameJa": "紋章獣"
+  },
+  {
+    "hex": "0x77",
+    "code": 119,
+    "nameZh": "海皇",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x78",
+    "code": 120,
+    "nameZh": "迅捷",
+    "nameJa": "素早い"
+  },
+  {
+    "hex": "0x79",
+    "code": 121,
+    "nameZh": "炎星",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x107a",
+    "code": 4218,
+    "nameZh": "圣骑士",
+    "nameJa": "聖騎士（せいきし）"
+  },
+  {
+    "hex": "0x207a",
+    "code": 8314,
+    "nameZh": "圣剑",
+    "nameJa": "聖剣（せいけん）"
+  },
+  {
+    "hex": "0x507a",
+    "code": 20602,
+    "nameZh": "焰圣骑士",
+    "nameJa": "焔聖騎士"
+  },
+  {
+    "hex": "0x607a",
+    "code": 24698,
+    "nameZh": "焰圣剑",
+    "nameJa": "焔聖剣"
+  },
+  {
+    "hex": "0x7b",
+    "code": 123,
+    "nameZh": "银河",
+    "nameJa": "ギャラクシー"
+  },
+  {
+    "hex": "0x107b",
+    "code": 4219,
+    "nameZh": "银河眼",
+    "nameJa": "ギャラクシーアイズ"
+  },
+  {
+    "hex": "0x307b",
+    "code": 12411,
+    "nameZh": "银河眼时空龙",
+    "nameJa": "ギャラクシーアイズ・タキオン・ドラゴン"
+  },
+  {
+    "hex": "0x7c",
+    "code": 124,
+    "nameZh": "炎舞",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x7d",
+    "code": 125,
+    "nameZh": "阳炎",
+    "nameJa": "ヘイズ"
+  },
+  {
+    "hex": "0x107d",
+    "code": 4221,
+    "nameZh": "阳炎兽",
+    "nameJa": "陽炎獣"
+  },
+  {
+    "hex": "0x7e",
+    "code": 126,
+    "nameZh": "异热同心",
+    "nameJa": "ゼアル"
+  },
+  {
+    "hex": "0x107e",
+    "code": 4222,
+    "nameZh": "异热同心武器",
+    "nameJa": "ZW（ゼアル・ウェポン）"
+  },
+  {
+    "hex": "0x207e",
+    "code": 8318,
+    "nameZh": "异热同心从者",
+    "nameJa": "ZS（ゼアル・サーバス）"
+  },
+  {
+    "hex": "0x7f",
+    "code": 127,
+    "nameZh": "霍普",
+    "nameJa": "ホープ"
+  },
+  {
+    "hex": "0x107f",
+    "code": 4223,
+    "nameZh": "希望皇 霍普",
+    "nameJa": "希望皇ホープ"
+  },
+  {
+    "hex": "0x207f",
+    "code": 8319,
+    "nameZh": "未来皇 霍普",
+    "nameJa": "未来皇ホープ"
+  },
+  {
+    "hex": "0x80",
+    "code": 128,
+    "nameZh": "尘妖",
+    "nameJa": "ダストン"
+  },
+  {
+    "hex": "0x81",
+    "code": 129,
+    "nameZh": "炎王",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x1081",
+    "code": 4225,
+    "nameZh": "炎王兽",
+    "nameJa": "炎王獣"
+  },
+  {
+    "hex": "0x82",
+    "code": 130,
+    "nameZh": "怒怒怒",
+    "nameJa": "ドドド"
+  },
+  {
+    "hex": "0x83",
+    "code": 131,
+    "nameZh": "人偶",
+    "nameJa": "パペット"
+  },
+  {
+    "hex": "0x1083",
+    "code": 4227,
+    "nameZh": "机关傀儡",
+    "nameJa": "ギミック・パペット"
+  },
+  {
+    "hex": "0x1084",
+    "code": 4228,
+    "nameZh": "燃烧拳击手",
+    "nameJa": "BK（バーニングナックラー）"
+  },
+  {
+    "hex": "0x2084",
+    "code": 8324,
+    "nameZh": "燃烧拳",
+    "nameJa": "バーニングナックル"
+  },
+  {
+    "hex": "0x85",
+    "code": 133,
+    "nameZh": "超级防卫机器人",
+    "nameJa": "SDロボ"
+  },
+  {
+    "hex": "0x86",
+    "code": 134,
+    "nameZh": "光天使",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x87",
+    "code": 135,
+    "nameZh": "阴影",
+    "nameJa": "アンブラル"
+  },
+  {
+    "hex": "0x88",
+    "code": 136,
+    "nameZh": "武神",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x89",
+    "code": 137,
+    "nameZh": "洞",
+    "nameJa": "ホール"
+  },
+  {
+    "hex": "0x108a",
+    "code": 4234,
+    "nameZh": "虫惑魔",
+    "nameJa": "蟲惑魔"
+  },
+  {
+    "hex": "0x8b",
+    "code": 139,
+    "nameZh": "食恶",
+    "nameJa": "マリスボラス"
+  },
+  {
+    "hex": "0x8d",
+    "code": 141,
+    "nameZh": "鬼计",
+    "nameJa": "ゴーストリック"
+  },
+  {
+    "hex": "0x8e",
+    "code": 142,
+    "nameZh": "吸血鬼",
+    "nameJa": "ヴァンパイア"
+  },
+  {
+    "hex": "0x8f",
+    "code": 143,
+    "nameZh": "刷拉拉",
+    "nameJa": "ズババ"
+  },
+  {
+    "hex": "0x90",
+    "code": 144,
+    "nameZh": "森罗",
+    "nameJa": "森羅"
+  },
+  {
+    "hex": "0x91",
+    "code": 145,
+    "nameZh": "王家长眠之谷",
+    "nameJa": "ネクロバレー"
+  },
+  {
+    "hex": "0x92",
+    "code": 146,
+    "nameZh": "纹章",
+    "nameJa": "メダリオン"
+  },
+  {
+    "hex": "0x93",
+    "code": 147,
+    "nameZh": "电子",
+    "nameJa": "サイバー"
+  },
+  {
+    "hex": "0x1093",
+    "code": 4243,
+    "nameZh": "电子龙",
+    "nameJa": "サイバー・ドラゴン"
+  },
+  {
+    "hex": "0x2093",
+    "code": 8339,
+    "nameZh": "电子化天使",
+    "nameJa": "サイバー・エンジェル"
+  },
+  {
+    "hex": "0x4093",
+    "code": 16531,
+    "nameZh": "电子暗黑",
+    "nameJa": "サイバー・ダーク/サイバーダーク"
+  },
+  {
+    "hex": "0x94",
+    "code": 148,
+    "nameZh": "电子科技",
+    "nameJa": "サイバネティック"
+  },
+  {
+    "hex": "0x95",
+    "code": 149,
+    "nameZh": "升阶魔法",
+    "nameJa": "RUM"
+  },
+  {
+    "hex": "0x96",
+    "code": 150,
+    "nameZh": "电子鱼人|非「电子」",
+    "nameJa": "フィッシュボーグ"
+  },
+  {
+    "hex": "0x97",
+    "code": 151,
+    "nameZh": "古遗物",
+    "nameJa": "アーティファクト"
+  },
+  {
+    "hex": "0x98",
+    "code": 152,
+    "nameZh": "魔术师",
+    "nameJa": "魔術師"
+  },
+  {
+    "hex": "0x99",
+    "code": 153,
+    "nameZh": "异色眼",
+    "nameJa": "オッドアイズ"
+  },
+  {
+    "hex": "0x9a",
+    "code": 154,
+    "nameZh": "超重武者",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x109a",
+    "code": 4250,
+    "nameZh": "超重武者装留",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x9b",
+    "code": 155,
+    "nameZh": "幻奏",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x109b",
+    "code": 4251,
+    "nameZh": "幻奏的音姬",
+    "nameJa": "幻奏の音姫"
+  },
+  {
+    "hex": "0x9c",
+    "code": 156,
+    "nameZh": "星骑士",
+    "nameJa": "テラナイト"
+  },
+  {
+    "hex": "0x109c",
+    "code": 4252,
+    "nameZh": "星辉士|星骑士",
+    "nameJa": "ステラナイト"
+  },
+  {
+    "hex": "0x9d",
+    "code": 157,
+    "nameZh": "影依",
+    "nameJa": "シャドール"
+  },
+  {
+    "hex": "0x9e",
+    "code": 158,
+    "nameZh": "龙星",
+    "nameJa": "竜星"
+  },
+  {
+    "hex": "0x9f",
+    "code": 159,
+    "nameZh": "娱乐伙伴",
+    "nameJa": "EM（エンタメイト）"
+  },
+  {
+    "hex": "0xa0",
+    "code": 160,
+    "nameZh": "传说的骑士",
+    "nameJa": "伝説の騎士"
+  },
+  {
+    "hex": "0xa1",
+    "code": 161,
+    "nameZh": "传说之龙",
+    "nameJa": "伝説の竜"
+  },
+  {
+    "hex": "0x10a2",
+    "code": 4258,
+    "nameZh": "黑魔术",
+    "nameJa": "ブラック・マジシャン"
+  },
+  {
+    "hex": "0x20a2",
+    "code": 8354,
+    "nameZh": "魔术少女",
+    "nameJa": "マジシャン・ガール"
+  },
+  {
+    "hex": "0x30a2",
+    "code": 12450,
+    "nameZh": "黑魔术少女",
+    "nameJa": "ブラック・マジシャン・ガール"
+  },
+  {
+    "hex": "0xa3",
+    "code": 163,
+    "nameZh": "星尘",
+    "nameJa": "スターダスト"
+  },
+  {
+    "hex": "0xa4",
+    "code": 164,
+    "nameZh": "栗子球",
+    "nameJa": "クリボー"
+  },
+  {
+    "hex": "0x10a4",
+    "code": 4260,
+    "nameZh": "羽翼栗子球",
+    "nameJa": "ハネクリボー"
+  },
+  {
+    "hex": "0xa5",
+    "code": 165,
+    "nameZh": "变化",
+    "nameJa": "チェンジ"
+  },
+  {
+    "hex": "0xa6",
+    "code": 166,
+    "nameZh": "幼芽",
+    "nameJa": "スプラウト"
+  },
+  {
+    "hex": "0xa7",
+    "code": 167,
+    "nameZh": "阿托利斯",
+    "nameJa": "アルトリウス"
+  },
+  {
+    "hex": "0xa8",
+    "code": 168,
+    "nameZh": "兰斯洛特",
+    "nameJa": "ランスロット"
+  },
+  {
+    "hex": "0xa9",
+    "code": 169,
+    "nameZh": "毛绒动物",
+    "nameJa": "ファーニマル"
+  },
+  {
+    "hex": "0xaa",
+    "code": 170,
+    "nameZh": "机壳",
+    "nameJa": "クリフォート"
+  },
+  {
+    "hex": "0x10aa",
+    "code": 4266,
+    "nameZh": "隐藏的机壳",
+    "nameJa": "アポクリフォート"
+  },
+  {
+    "hex": "0xab",
+    "code": 171,
+    "nameZh": "文具电子人|非「电子」",
+    "nameJa": "ブンボーグ"
+  },
+  {
+    "hex": "0xac",
+    "code": 172,
+    "nameZh": "哥布林",
+    "nameJa": "ゴブリン"
+  },
+  {
+    "hex": "0x10ac",
+    "code": 4268,
+    "nameZh": "哥布林骑手",
+    "nameJa": "ゴブリンライダー"
+  },
+  {
+    "hex": "0xad",
+    "code": 173,
+    "nameZh": "魔玩具",
+    "nameJa": "デストーイ"
+  },
+  {
+    "hex": "0xae",
+    "code": 174,
+    "nameZh": "契约书",
+    "nameJa": "契約書"
+  },
+  {
+    "hex": "0xaf",
+    "code": 175,
+    "nameZh": "DD",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x10af",
+    "code": 4271,
+    "nameZh": "DDD",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xb0",
+    "code": 176,
+    "nameZh": "加特姆士",
+    "nameJa": "ガトムズ"
+  },
+  {
+    "hex": "0xb1",
+    "code": 177,
+    "nameZh": "彼岸",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xb2",
+    "code": 178,
+    "nameZh": "超级运动员",
+    "nameJa": "U.A."
+  },
+  {
+    "hex": "0xb3",
+    "code": 179,
+    "nameZh": "妖仙兽",
+    "nameJa": "妖仙獣"
+  },
+  {
+    "hex": "0xb4",
+    "code": 180,
+    "nameZh": "影灵衣",
+    "nameJa": "影霊衣"
+  },
+  {
+    "hex": "0xb5",
+    "code": 181,
+    "nameZh": "灵兽",
+    "nameJa": "霊獣"
+  },
+  {
+    "hex": "0x10b5",
+    "code": 4277,
+    "nameZh": "灵兽使",
+    "nameJa": "霊獣使い"
+  },
+  {
+    "hex": "0x20b5",
+    "code": 8373,
+    "nameZh": "精灵兽",
+    "nameJa": "精霊獣"
+  },
+  {
+    "hex": "0x40b5",
+    "code": 16565,
+    "nameZh": "圣灵兽骑",
+    "nameJa": "聖霊獣騎"
+  },
+  {
+    "hex": "0xb6",
+    "code": 182,
+    "nameZh": "外神",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xb7",
+    "code": 183,
+    "nameZh": "旧神",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xb8",
+    "code": 184,
+    "nameZh": "古神",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xb9",
+    "code": 185,
+    "nameZh": "烈焰加农炮",
+    "nameJa": "ブレイズ・キャノン"
+  },
+  {
+    "hex": "0xba",
+    "code": 186,
+    "nameZh": "急袭猛禽",
+    "nameJa": "RR（レイド・ラプターズ）"
+  },
+  {
+    "hex": "0xbb",
+    "code": 187,
+    "nameZh": "狱火机",
+    "nameJa": "インフェルノイド"
+  },
+  {
+    "hex": "0xbc",
+    "code": 188,
+    "nameZh": "人造人",
+    "nameJa": "人造人間"
+  },
+  {
+    "hex": "0xbd",
+    "code": 189,
+    "nameZh": "暗黑骑士 盖亚",
+    "nameJa": "暗黒騎士ガイア"
+  },
+  {
+    "hex": "0xbe",
+    "code": 190,
+    "nameZh": "帝王",
+    "nameJa": "帝王"
+  },
+  {
+    "hex": "0xbf",
+    "code": 191,
+    "nameZh": "灵使",
+    "nameJa": "霊使い"
+  },
+  {
+    "hex": "0xc0",
+    "code": 192,
+    "nameZh": "凭依",
+    "nameJa": "憑依"
+  },
+  {
+    "hex": "0x10c0",
+    "code": 4288,
+    "nameZh": "凭依装着",
+    "nameJa": "憑依装着"
+  },
+  {
+    "hex": "0xc1",
+    "code": 193,
+    "nameZh": "PSY骨架",
+    "nameJa": "PSYフレーム"
+  },
+  {
+    "hex": "0x10c1",
+    "code": 4289,
+    "nameZh": "PSY骨架装备",
+    "nameJa": "PSYフレームギア"
+  },
+  {
+    "hex": "0xc2",
+    "code": 194,
+    "nameZh": "动力工具",
+    "nameJa": "パワー・ツール"
+  },
+  {
+    "hex": "0xc3",
+    "code": 195,
+    "nameZh": "锋利小鬼",
+    "nameJa": "エッジインプ"
+  },
+  {
+    "hex": "0xc4",
+    "code": 196,
+    "nameZh": "神数",
+    "nameJa": "セフィラ"
+  },
+  {
+    "hex": "0xc5",
+    "code": 197,
+    "nameZh": "炼狱",
+    "nameJa": "煉獄"
+  },
+  {
+    "hex": "0xc6",
+    "code": 198,
+    "nameZh": "娱乐法师",
+    "nameJa": "Em（エンタメイジ）"
+  },
+  {
+    "hex": "0xc7",
+    "code": 199,
+    "nameZh": "龙剑士",
+    "nameJa": "竜剣士"
+  },
+  {
+    "hex": "0xc8",
+    "code": 200,
+    "nameZh": "点火骑士",
+    "nameJa": "イグナイト"
+  },
+  {
+    "hex": "0xc9",
+    "code": 201,
+    "nameZh": "芳香",
+    "nameJa": "アロマ"
+  },
+  {
+    "hex": "0xca",
+    "code": 202,
+    "nameZh": "魔装战士",
+    "nameJa": "魔装戦士"
+  },
+  {
+    "hex": "0xcb",
+    "code": 203,
+    "nameZh": "以太神兵龙",
+    "nameJa": "イーサルウェポン"
+  },
+  {
+    "hex": "0xcc",
+    "code": 204,
+    "nameZh": "占术姬",
+    "nameJa": "占術姫"
+  },
+  {
+    "hex": "0xcd",
+    "code": 205,
+    "nameZh": "水伶女",
+    "nameJa": "アクアアクトレス"
+  },
+  {
+    "hex": "0xce",
+    "code": 206,
+    "nameZh": "水族馆",
+    "nameJa": "アクアリウム"
+  },
+  {
+    "hex": "0xcf",
+    "code": 207,
+    "nameZh": "混沌",
+    "nameJa": "カオス"
+  },
+  {
+    "hex": "0x10cf",
+    "code": 4303,
+    "nameZh": "混沌战士",
+    "nameJa": "カオス・ソルジャー"
+  },
+  {
+    "hex": "0xd0",
+    "code": 208,
+    "nameZh": "威风妖怪",
+    "nameJa": "マジェスペクター"
+  },
+  {
+    "hex": "0xd1",
+    "code": 209,
+    "nameZh": "灰篮",
+    "nameJa": "グレイドル"
+  },
+  {
+    "hex": "0xd2",
+    "code": 210,
+    "nameZh": "星际仙踪",
+    "nameJa": "Kozmo"
+  },
+  {
+    "hex": "0xd3",
+    "code": 211,
+    "nameZh": "坏兽",
+    "nameJa": "壊獣"
+  },
+  {
+    "hex": "0xd4",
+    "code": 212,
+    "nameZh": "伯吉斯异兽",
+    "nameJa": "バージェストマ"
+  },
+  {
+    "hex": "0xd5",
+    "code": 213,
+    "nameZh": "但丁",
+    "nameJa": "ダンテ"
+  },
+  {
+    "hex": "0xd6",
+    "code": 214,
+    "nameZh": "破坏剑",
+    "nameJa": "破壊剣"
+  },
+  {
+    "hex": "0xd7",
+    "code": 215,
+    "nameZh": "破坏之剑士",
+    "nameJa": "バスター・ブレイダー"
+  },
+  {
+    "hex": "0xd8",
+    "code": 216,
+    "nameZh": "雾动机龙",
+    "nameJa": "ダイナミスト"
+  },
+  {
+    "hex": "0xd9",
+    "code": 217,
+    "nameZh": "不知火",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x10d9",
+    "code": 4313,
+    "nameZh": "妖刀-不知火",
+    "nameJa": "妖刀－不知火"
+  },
+  {
+    "hex": "0xda",
+    "code": 218,
+    "nameZh": "龙魔王",
+    "nameJa": "竜魔王"
+  },
+  {
+    "hex": "0xdb",
+    "code": 219,
+    "nameZh": "幻影",
+    "nameJa": "ファントム"
+  },
+  {
+    "hex": "0x10db",
+    "code": 4315,
+    "nameZh": "幻影骑士团",
+    "nameJa": "幻影騎士団"
+  },
+  {
+    "hex": "0xdc",
+    "code": 220,
+    "nameZh": "超级量子",
+    "nameJa": "超量"
+  },
+  {
+    "hex": "0x10dc",
+    "code": 4316,
+    "nameZh": "超级量子战士",
+    "nameJa": "超量士"
+  },
+  {
+    "hex": "0x20dc",
+    "code": 8412,
+    "nameZh": "超级量子机兽",
+    "nameJa": "超量機獣"
+  },
+  {
+    "hex": "0xdd",
+    "code": 221,
+    "nameZh": "青眼",
+    "nameJa": "ブルーアイズ"
+  },
+  {
+    "hex": "0xde",
+    "code": 222,
+    "nameZh": "艾克佐迪亚",
+    "nameJa": "エクゾディア"
+  },
+  {
+    "hex": "0xdf",
+    "code": 223,
+    "nameZh": "月光",
+    "nameJa": "ムーンライト"
+  },
+  {
+    "hex": "0xe0",
+    "code": 224,
+    "nameZh": "无形噬体",
+    "nameJa": "アモルファージ"
+  },
+  {
+    "hex": "0xe1",
+    "code": 225,
+    "nameZh": "炼装",
+    "nameJa": "メタルフォーゼ"
+  },
+  {
+    "hex": "0xe2",
+    "code": 226,
+    "nameZh": "三形金字塔",
+    "nameJa": "トラミッド"
+  },
+  {
+    "hex": "0xe3",
+    "code": 227,
+    "nameZh": "方界",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xe4",
+    "code": 228,
+    "nameZh": "精灵剑士",
+    "nameJa": "エルフの剣士"
+  },
+  {
+    "hex": "0xe5",
+    "code": 229,
+    "nameZh": "光波",
+    "nameJa": "サイファー"
+  },
+  {
+    "hex": "0x10e5",
+    "code": 4325,
+    "nameZh": "光波龙",
+    "nameJa": "サイファー・ドラゴン"
+  },
+  {
+    "hex": "0xe6",
+    "code": 230,
+    "nameZh": "花札卫",
+    "nameJa": "花札衛"
+  },
+  {
+    "hex": "0xe7",
+    "code": 231,
+    "nameZh": "沉默剑士",
+    "nameJa": "サイレント・ソードマン"
+  },
+  {
+    "hex": "0xe8",
+    "code": 232,
+    "nameZh": "沉默魔术师",
+    "nameJa": "サイレント・マジシャン"
+  },
+  {
+    "hex": "0xe9",
+    "code": 233,
+    "nameZh": "磁石战士",
+    "nameJa": "磁石の戦士(じしゃくのせんし)"
+  },
+  {
+    "hex": "0xea",
+    "code": 234,
+    "nameZh": "水晶机巧|非「机巧」",
+    "nameJa": "クリストロン"
+  },
+  {
+    "hex": "0xeb",
+    "code": 235,
+    "nameZh": "化合兽",
+    "nameJa": "化合獣"
+  },
+  {
+    "hex": "0x10ec",
+    "code": 4332,
+    "nameZh": "魔界剧团",
+    "nameJa": "魔界劇団"
+  },
+  {
+    "hex": "0x20ec",
+    "code": 8428,
+    "nameZh": "魔界台本",
+    "nameJa": "魔界台本"
+  },
+  {
+    "hex": "0xed",
+    "code": 237,
+    "nameZh": "地中族",
+    "nameJa": "サブテラー"
+  },
+  {
+    "hex": "0x10ed",
+    "code": 4333,
+    "nameZh": "地中族邪界",
+    "nameJa": "サブテラーマリス"
+  },
+  {
+    "hex": "0xee",
+    "code": 238,
+    "nameZh": "秘旋谍",
+    "nameJa": "SPYRAL"
+  },
+  {
+    "hex": "0x10ee",
+    "code": 4334,
+    "nameZh": "秘旋谍装备",
+    "nameJa": "SPYRAL GEAR"
+  },
+  {
+    "hex": "0x20ee",
+    "code": 8430,
+    "nameZh": "秘旋谍任务",
+    "nameJa": "SPYRAL MISSION"
+  },
+  {
+    "hex": "0xef",
+    "code": 239,
+    "nameZh": "堕天使",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xf0",
+    "code": 240,
+    "nameZh": "风魔女",
+    "nameJa": "WW（ウィンド・ウィッチ）"
+  },
+  {
+    "hex": "0xf1",
+    "code": 241,
+    "nameZh": "十二兽",
+    "nameJa": "十二獣"
+  },
+  {
+    "hex": "0xf2",
+    "code": 242,
+    "nameZh": "灵摆",
+    "nameJa": "ペンデュラム"
+  },
+  {
+    "hex": "0x10f2",
+    "code": 4338,
+    "nameZh": "灵摆龙",
+    "nameJa": "ペンデュラム・ドラゴン"
+  },
+  {
+    "hex": "0x20f2",
+    "code": 8434,
+    "nameZh": "灵摆读阵",
+    "nameJa": "ペンデュラムグラフ"
+  },
+  {
+    "hex": "0xf3",
+    "code": 243,
+    "nameZh": "捕食",
+    "nameJa": "プレデター"
+  },
+  {
+    "hex": "0x10f3",
+    "code": 4339,
+    "nameZh": "捕食植物",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xf4",
+    "code": 244,
+    "nameZh": "召唤兽",
+    "nameJa": "召喚獣"
+  },
+  {
+    "hex": "0xf5",
+    "code": 245,
+    "nameZh": "甘多拉",
+    "nameJa": "ガンドラ"
+  },
+  {
+    "hex": "0xf6",
+    "code": 246,
+    "nameZh": "摩天楼",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xf7",
+    "code": 247,
+    "nameZh": "抒情歌鸲",
+    "nameJa": "LL（リリカル・ルスキニア）"
+  },
+  {
+    "hex": "0x10f8",
+    "code": 4344,
+    "nameZh": "霸王门",
+    "nameJa": "覇王門"
+  },
+  {
+    "hex": "0x20f8",
+    "code": 8440,
+    "nameZh": "霸王眷龙",
+    "nameJa": "覇王眷竜"
+  },
+  {
+    "hex": "0xf9",
+    "code": 249,
+    "nameZh": "真龙",
+    "nameJa": "真竜"
+  },
+  {
+    "hex": "0xfa",
+    "code": 250,
+    "nameZh": "幻煌龙",
+    "nameJa": "幻煌龍"
+  },
+  {
+    "hex": "0xfb",
+    "code": 251,
+    "nameZh": "淘气仙星",
+    "nameJa": "トリックスター"
+  },
+  {
+    "hex": "0xfc",
+    "code": 252,
+    "nameZh": "刚鬼",
+    "nameJa": "剛鬼"
+  },
+  {
+    "hex": "0xfd",
+    "code": 253,
+    "nameZh": "星杯",
+    "nameJa": ""
+  },
+  {
+    "hex": "0xfe",
+    "code": 254,
+    "nameZh": "星遗物",
+    "nameJa": "星遺物"
+  },
+  {
+    "hex": "0xff",
+    "code": 255,
+    "nameZh": "幻透翼",
+    "nameJa": "クリアウィング"
+  },
+  {
+    "hex": "0x100",
+    "code": 256,
+    "nameZh": "结合术",
+    "nameJa": "ボンディング"
+  },
+  {
+    "hex": "0x101",
+    "code": 257,
+    "nameZh": "码语者",
+    "nameJa": "コード・トーカー"
+  },
+  {
+    "hex": "0x102",
+    "code": 258,
+    "nameZh": "弹丸",
+    "nameJa": "ヴァレット"
+  },
+  {
+    "hex": "0x103",
+    "code": 259,
+    "nameZh": "幻变骚灵",
+    "nameJa": "オルターガイスト"
+  },
+  {
+    "hex": "0x104",
+    "code": 260,
+    "nameZh": "机怪虫",
+    "nameJa": "クローラー"
+  },
+  {
+    "hex": "0x105",
+    "code": 261,
+    "nameZh": "玄化",
+    "nameJa": "メタファイズ"
+  },
+  {
+    "hex": "0x106",
+    "code": 262,
+    "nameZh": "复仇死者",
+    "nameJa": "ヴェンデット"
+  },
+  {
+    "hex": "0x107",
+    "code": 263,
+    "nameZh": "方程式运动员",
+    "nameJa": "F.A."
+  },
+  {
+    "hex": "0x108",
+    "code": 264,
+    "nameZh": "魔弹",
+    "nameJa": "魔弾"
+  },
+  {
+    "hex": "0x109",
+    "code": 265,
+    "nameZh": "天气",
+    "nameJa": "天気"
+  },
+  {
+    "hex": "0x10a",
+    "code": 266,
+    "nameZh": "珀耳修斯",
+    "nameJa": "パーシアス"
+  },
+  {
+    "hex": "0x10b",
+    "code": 267,
+    "nameZh": "廷达魔三角",
+    "nameJa": "ティンダングル"
+  },
+  {
+    "hex": "0x10c",
+    "code": 268,
+    "nameZh": "机界骑士",
+    "nameJa": "ジャックナイツ"
+  },
+  {
+    "hex": "0x10d",
+    "code": 269,
+    "nameZh": "魔导兽|非「魔导」",
+    "nameJa": "魔導獣"
+  },
+  {
+    "hex": "0x10e",
+    "code": 270,
+    "nameZh": "进化药",
+    "nameJa": "進化薬"
+  },
+  {
+    "hex": "0x10f",
+    "code": 271,
+    "nameZh": "枪管",
+    "nameJa": "ヴァレル"
+  },
+  {
+    "hex": "0x110",
+    "code": 272,
+    "nameZh": "纳祭",
+    "nameJa": "サクリファイス"
+  },
+  {
+    "hex": "0x1110",
+    "code": 4368,
+    "nameZh": "眼纳祭神",
+    "nameJa": "アイズ・サクリファイス"
+  },
+  {
+    "hex": "0x111",
+    "code": 273,
+    "nameZh": "武装龙",
+    "nameJa": "アームド・ドラゴン"
+  },
+  {
+    "hex": "0x112",
+    "code": 274,
+    "nameZh": "幻崩",
+    "nameJa": "トロイメア"
+  },
+  {
+    "hex": "0x113",
+    "code": 275,
+    "nameZh": "灵神",
+    "nameJa": "霊神"
+  },
+  {
+    "hex": "0x114",
+    "code": 276,
+    "nameZh": "空牙团",
+    "nameJa": "空牙団"
+  },
+  {
+    "hex": "0x115",
+    "code": 277,
+    "nameZh": "闪刀",
+    "nameJa": "閃刀"
+  },
+  {
+    "hex": "0x1115",
+    "code": 4373,
+    "nameZh": "闪刀姬",
+    "nameJa": "閃刀姫"
+  },
+  {
+    "hex": "0x116",
+    "code": 278,
+    "nameZh": "圣像骑士",
+    "nameJa": "パラディオン"
+  },
+  {
+    "hex": "0x117",
+    "code": 279,
+    "nameZh": "魔神仪",
+    "nameJa": "魔神儀"
+  },
+  {
+    "hex": "0x118",
+    "code": 280,
+    "nameZh": "电脑网",
+    "nameJa": "サイバネット"
+  },
+  {
+    "hex": "0x119",
+    "code": 281,
+    "nameZh": "转生炎兽",
+    "nameJa": "サラマングレイト"
+  },
+  {
+    "hex": "0x11a",
+    "code": 282,
+    "nameZh": "恐龙摔跤手",
+    "nameJa": "ダイナレスラー"
+  },
+  {
+    "hex": "0x11b",
+    "code": 283,
+    "nameZh": "自奏圣乐",
+    "nameJa": "オルフェゴール"
+  },
+  {
+    "hex": "0x11c",
+    "code": 284,
+    "nameZh": "雷龙",
+    "nameJa": "サンダー·ドラゴン"
+  },
+  {
+    "hex": "0x11d",
+    "code": 285,
+    "nameZh": "禁忌的",
+    "nameJa": "禁じられた"
+  },
+  {
+    "hex": "0x11e",
+    "code": 286,
+    "nameZh": "未界域",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x11f",
+    "code": 287,
+    "nameZh": "奈芙提斯",
+    "nameJa": "ネフティス"
+  },
+  {
+    "hex": "0x120",
+    "code": 288,
+    "nameZh": "调皮宝贝",
+    "nameJa": "プランキッズ"
+  },
+  {
+    "hex": "0x121",
+    "code": 289,
+    "nameZh": "魔妖",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x122",
+    "code": 290,
+    "nameZh": "女武神|非「武神」",
+    "nameJa": "ワルキューレ"
+  },
+  {
+    "hex": "0x123",
+    "code": 291,
+    "nameZh": "蔷薇",
+    "nameJa": "ローズ"
+  },
+  {
+    "hex": "0x1123",
+    "code": 4387,
+    "nameZh": "蔷薇龙",
+    "nameJa": "ローズ・ドラゴン"
+  },
+  {
+    "hex": "0x124",
+    "code": 292,
+    "nameZh": "机械天使",
+    "nameJa": "機械天使"
+  },
+  {
+    "hex": "0x125",
+    "code": 293,
+    "nameZh": "笑容",
+    "nameJa": "スマイル"
+  },
+  {
+    "hex": "0x126",
+    "code": 294,
+    "nameZh": "时间潜行者",
+    "nameJa": "クロノダイバー"
+  },
+  {
+    "hex": "0x127",
+    "code": 295,
+    "nameZh": "无限起动",
+    "nameJa": "無限起動"
+  },
+  {
+    "hex": "0x128",
+    "code": 296,
+    "nameZh": "魔女术",
+    "nameJa": "ウィッチクラフト"
+  },
+  {
+    "hex": "0x129",
+    "code": 297,
+    "nameZh": "咒眼",
+    "nameJa": "呪眼"
+  },
+  {
+    "hex": "0x12a",
+    "code": 298,
+    "nameZh": "恩底弥翁",
+    "nameJa": "エンディミオン"
+  },
+  {
+    "hex": "0x12b",
+    "code": 299,
+    "nameZh": "海晶少女",
+    "nameJa": "マリンセス"
+  },
+  {
+    "hex": "0x12c",
+    "code": 300,
+    "nameZh": "天威",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x12d",
+    "code": 301,
+    "nameZh": "斯摩夫",
+    "nameJa": "シムルグ"
+  },
+  {
+    "hex": "0x12e",
+    "code": 302,
+    "nameZh": "占卜魔女",
+    "nameJa": "占い魔女"
+  },
+  {
+    "hex": "0x12f",
+    "code": 303,
+    "nameZh": "蜂军",
+    "nameJa": "B・F（ビー・フォース）"
+  },
+  {
+    "hex": "0x130",
+    "code": 304,
+    "nameZh": "破械",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x1130",
+    "code": 4400,
+    "nameZh": "破械神",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x131",
+    "code": 305,
+    "nameZh": "梦魔镜",
+    "nameJa": "夢魔鏡"
+  },
+  {
+    "hex": "0x132",
+    "code": 306,
+    "nameZh": "斩机",
+    "nameJa": "斬機"
+  },
+  {
+    "hex": "0x133",
+    "code": 307,
+    "nameZh": "半龙女仆",
+    "nameJa": "ドラゴンメイド"
+  },
+  {
+    "hex": "0x134",
+    "code": 308,
+    "nameZh": "王战",
+    "nameJa": "ジェネレイド"
+  },
+  {
+    "hex": "0x135",
+    "code": 309,
+    "nameZh": "@火灵天星",
+    "nameJa": "@イグニスター"
+  },
+  {
+    "hex": "0x136",
+    "code": 310,
+    "nameZh": "“艾”",
+    "nameJa": "Ai（アイ）"
+  },
+  {
+    "hex": "0x137",
+    "code": 311,
+    "nameZh": "战华",
+    "nameJa": "戦華"
+  },
+  {
+    "hex": "0x138",
+    "code": 312,
+    "nameZh": "巨石遗物",
+    "nameJa": "メガリス"
+  },
+  {
+    "hex": "0x139",
+    "code": 313,
+    "nameZh": "守护神官",
+    "nameJa": "守護神官"
+  },
+  {
+    "hex": "0x13a",
+    "code": 314,
+    "nameZh": "拟声",
+    "nameJa": "オノマト"
+  },
+  {
+    "hex": "0x13b",
+    "code": 315,
+    "nameZh": "叛逆",
+    "nameJa": "リベリオン"
+  },
+  {
+    "hex": "0x13c",
+    "code": 316,
+    "nameZh": "代码破坏者",
+    "nameJa": "コードブレイカー"
+  },
+  {
+    "hex": "0x13d",
+    "code": 317,
+    "nameZh": "星义",
+    "nameJa": "ネメシス"
+  },
+  {
+    "hex": "0x13e",
+    "code": 318,
+    "nameZh": "巴巴罗斯",
+    "nameJa": "バルバロス"
+  },
+  {
+    "hex": "0x13f",
+    "code": 319,
+    "nameZh": "海造贼",
+    "nameJa": "海造賊"
+  },
+  {
+    "hex": "0x140",
+    "code": 320,
+    "nameZh": "魔救",
+    "nameJa": "アダマシア"
+  },
+  {
+    "hex": "0x141",
+    "code": 321,
+    "nameZh": "六花",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x1142",
+    "code": 4418,
+    "nameZh": "黄金国巫妖",
+    "nameJa": "エルドリッチ"
+  },
+  {
+    "hex": "0x2142",
+    "code": 8514,
+    "nameZh": "黄金国永生药",
+    "nameJa": "エルドリクシル"
+  },
+  {
+    "hex": "0x143",
+    "code": 323,
+    "nameZh": "黄金乡",
+    "nameJa": "黄金郷"
+  },
+  {
+    "hex": "0x144",
+    "code": 324,
+    "nameZh": "幻魔",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x1144",
+    "code": 4420,
+    "nameZh": "三幻魔",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x145",
+    "code": 325,
+    "nameZh": "教导",
+    "nameJa": "ドラグマ"
+  },
+  {
+    "hex": "0x146",
+    "code": 326,
+    "nameZh": "童话动物",
+    "nameJa": "メルフィー"
+  },
+  {
+    "hex": "0x147",
+    "code": 327,
+    "nameZh": "波波",
+    "nameJa": "ポータン"
+  },
+  {
+    "hex": "0x148",
+    "code": 328,
+    "nameZh": "罗兰",
+    "nameJa": "ローラン"
+  },
+  {
+    "hex": "0x149",
+    "code": 329,
+    "nameZh": "化石",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x14a",
+    "code": 330,
+    "nameZh": "源数",
+    "nameJa": "ヌメロン"
+  },
+  {
+    "hex": "0x114a",
+    "code": 4426,
+    "nameZh": "源数之门",
+    "nameJa": "ゲート・オブ・ヌメロン"
+  },
+  {
+    "hex": "0x14b",
+    "code": 331,
+    "nameZh": "机块",
+    "nameJa": "機塊"
+  },
+  {
+    "hex": "0x314c",
+    "code": 12620,
+    "nameZh": "地灵术",
+    "nameJa": "地霊術"
+  },
+  {
+    "hex": "0x514c",
+    "code": 20812,
+    "nameZh": "水灵术",
+    "nameJa": "水霊術"
+  },
+  {
+    "hex": "0x614c",
+    "code": 24908,
+    "nameZh": "火灵术",
+    "nameJa": "火霊術"
+  },
+  {
+    "hex": "0x914c",
+    "code": 37196,
+    "nameZh": "风灵术",
+    "nameJa": "風霊術"
+  },
+  {
+    "hex": "0x14d",
+    "code": 333,
+    "nameZh": "铁兽",
+    "nameJa": "トライブリゲード"
+  },
+  {
+    "hex": "0x14e",
+    "code": 334,
+    "nameZh": "电脑堺",
+    "nameJa": "電脳堺"
+  },
+  {
+    "hex": "0x114e",
+    "code": 4430,
+    "nameZh": "电脑堺门",
+    "nameJa": "電脳堺門"
+  },
+  {
+    "hex": "0x14f",
+    "code": 335,
+    "nameZh": "双天",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x150",
+    "code": 336,
+    "nameZh": "大贤者",
+    "nameJa": "マギストス"
+  },
+  {
+    "hex": "0x1151",
+    "code": 4433,
+    "nameZh": "直播☆双子",
+    "nameJa": "Live☆Twin"
+  },
+  {
+    "hex": "0x2151",
+    "code": 8529,
+    "nameZh": "邪恶★双子",
+    "nameJa": "Evil★Twin"
+  },
+  {
+    "hex": "0x152",
+    "code": 338,
+    "nameZh": "姬丝基勒",
+    "nameJa": "キスキル"
+  },
+  {
+    "hex": "0x153",
+    "code": 339,
+    "nameZh": "璃拉",
+    "nameJa": "リィラ"
+  },
+  {
+    "hex": "0x154",
+    "code": 340,
+    "nameZh": "龙辉巧",
+    "nameJa": "ドライトロン"
+  },
+  {
+    "hex": "0x155",
+    "code": 341,
+    "nameZh": "护宝炮妖",
+    "nameJa": "スプリガンズ"
+  },
+  {
+    "hex": "0x156",
+    "code": 342,
+    "nameZh": "治安战警队",
+    "nameJa": "S－Force"
+  },
+  {
+    "hex": "0x157",
+    "code": 343,
+    "nameZh": "秘异三变",
+    "nameJa": "ミュートリア"
+  },
+  {
+    "hex": "0x1158",
+    "code": 4440,
+    "nameZh": "圣蔓",
+    "nameJa": "サンヴァイン"
+  },
+  {
+    "hex": "0x2158",
+    "code": 8536,
+    "nameZh": "圣天树",
+    "nameJa": "サンアバロン"
+  },
+  {
+    "hex": "0x4158",
+    "code": 16728,
+    "nameZh": "圣种",
+    "nameJa": "サンシード"
+  },
+  {
+    "hex": "0x159",
+    "code": 345,
+    "nameZh": "圣夜骑士",
+    "nameJa": "ホーリーナイツ"
+  },
+  {
+    "hex": "0x15a",
+    "code": 346,
+    "nameZh": "人偶怪兽",
+    "nameJa": "ドール・モンスター"
+  },
+  {
+    "hex": "0x15b",
+    "code": 347,
+    "nameZh": "惊乐",
+    "nameJa": "アメイズメント"
+  },
+  {
+    "hex": "0x15c",
+    "code": 348,
+    "nameZh": "游乐设施",
+    "nameJa": "アトラクション"
+  },
+  {
+    "hex": "0x15d",
+    "code": 349,
+    "nameZh": "烙印",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x15e",
+    "code": 350,
+    "nameZh": "降阶魔法",
+    "nameJa": "RDM"
+  },
+  {
+    "hex": "0x15f",
+    "code": 351,
+    "nameZh": "战吼",
+    "nameJa": "ウォークライ"
+  },
+  {
+    "hex": "0x160",
+    "code": 352,
+    "nameZh": "原质炉",
+    "nameJa": "マテリアクトル"
+  },
+  {
+    "hex": "0x161",
+    "code": 353,
+    "nameZh": "溟界",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x162",
+    "code": 354,
+    "nameZh": "七音服",
+    "nameJa": "ドレミコード"
+  },
+  {
+    "hex": "0x1162",
+    "code": 4450,
+    "nameZh": "大钢琴之七音服",
+    "nameJa": "グランドレミコード"
+  },
+  {
+    "hex": "0x163",
+    "code": 355,
+    "nameZh": "北极天熊",
+    "nameJa": "ベアルクティ"
+  },
+  {
+    "hex": "0x164",
+    "code": 356,
+    "nameZh": "死狱乡",
+    "nameJa": "デスピア"
+  },
+  {
+    "hex": "0x165",
+    "code": 357,
+    "nameZh": "魔键",
+    "nameJa": "魔鍵"
+  },
+  {
+    "hex": "0x166",
+    "code": 358,
+    "nameZh": "军贯",
+    "nameJa": "軍貫"
+  },
+  {
+    "hex": "0x1167",
+    "code": 4455,
+    "nameZh": "森之圣兽",
+    "nameJa": "森の聖獣"
+  },
+  {
+    "hex": "0x2167",
+    "code": 8551,
+    "nameZh": "森之圣灵",
+    "nameJa": "森の聖霊"
+  },
+  {
+    "hex": "0x168",
+    "code": 360,
+    "nameZh": "隐形水母怪",
+    "nameJa": "ステルス・クラーゲン"
+  },
+  {
+    "hex": "0x169",
+    "code": 361,
+    "nameZh": "原数天灵",
+    "nameJa": "ヌメロニアス"
+  },
+  {
+    "hex": "0x16a",
+    "code": 362,
+    "nameZh": "编号系",
+    "nameJa": "ナンバーズ"
+  },
+  {
+    "hex": "0x16b",
+    "code": 363,
+    "nameZh": "相剑",
+    "nameJa": "相剣"
+  },
+  {
+    "hex": "0x16c",
+    "code": 364,
+    "nameZh": "冰水",
+    "nameJa": "氷水"
+  },
+  {
+    "hex": "0x16d",
+    "code": 365,
+    "nameZh": "随风旅鸟",
+    "nameJa": "ふわんだりぃず"
+  },
+  {
+    "hex": "0x16e",
+    "code": 366,
+    "nameZh": "拓扑",
+    "nameJa": "トポロジック"
+  },
+  {
+    "hex": "0x16f",
+    "code": 367,
+    "nameZh": "许珀里翁",
+    "nameJa": "ヒュペリオン"
+  },
+  {
+    "hex": "0x170",
+    "code": 368,
+    "nameZh": "骑甲虫",
+    "nameJa": "ビートルーパー"
+  },
+  {
+    "hex": "0x171",
+    "code": 369,
+    "nameZh": "朋克",
+    "nameJa": "P.U.N.K."
+  },
+  {
+    "hex": "0x172",
+    "code": 370,
+    "nameZh": "救祓少女",
+    "nameJa": "エクソシスター"
+  },
+  {
+    "hex": "0x173",
+    "code": 371,
+    "nameZh": "恐啡肽狂龙",
+    "nameJa": "ダイノルフィア"
+  },
+  {
+    "hex": "0x174",
+    "code": 372,
+    "nameZh": "恶魔娘",
+    "nameJa": "悪魔嬢"
+  },
+  {
+    "hex": "0x175",
+    "code": 373,
+    "nameZh": "七皇",
+    "nameJa": "セブンス"
+  },
+  {
+    "hex": "0x176",
+    "code": 374,
+    "nameZh": "异晶人的",
+    "nameJa": "バリアンズ"
+  },
+  {
+    "hex": "0x177",
+    "code": 375,
+    "nameZh": "利维坦",
+    "nameJa": "リバイアサン"
+  },
+  {
+    "hex": "0x178",
+    "code": 376,
+    "nameZh": "潜海",
+    "nameJa": "シー・ステルス"
+  },
+  {
+    "hex": "0x179",
+    "code": 377,
+    "nameZh": "兽带斗神",
+    "nameJa": "セリオンズ"
+  },
+  {
+    "hex": "0x17a",
+    "code": 378,
+    "nameZh": "恐吓爪牙族",
+    "nameJa": "スケアクロー"
+  },
+  {
+    "hex": "0x17b",
+    "code": 379,
+    "nameZh": "野蛮人",
+    "nameJa": "バーバリアン"
+  },
+  {
+    "hex": "0x17c",
+    "code": 380,
+    "nameZh": "书灵师",
+    "nameJa": "リブロマンサー"
+  },
+  {
+    "hex": "0x17d",
+    "code": 381,
+    "nameZh": "群豪",
+    "nameJa": "ヴァリアンツ"
+  },
+  {
+    "hex": "0x17e",
+    "code": 382,
+    "nameZh": "拉比林斯迷宫",
+    "nameJa": "ラビュリンス"
+  },
+  {
+    "hex": "0x117e",
+    "code": 4478,
+    "nameZh": "拉比林斯迷宫欢迎",
+    "nameJa": "ウェルカム・ラビュリンス"
+  },
+  {
+    "hex": "0x17f",
+    "code": 383,
+    "nameZh": "神碑",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x180",
+    "code": 384,
+    "nameZh": "卫星闪灵",
+    "nameJa": "スプライト"
+  },
+  {
+    "hex": "0x181",
+    "code": 385,
+    "nameZh": "珠泪哀歌族",
+    "nameJa": "ティアラメンツ"
+  },
+  {
+    "hex": "0x182",
+    "code": 386,
+    "nameZh": "春化精",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x183",
+    "code": 387,
+    "nameZh": "悠悠",
+    "nameJa": "もけもけ"
+  },
+  {
+    "hex": "0x184",
+    "code": 388,
+    "nameZh": "翼侠",
+    "nameJa": "ウィングマン"
+  },
+  {
+    "hex": "0x1185",
+    "code": 4485,
+    "nameZh": "涂鸦兽",
+    "nameJa": "らくがきじゅう"
+  },
+  {
+    "hex": "0x2185",
+    "code": 8581,
+    "nameZh": "涂鸦本",
+    "nameJa": "らくがきちょう"
+  },
+  {
+    "hex": "0x186",
+    "code": 390,
+    "nameZh": "G石人",
+    "nameJa": "Gゴーレム"
+  },
+  {
+    "hex": "0x187",
+    "code": 391,
+    "nameZh": "桥梁",
+    "nameJa": "架け橋"
+  },
+  {
+    "hex": "0x188",
+    "code": 392,
+    "nameZh": "深渊之兽",
+    "nameJa": "ビーステッド"
+  },
+  {
+    "hex": "0x189",
+    "code": 393,
+    "nameZh": "俱舍怒威族",
+    "nameJa": "クシャトリラ"
+  },
+  {
+    "hex": "0x18a",
+    "code": 394,
+    "nameZh": "魊影",
+    "nameJa": "ゴーティス"
+  },
+  {
+    "hex": "0x18b",
+    "code": 395,
+    "nameZh": "救援ACE队",
+    "nameJa": "R－ACE"
+  },
+  {
+    "hex": "0x18c",
+    "code": 396,
+    "nameZh": "纯爱妖精",
+    "nameJa": "ピュアリィ"
+  },
+  {
+    "hex": "0x18d",
+    "code": 397,
+    "nameZh": "御巫",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x18e",
+    "code": 398,
+    "nameZh": "仪水镜",
+    "nameJa": "儀水鏡"
+  },
+  {
+    "hex": "0x18f",
+    "code": 399,
+    "nameZh": "防火",
+    "nameJa": "ファイアウォール"
+  },
+  {
+    "hex": "0x190",
+    "code": 400,
+    "nameZh": "末那愚子族",
+    "nameJa": "マナドゥム"
+  },
+  {
+    "hex": "0x191",
+    "code": 401,
+    "nameZh": "妮穆蕾莉娅",
+    "nameJa": "ネムレリア"
+  },
+  {
+    "hex": "0x192",
+    "code": 402,
+    "nameZh": "黄金荣耀",
+    "nameJa": "GP（ゴールド・プライド）"
+  },
+  {
+    "hex": "0x193",
+    "code": 403,
+    "nameZh": "迷宫壁",
+    "nameJa": "ラビリンス・ウォール"
+  },
+  {
+    "hex": "0x194",
+    "code": 404,
+    "nameZh": "至爱",
+    "nameJa": "フェイバリット"
+  },
+  {
+    "hex": "0x195",
+    "code": 405,
+    "nameZh": "征服斗魂",
+    "nameJa": "VS（ヴァンキッシュ・ソウル）"
+  },
+  {
+    "hex": "0x196",
+    "code": 406,
+    "nameZh": "新式魔厨",
+    "nameJa": "ヌーベルズ"
+  },
+  {
+    "hex": "0x197",
+    "code": 407,
+    "nameZh": "食谱",
+    "nameJa": "レシピ"
+  },
+  {
+    "hex": "0x198",
+    "code": 408,
+    "nameZh": "维萨斯",
+    "nameJa": "ヴィサス"
+  },
+  {
+    "hex": "0x199",
+    "code": 409,
+    "nameZh": "反击",
+    "nameJa": "カウンター"
+  },
+  {
+    "hex": "0x19a",
+    "code": 410,
+    "nameZh": "吠陀",
+    "nameJa": "ヴェーダ"
+  },
+  {
+    "hex": "0x19b",
+    "code": 411,
+    "nameZh": "迪亚贝尔",
+    "nameJa": "ディアベル"
+  },
+  {
+    "hex": "0x119b",
+    "code": 4507,
+    "nameZh": "迪亚贝尔斯塔尔",
+    "nameJa": "ディアベルスター"
+  },
+  {
+    "hex": "0x19c",
+    "code": 412,
+    "nameZh": "蛇眼",
+    "nameJa": "スネークアイ"
+  },
+  {
+    "hex": "0x19d",
+    "code": 413,
+    "nameZh": "荷鲁斯",
+    "nameJa": "ホルス"
+  },
+  {
+    "hex": "0x119d",
+    "code": 4509,
+    "nameZh": "荷鲁斯之黑炎龙",
+    "nameJa": "ホルスの黒炎竜"
+  },
+  {
+    "hex": "0x19e",
+    "code": 414,
+    "nameZh": "罪宝",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x19f",
+    "code": 415,
+    "nameZh": "圣菓使",
+    "nameJa": "聖菓使"
+  },
+  {
+    "hex": "0x1a0",
+    "code": 416,
+    "nameZh": "哈特",
+    "nameJa": "ハート"
+  },
+  {
+    "hex": "0x1a1",
+    "code": 417,
+    "nameZh": "莫忘",
+    "nameJa": "メメント"
+  },
+  {
+    "hex": "0x1a2",
+    "code": 418,
+    "nameZh": "百夫长骑士",
+    "nameJa": "センチュリオン"
+  },
+  {
+    "hex": "0x1a3",
+    "code": 419,
+    "nameZh": "异响鸣",
+    "nameJa": "ヴァルモニカ"
+  },
+  {
+    "hex": "0x1a4",
+    "code": 420,
+    "nameZh": "提斯蒂娜",
+    "nameJa": "ティスティナ"
+  },
+  {
+    "hex": "0x1a5",
+    "code": 421,
+    "nameZh": "于贝尔",
+    "nameJa": "ユベル"
+  },
+  {
+    "hex": "0x1a6",
+    "code": 422,
+    "nameZh": "肃声",
+    "nameJa": "粛声"
+  },
+  {
+    "hex": "0x1a7",
+    "code": 423,
+    "nameZh": "白斗气",
+    "nameJa": "ホワイト・オーラ"
+  },
+  {
+    "hex": "0x1a8",
+    "code": 424,
+    "nameZh": "玩具",
+    "nameJa": "トイ"
+  },
+  {
+    "hex": "0x1a9",
+    "code": 425,
+    "nameZh": "灿幻",
+    "nameJa": "燦幻"
+  },
+  {
+    "hex": "0x1aa",
+    "code": 426,
+    "nameZh": "天杯龙",
+    "nameJa": "天盃龍"
+  },
+  {
+    "hex": "0x1ab",
+    "code": 427,
+    "nameZh": "蕾祸",
+    "nameJa": "蕾禍"
+  },
+  {
+    "hex": "0x1ac",
+    "code": 428,
+    "nameZh": "飞龙炎",
+    "nameJa": "サラマンドラ"
+  },
+  {
+    "hex": "0x1ad",
+    "code": 429,
+    "nameZh": "灰灭",
+    "nameJa": "灰滅"
+  },
+  {
+    "hex": "0x1ae",
+    "code": 430,
+    "nameZh": "千年",
+    "nameJa": "千年/ミレニアム"
+  },
+  {
+    "hex": "0x1af",
+    "code": 431,
+    "nameZh": "艾格佐德",
+    "nameJa": "エグゾード"
+  },
+  {
+    "hex": "0x1b0",
+    "code": 432,
+    "nameZh": "刻魔",
+    "nameJa": "デモンスミス"
+  },
+  {
+    "hex": "0x1b1",
+    "code": 433,
+    "nameZh": "白森林",
+    "nameJa": "白き森"
+  },
+  {
+    "hex": "0x1b2",
+    "code": 434,
+    "nameZh": "欢聚友伴",
+    "nameJa": "マルチャミー"
+  },
+  {
+    "hex": "0x1b3",
+    "code": 435,
+    "nameZh": "徽记",
+    "nameJa": "エンブレーマ"
+  },
+  {
+    "hex": "0x1b4",
+    "code": 436,
+    "nameZh": "时空",
+    "nameJa": "タキオン"
+  },
+  {
+    "hex": "0x1b5",
+    "code": 437,
+    "nameZh": "蓝泪",
+    "nameJa": "青い涙"
+  },
+  {
+    "hex": "0x1b6",
+    "code": 438,
+    "nameZh": "石版",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x1b7",
+    "code": 439,
+    "nameZh": "迷拟宝箱鬼",
+    "nameJa": "ミミグル"
+  },
+  {
+    "hex": "0x1b8",
+    "code": 440,
+    "nameZh": "鲨",
+    "nameJa": "シャーク"
+  },
+  {
+    "hex": "0x11b8",
+    "code": 4536,
+    "nameZh": "鲨龙兽",
+    "nameJa": "シャーク・ドレイク"
+  },
+  {
+    "hex": "0x1b9",
+    "code": 441,
+    "nameZh": "原石",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x1ba",
+    "code": 442,
+    "nameZh": "金属化",
+    "nameJa": "メタル化"
+  },
+  {
+    "hex": "0x1bb",
+    "code": 443,
+    "nameZh": "魔瞳",
+    "nameJa": "モルガナイト"
+  },
+  {
+    "hex": "0x1bc",
+    "code": 444,
+    "nameZh": "蓟花",
+    "nameJa": "アザミナ"
+  },
+  {
+    "hex": "0x1bd",
+    "code": 445,
+    "nameZh": "祝台",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x1be",
+    "code": 446,
+    "nameZh": "雷火沸动",
+    "nameJa": "ライゼオル"
+  },
+  {
+    "hex": "0x1bf",
+    "code": 447,
+    "nameZh": "码丽丝",
+    "nameJa": "M∀LICE"
+  },
+  {
+    "hex": "0x1c0",
+    "code": 448,
+    "nameZh": "龙华",
+    "nameJa": "竜華"
+  },
+  {
+    "hex": "0x1c1",
+    "code": 449,
+    "nameZh": "阿尔戈☆群星",
+    "nameJa": "ARG☆S"
+  },
+  {
+    "hex": "0x1c2",
+    "code": 450,
+    "nameZh": "喷水引擎",
+    "nameJa": "アクア・ジェット"
+  },
+  {
+    "hex": "0x1c3",
+    "code": 451,
+    "nameZh": "巳剑",
+    "nameJa": "巳剣"
+  },
+  {
+    "hex": "0x1c4",
+    "code": 452,
+    "nameZh": "征龙",
+    "nameJa": "征竜"
+  },
+  {
+    "hex": "0x1c5",
+    "code": 453,
+    "nameZh": "再世",
+    "nameJa": "リジェネシス"
+  },
+  {
+    "hex": "0x1c6",
+    "code": 454,
+    "nameZh": "统王",
+    "nameJa": "ドミナス"
+  },
+  {
+    "hex": "0x31c6",
+    "code": 12742,
+    "nameZh": "圣王的粉碎|统王",
+    "nameJa": "ドミナス・パージ"
+  },
+  {
+    "hex": "0x1c7",
+    "code": 455,
+    "nameZh": "塞勒凯特",
+    "nameJa": "セルケト"
+  },
+  {
+    "hex": "0x1c8",
+    "code": 456,
+    "nameZh": "阿匹卜",
+    "nameJa": "アポピス"
+  },
+  {
+    "hex": "0x1c9",
+    "code": 457,
+    "nameZh": "星辰",
+    "nameJa": "ドラゴンテイル"
+  },
+  {
+    "hex": "0x1ca",
+    "code": 458,
+    "nameZh": "味美喵",
+    "nameJa": "ヤミー"
+  },
+  {
+    "hex": "0x1cb",
+    "code": 459,
+    "nameZh": "K9",
+    "nameJa": ""
+  },
+  {
+    "hex": "0x1cc",
+    "code": 460,
+    "nameZh": "瞬间移动",
+    "nameJa": "テレポート"
+  },
+  {
+    "hex": "0x1cd",
+    "code": 461,
+    "nameZh": "神艺",
+    "nameJa": "アルトメギア"
+  },
+  {
+    "hex": "0x1ce",
+    "code": 462,
+    "nameZh": "狱神",
+    "nameJa": "獄神"
+  },
+  {
+    "hex": "0x1cf",
+    "code": 463,
+    "nameZh": "反叛曲机器人",
+    "nameJa": "R.B."
+  },
+  {
+    "hex": "0x1d0",
+    "code": 464,
+    "nameZh": "死伟王",
+    "nameJa": "死偉王"
+  },
+  {
+    "hex": "0x1d1",
+    "code": 465,
+    "nameZh": "绚岚",
+    "nameJa": "絢嵐"
+  },
+  {
+    "hex": "0x1d2",
+    "code": 466,
+    "nameZh": "终刻",
+    "nameJa": "ドゥームズ"
+  },
+  {
+    "hex": "0x1d3",
+    "code": 467,
+    "nameZh": "不可见之手",
+    "nameJa": "ヘカトンケイル"
+  },
+  {
+    "hex": "0x1d4",
+    "code": 468,
+    "nameZh": "纠罪巧",
+    "nameJa": "糾罪巧"
+  },
+  {
+    "hex": "0x1d5",
+    "code": 469,
+    "nameZh": "杀手级调整曲",
+    "nameJa": "キラーチューン"
+  },
+  {
+    "hex": "0x1d6",
+    "code": 470,
+    "nameZh": "树熊",
+    "nameJa": "コアラ"
+  },
+  {
+    "hex": "0x1d7",
+    "code": 471,
+    "nameZh": "艾克莉西娅",
+    "nameJa": "エクレシア"
+  },
+  {
+    "hex": "0x1d8",
+    "code": 472,
+    "nameZh": "耀圣",
+    "nameJa": "エルフェンノーツ"
+  },
+  {
+    "hex": "0x1d9",
+    "code": 473,
+    "nameZh": "磁力",
+    "nameJa": "マグネット"
+  },
+  {
+    "hex": "0x1da",
+    "code": 474,
+    "nameZh": "世界末日",
+    "nameJa": "エンド・オブ・ザ・ワールド"
+  },
+  {
+    "hex": "0x1db",
+    "code": 475,
+    "nameZh": "妖精传姬",
+    "nameJa": "妖精伝姫"
+  },
+  {
+    "hex": "0x1dc",
+    "code": 476,
+    "nameZh": "道化一座",
+    "nameJa": "道化の一座"
+  },
+  {
+    "hex": "0x1dd",
+    "code": 477,
+    "nameZh": "基因组混合",
+    "nameJa": "GMX"
+  },
+  {
+    "hex": "0x1de",
+    "code": 478,
+    "nameZh": "暗黑调整",
+    "nameJa": "DT"
+  },
+  {
+    "hex": "0x1df",
+    "code": 479,
+    "nameZh": "雷盟",
+    "nameJa": "ブリッツクリーク"
+  },
+  {
+    "hex": "0x1e0",
+    "code": 480,
+    "nameZh": "预幻",
+    "nameJa": "テオリアライズ"
+  },
+  {
+    "hex": "0x1e1",
+    "code": 481,
+    "nameZh": "阿莱斯特",
+    "nameJa": "アレイスター"
+  },
+  {
+    "hex": "0x1e2",
+    "code": 482,
+    "nameZh": "具象天使",
+    "nameJa": "Angelechy"
+  },
+  {
+    "hex": "0x1e3",
+    "code": 483,
+    "nameZh": "假面魔蹈士",
+    "nameJa": "仮面魔踏士"
+  },
+  {
+    "hex": "0x1e4",
+    "code": 484,
+    "nameZh": "艮神鬼",
+    "nameJa": "アシュトラ"
+  },
+  {
+    "hex": "0x1e5",
+    "code": 485,
+    "nameZh": "泰达路斯",
+    "nameJa": "ダイダロス"
+  },
+  {
+    "hex": "0x1e6",
+    "code": 486,
+    "nameZh": "无垢大艺术",
+    "nameJa": "アルス＝マグナ"
+  },
+  {
+    "hex": "0x1e7",
+    "code": 487,
+    "nameZh": "底亚克托罗斯",
+    "nameJa": "ディアクトロス"
+  },
+  {
+    "hex": "0x1e8",
+    "code": 488,
+    "nameZh": "米底乌斯",
+    "nameJa": "メディウス"
+  },
+  {
+    "hex": "0x1e9",
+    "code": 489,
+    "nameZh": "白夜",
+    "nameJa": "ホワイトナイツ"
+  },
+  {
+    "hex": "0x1ea",
+    "code": 490,
+    "nameZh": "列王",
+    "nameJa": ""
+  }
+]

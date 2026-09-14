@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0e17">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>游戏王 AI 制卡工作室 - 独立离线版</title>
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+  <link rel="stylesheet" href="./css/main.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+  <!-- 离线依赖库 -->
+  <script src="./libs/handlebars.min.js"></script>
+  <script src="./libs/sql-wasm.js"></script>
+  <script src="./libs/jszip.min.js"></script>
+</head>
+<body class="theme-obsidian">
+  <!-- 商业化专业制卡顶栏 (彻底替代并省略左上角浏览器界面) -->
+  <header class="studio-header">
+    <div class="header-brand">
+      <div class="brand-logo-eye">𓂀</div>
+      <div class="brand-info">
+        <h1 class="brand-title">游戏王 AI 制卡工作室</h1>
+        <span class="brand-version">PRO STUDIO · 纯离线引擎</span>
+      </div>
+    </div>
+
+    <!-- 顶部四步流转向导指示器 -->
+    <div class="header-steps-bar">
+      <button type="button" class="header-step-btn active" data-step="1" onclick="jumpToStep(1)">
+        <span class="h-step-num">1</span>
+        <span class="h-step-name">卡牌属性</span>
+      </button>
+      <div class="h-step-line"></div>
+      <button type="button" class="header-step-btn" data-step="2" onclick="jumpToStep(2)">
+        <span class="h-step-num">2</span>
+        <span class="h-step-name">效果向导</span>
+      </button>
+      <div class="h-step-line"></div>
+      <button type="button" class="header-step-btn" data-step="3" onclick="jumpToStep(3)">
+        <span class="h-step-num">3</span>
+        <span class="h-step-name">卡面配图</span>
+      </button>
+      <div class="h-step-line"></div>
+      <button type="button" class="header-step-btn" data-step="4" onclick="jumpToStep(4)">
+        <span class="h-step-num">4</span>
+        <span class="h-step-name">一键打包</span>
+      </button>
+    </div>
+
+    <!-- 顶部快捷操作 -->
+    <div class="header-actions">
+      <button type="button" class="mobile-ui-cfg-btn" onclick="openMobileUiSettings()" title="手机端专属界面与交互配置">
+        <span>📱 手机UI</span>
+      </button>
+      <button type="button" class="btn-top-gold" onclick="showAIWorkflow()" title="AI 自动工作流 · 灵感一键生卡">
+        <span>⚡ AI 灵感</span>
+      </button>
+      <button type="button" class="btn-top-outline" onclick="navigateTo('card-library')" title="本地卡牌收藏库">
+        <span>📚 卡牌库</span>
+      </button>
+      <button type="button" class="btn-top-outline" onclick="navigateTo('script-designer')" title="独立脚本设计器">
+        <span>📜 脚本</span>
+      </button>
+      <button type="button" class="btn-top-icon" onclick="navigateTo('settings')" title="全局偏好与引擎配置">
+        <span>⚙️</span>
+      </button>
+      <button type="button" class="btn-top-outline btn-desktop-exit" onclick="requestAppExit()" title="退出并彻底关闭程序">
+        <span>🚪 退出</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 全宽主工作区容器 (不再受左侧栏挤压) -->
+  <div class="app-container">
+    <main class="main-content">
+      <!-- 制卡器页面 -->
+      <div class="page active" id="card-maker">
+        <!-- 双栏工作区容器 -->
+        <div class="studio-workspace">
+          <!-- 左栏：参数编辑区 -->
+          <div class="studio-editor-pane">
+            
+            <!-- 手机端顶部吸顶微缩动态卡片胶囊 (Sticky Mini Card Pill) -->
+            <div class="mobile-sticky-card-pill" id="mobileStickyCardPill" onclick="openMobileCardDrawer()" title="点击展开全景大图预览">
+              <div class="sticky-pill-left">
+                <span class="sticky-attr-badge attr-32" id="stickyCardAttr">暗</span>
+                <div class="sticky-pill-title-group">
+                  <span class="sticky-card-name" id="stickyCardName">究极创世神 艾克佐迪亚</span>
+                  <div class="sticky-pill-meta">
+                    <span id="stickyCardLevel">★ 等级 10</span>
+                    <span id="stickyCardStats">4000 / 4000</span>
+                  </div>
+                </div>
+              </div>
+              <div class="sticky-pill-right">
+                <span class="sticky-inspect-badge">🔍 看大图</span>
+              </div>
+            </div>
+
+            <!-- 手机端多页面设计流专属进度指示器 (Mobile Flow Tracker) -->
+            <div class="mobile-flow-tracker" id="mobileFlowTracker">
+              <div class="flow-tracker-top">
+                <span class="flow-tracker-badge" id="flowStepBadge">第 1 / 6 步</span>
+                <h4 class="flow-tracker-title" id="flowStepTitle">🏷️ 卡面基础数据</h4>
+              </div>
+              <div class="flow-tracker-dots" id="flowTrackerDots">
+                <!-- 动态渲染各子步骤微缩指示胶囊 -->
+              </div>
+            </div>
+
+            <!-- 步骤1: 卡牌信息录入面板 (卡面基础) -->
+            <div class="step-section active" id="step1-content">
+              <!-- 原卡池检测与防卡密冲突引擎状态条 -->
+              <div class="cdb-status-bar mb-3" style="display:flex;align-items:center;justify-content:space-between;background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 14px;font-size:13px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span id="cdbStatusDot" style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;"></span>
+                  <span id="cdbStatusText" style="color:#e2e8f0;">正在扫描本机 YGOPRO / MDPro3 原卡池...</span>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <label for="cdbFileInput" class="btn-sm btn-outline" style="cursor:pointer;margin:0;padding:3px 10px;font-size:12px;" title="手动载入外部 cards.cdb 进行防重校验">
+                    📂 载入 cards.cdb
+                  </label>
+                  <input type="file" id="cdbFileInput" accept=".cdb" style="display:none;" onchange="onManualCdbUploaded(event)">
+                </div>
+              </div>
+
+              <!-- 多卡卡包工程管理器 (仅在此处出现，不占用后续效果与配图页面) -->
+              <div class="card-set-manager-bar mb-3" id="cardSetBar" style="background:rgba(15,23,42,0.85);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:10px 14px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:16px;">🎴</span>
+                    <span style="font-weight:600;font-size:14px;color:#f8fafc;">卡包系列工程:</span>
+                    <input type="text" id="cardSetNameInput" value="自定义扩展系列 #1" onchange="onSetNameChanged(this.value)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:4px;padding:2px 8px;font-size:13px;width:170px;">
+                    <span id="cardSetCountBadge" style="background:rgba(245,158,11,0.15);color:#f59e0b;font-size:12px;padding:2px 6px;border-radius:4px;">1 张卡</span>
+                  </div>
+                  <div style="display:flex;gap:6px;">
+                    <button type="button" class="btn-sm btn-outline" onclick="addNewCardToSet()" title="添加一张新卡至此卡包">+ 添加新卡</button>
+                    <button type="button" class="btn-sm btn-outline" onclick="cloneCurrentCard()" title="克隆当前卡片数据并自动分配卡密">📑 克隆本卡</button>
+                    <button type="button" class="btn-sm btn-gold" onclick="downloadMdpro3Package(true)" title="一键将卡包全部卡片打包为 MDPro3 扩展包">📱 导出整包 .ypk</button>
+                  </div>
+                </div>
+                <!-- 卡片标签切换列表 -->
+                <div id="cardSetTabsList" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;">
+                  <!-- 动态渲染卡片 Pills -->
+                </div>
+              </div>
+
+              <!-- 基础身份识别与主类型选择 -->
+              <div class="glass-card mb-4">
+                <div class="card-section-title">
+                  <span class="icon">🏷️</span>
+                  <h3>卡牌核心身份与类别</h3>
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="input-field">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                      <label>卡片密码 (8位数字) <span class="req">*</span></label>
+                      <span id="cdbConflictBadge" style="font-size:12px;font-weight:600;display:none;"></span>
+                    </div>
+                    <div class="id-input-wrap">
+                      <input type="number" id="cardId" value="100000001" min="1" max="999999999" oninput="onCardIdInput(this.value)">
+                      <div class="id-action-btns" style="display:flex;gap:8px;">
+                        <button type="button" class="btn-sm" id="btnAutoSafeId" onclick="assignSafePasscode()" style="display:none;background:#ef4444;color:#fff;border:1px solid #dc2626;" title="自动分配未被原卡池占用的空闲卡密">⚡ 自动分配空闲卡密</button>
+                        <button type="button" class="btn-sm btn-outline" onclick="generateRandomId()" title="随机生成官方标准8位密码">🎲 随机密码</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="input-field">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                      <label style="margin:0;">卡片名称 <span class="req">*</span></label>
+                      <button type="button" class="btn-sm btn-outline" id="btnAutoRuby" onclick="triggerAutoFurigana()" style="font-size:12px;padding:2px 8px;color:#38bdf8;border-color:#0284c7;" title="智能为日文卡名汉字添加注音/振假名(对齐LD制卡器规范)">⚡ 一键注音</button>
+                    </div>
+                    <input type="text" id="cardName" placeholder="例如：青眼白龙、[青眼(ブルーアイズ)]の[白龍(ホワイト・ドラゴン)]" value="究极创世神 艾克佐迪亚">
+                  </div>
+                </div>
+
+                <!-- 语言、日文振假名与字段系列 -->
+                <div class="form-grid-3">
+                  <div class="input-field">
+                    <label>卡片语言 (Language)</label>
+                    <select id="cardLanguage" onchange="onCardLanguageChanged(this.value)">
+                      <option value="zh" selected>简体中文 (zh-CN)</option>
+                      <option value="ja">日本語 OCG (ja-JP)</option>
+                      <option value="en">English TCG (en-US)</option>
+                    </select>
+                  </div>
+                  <div class="input-field" id="wrapCardRuby">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                      <label style="margin:0;">日文振假名 / 注音 (ルビ)</label>
+                      <button type="button" class="btn-sm btn-outline" onclick="triggerAutoFurigana()" style="font-size:11px;padding:1px 6px;color:#38bdf8;border-color:#0284c7;" title="自动注入合并为 LD 规范注音">⚡ 自动注音</button>
+                    </div>
+                    <input type="text" id="cardRuby" placeholder="例如：ブルーアイズ・ホワイト・ドラゴン" oninput="onCardRubyChanged(this.value)">
+                  </div>
+                  <div class="input-field" style="grid-column: 1 / -1;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <label style="margin:0;">🎴 字段 / 系列归属 (已纳入官方 595+ 全量字段库)</label>
+                      <button type="button" class="btn-sm btn-outline" onclick="openCustomArchetypeModal()" style="font-size:12px;padding:2px 8px;" title="新增自定义独立系列字段">+ 新建自定义字段</button>
+                    </div>
+                    <div class="archetype-input-wrap" style="display:flex;gap:8px;">
+                      <input type="text" id="cardArchetype" placeholder="输入搜索或选择官方系列字段 (如：青眼、英雄、俱舍怒威族、刻魔...)" list="archetypeDatalist" oninput="onCardArchetypeInput(this.value)" style="flex:1;">
+                      <datalist id="archetypeDatalist"></datalist>
+                      <input type="text" id="cardSetcode" placeholder="Setcode (0x...)" style="width:110px;font-family:monospace;text-align:center;" title="字段十六进制代码 (自动对应或自定义)" oninput="onSetcodeManualInput(this.value)">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="input-field mt-2">
+                  <div class="toggle-switch-row" style="display:flex;align-items:center;gap:8px;padding-top:4px;">
+                    <input type="checkbox" id="chkIsPendulum" onchange="togglePendulumMode(this.checked)">
+                    <label for="chkIsPendulum" style="color:var(--text-muted);font-size:13px;cursor:pointer;">启用下半身灵摆框 (半魔陷/半怪兽)</label>
+                  </div>
+                </div>
+
+                <!-- 核心三要素：怪兽卡 / 魔法卡 / 陷阱卡 顶级卡片切换器 -->
+                <div class="input-field mt-3">
+                  <label>卡片主类型 <span class="req">*</span></label>
+                  <div class="main-type-selector">
+                    <button type="button" class="type-card-btn active" id="btnMainTypeMonster" onclick="selectMainCardType('monster')">
+                      <span class="type-icon">🐲</span>
+                      <div class="type-meta">
+                        <span class="type-title">怪兽卡 (Monster)</span>
+                      </div>
+                    </button>
+
+                    <button type="button" class="type-card-btn" id="btnMainTypeSpell" onclick="selectMainCardType('spell')">
+                      <span class="type-icon">🔮</span>
+                      <div class="type-meta">
+                        <span class="type-title">魔法卡 (Spell)</span>
+                      </div>
+                    </button>
+
+                    <button type="button" class="type-card-btn" id="btnMainTypeTrap" onclick="selectMainCardType('trap')">
+                      <span class="type-icon">🛡️</span>
+                      <div class="type-meta">
+                        <span class="type-title">陷阱卡 (Trap)</span>
+                      </div>
+                    </button>
+                  </div>
+                  <!-- 原生隐藏字段保持底层兼容 -->
+                  <input type="hidden" id="cardType" value="33">
+                </div>
+              </div>
+
+              <!-- 面板 A: 若是怪兽卡 -->
+              <div id="panelMonsterFields" class="glass-card mb-4">
+                <div class="card-section-title">
+                  <span class="icon">🐲</span>
+                  <h3>怪兽专属属性、种族与攻防</h3>
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="input-field">
+                    <label>怪兽种类 <span class="req">*</span></label>
+                    <select id="monsterCategory" onchange="onMonsterCategoryChanged()">
+                      <option value="33" selected>效果怪兽 (Effect)</option>
+                      <option value="1">通常怪兽 (Normal)</option>
+                      <option value="129">仪式怪兽 (Ritual)</option>
+                      <option value="65">融合怪兽 (Fusion)</option>
+                      <option value="8193">同调怪兽 (Synchro)</option>
+                      <option value="8388609">超量怪兽 (Xyz)</option>
+                      <option value="67108865">连接怪兽 (Link)</option>
+                      <option value="16777249">灵摆怪兽 (Pendulum)</option>
+                      <option value="16385">衍生物 (Token)</option>
+                    </select>
+                  </div>
+
+                  <div class="input-field">
+                    <label>属性徽章</label>
+                    <select id="cardAttribute">
+                      <option value="32" selected>暗 (DARK)</option>
+                      <option value="16">光 (LIGHT)</option>
+                      <option value="1">地 (EARTH)</option>
+                      <option value="2">水 (WATER)</option>
+                      <option value="4">炎 (FIRE)</option>
+                      <option value="8">风 (WIND)</option>
+                      <option value="64">神 (DIVINE)</option>
+                    </select>
+                  </div>
+
+                  <div class="input-field">
+                    <label id="levelLabel">等级 (Level)</label>
+                    <input type="number" id="cardLevel" value="10" min="1" max="13">
+                  </div>
+                </div>
+
+                <div class="form-grid-3 mt-2">
+                  <div class="input-field">
+                    <label>种族 (25 种官方种族含幻想魔族)</label>
+                    <select id="cardRace">
+                      <option value="1">战士族 (Warrior)</option>
+                      <option value="2">魔法师族 (Spellcaster)</option>
+                      <option value="4">天使族 (Fairy)</option>
+                      <option value="8">恶魔族 (Fiend)</option>
+                      <option value="16">不死族 (Zombie)</option>
+                      <option value="32">机械族 (Machine)</option>
+                      <option value="64">水族 (Aqua)</option>
+                      <option value="128">炎族 (Pyro)</option>
+                      <option value="256">岩石族 (Rock)</option>
+                      <option value="512">鸟兽族 (Winged Beast)</option>
+                      <option value="1024">植物族 (Plant)</option>
+                      <option value="2048">昆虫族 (Insect)</option>
+                      <option value="4096">雷族 (Thunder)</option>
+                      <option value="8192">龙族 (Dragon)</option>
+                      <option value="16384">兽族 (Beast)</option>
+                      <option value="32768">兽战士族 (Beast-Warrior)</option>
+                      <option value="65536">恐龙族 (Dinosaur)</option>
+                      <option value="131072">鱼族 (Fish)</option>
+                      <option value="262144">海龙族 (Sea Serpent)</option>
+                      <option value="524288">爬虫族 (Reptile)</option>
+                      <option value="1048576">念动力族 (Psychic)</option>
+                      <option value="2097152">幻神兽族 (Divine-Beast)</option>
+                      <option value="4194304">幻龙族 (Wyrm)</option>
+                      <option value="8388608">电子界族 (Cyberse)</option>
+                      <option value="16777216">幻想魔族 (Illusion)</option>
+                      <option value="33554432">创造神族 (Creator-God)</option>
+                    </select>
+                  </div>
+
+                  <div class="input-field">
+                    <label>攻击力 (ATK)</label>
+                    <input type="number" id="cardAtk" value="4000" min="-1" step="50" placeholder="-1 为 ?">
+                  </div>
+
+                  <div class="input-field" id="defFieldWrap">
+                    <label>守备力 (DEF)</label>
+                    <input type="number" id="cardDef" value="4000" min="-1" step="50" placeholder="-1 为 ?">
+                  </div>
+                </div>
+
+                <!-- 怪兽复合特性多选选择器 (支持多选叠加，卡面自动组合排版) -->
+                <div class="trait-selector-wrap mt-3">
+                  <div class="trait-header-row">
+                    <label class="trait-label">🏷️ 怪兽复合特性 (支持多条同时勾选，卡面【种族／特性...】自动对齐 OCG 排版):</label>
+                    <span class="trait-hint">点击标签激活 / 取消</span>
+                  </div>
+                  <div class="trait-chip-group" id="monsterTraitsGroup">
+                    <button type="button" class="trait-chip active" id="chip_trait_32" data-trait="32" onclick="toggleMonsterTrait(32)" title="效果怪兽 (Effect)">
+                      <span class="chip-icon">✨</span>
+                      <span class="chip-name">效果</span>
+                    </button>
+                    <button type="button" class="trait-chip" id="chip_trait_4096" data-trait="4096" onclick="toggleMonsterTrait(4096)" title="调整怪兽 (Tuner，同调怪兽素材)">
+                      <span class="chip-icon">⚡</span>
+                      <span class="chip-name">调整</span>
+                    </button>
+                    <button type="button" class="trait-chip" id="chip_trait_33554432" data-trait="33554432" onclick="toggleMonsterTrait(33554432)" title="特殊召唤 (Special Summon)">
+                      <span class="chip-icon">🌟</span>
+                      <span class="chip-name">特殊召唤</span>
+                    </button>
+                    <button type="button" class="trait-chip" id="chip_trait_16777216" data-trait="16777216" onclick="toggleMonsterTrait(16777216)" title="灵摆怪兽 (Pendulum，下半身灵摆框)">
+                      <span class="chip-icon">⚖️</span>
+                      <span class="chip-name">灵摆</span>
+                    </button>
+                    <button type="button" class="trait-chip" id="chip_trait_2097152" data-trait="2097152" onclick="toggleMonsterTrait(2097152)" title="反转怪兽 (Flip)">
+                      <span class="chip-icon">🌀</span>
+                      <span class="chip-name">反转</span>
+                    </button>
+                    <button type="button" class="trait-chip" id="chip_trait_4194304" data-trait="4194304" onclick="toggleMonsterTrait(4194304)" title="卡通怪兽 (Toon)">
+                      <span class="chip-icon">🎪</span>
+                      <span class="chip-name">卡通</span>
+                    </button>
+                    <button type="button" class="trait-chip" id="chip_trait_512" data-trait="512" onclick="toggleMonsterTrait(512)" title="灵魂怪兽 (Spirit)">
+                      <span class="chip-icon">👻</span>
+                      <span class="chip-name">灵魂</span>
+                    </button>
+                    <button type="button" class="trait-chip" id="chip_trait_1024" data-trait="1024" onclick="toggleMonsterTrait(1024)" title="同盟怪兽 (Union)">
+                      <span class="chip-icon">🤝</span>
+                      <span class="chip-name">同盟</span>
+                    </button>
+                    <button type="button" class="trait-chip" id="chip_trait_2048" data-trait="2048" onclick="toggleMonsterTrait(2048)" title="二重怪兽 (Gemini)">
+                      <span class="chip-icon">♊</span>
+                      <span class="chip-name">二重</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 上部文本 (LD制卡器标准: 【種族／召喚分類／能力／効果】) 与一键适配 -->
+                <div class="upper-type-header-wrap mt-3" id="wrapCardTypeHeader" style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px;">
+                    <label style="font-size:13px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:6px;margin:0;">
+                      <span>🏷️ 上部文本 (怪兽种族与分类排版标签)</span>
+                    </label>
+                    <div style="display:flex;gap:6px;">
+                      <button type="button" class="btn-sm btn-outline" id="btnAutoAdaptUpper" onclick="autoAdaptUpperText(true)" style="padding:2px 10px;font-size:12px;color:#38bdf8;border-color:rgba(56,189,248,0.4);" title="参考LD制卡器规范：根据当前选择的卡片分类、种族及复合特性，自动生成标准上部文本">
+                        ⚡ 一键适配上部文本
+                      </button>
+                      <button type="button" class="btn-sm btn-outline" onclick="autoAdaptJapaneseCard(true)" style="padding:2px 8px;font-size:12px;color:#fbbf24;border-color:rgba(251,191,36,0.4);" title="一键将上部文本、卡名注音以及卡面效果排版完整适配为日文OCG规范">
+                        🇯🇵 OCG一键适配
+                      </button>
+                    </div>
+                  </div>
+                  <input type="text" id="cardTypeHeader" placeholder="例如：【ドラゴン族／シンクロ／チューナー／効果】 或 【龙族／同调／调整／效果】" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:6px;padding:6px 10px;font-size:13px;" oninput="onCardTypeHeaderChanged(this.value)">
+                </div>
+
+                <!-- 灵摆专属刻度配置 -->
+                <div id="pendulumScaleWrap" class="form-grid-2 mt-2" style="display:none;">
+                  <div class="input-field">
+                    <label>灵摆刻度 (Scale: 0 ~ 13)</label>
+                    <input type="number" id="cardScale" value="1" min="0" max="13" oninput="onScaleChanged(this.value)">
+                  </div>
+                  <div class="input-field">
+                    <label>灵摆区域卡文 (在步骤2独立设计)</label>
+                    <input type="text" id="pendulumDesc" placeholder="在步骤 2「灵摆效果独立设计器」中自动同步生成..." readonly style="background:rgba(255,255,255,0.03);color:var(--text-muted);">
+                  </div>
+                </div>
+
+                <!-- 链接怪兽专属：九宫格 8 方向连接箭头交互面板 (若是连接怪兽才显示，且DEF隐藏) -->
+                <div id="linkMonsterArrowsWrap" class="link-arrows-section mt-3" style="display:none;">
+                  <div class="link-arrows-header">
+                    <span class="link-icon">🔗</span>
+                    <div>
+                      <h4>连接箭头方向选择器 (8 方向九宫格)</h4>
+                    </div>
+                  </div>
+                  <div class="link-arrows-grid-container">
+                    <div class="link-arrows-9grid">
+                      <button type="button" class="link-arrow-btn" id="larr_8" data-arrow="8" onclick="toggleLinkArrow(8)" title="左上 (↖)">↖</button>
+                      <button type="button" class="link-arrow-btn" id="larr_1" data-arrow="1" onclick="toggleLinkArrow(1)" title="上 (↑)">↑</button>
+                      <button type="button" class="link-arrow-btn" id="larr_2" data-arrow="2" onclick="toggleLinkArrow(2)" title="右上 (↗)">↗</button>
+                      <button type="button" class="link-arrow-btn" id="larr_7" data-arrow="7" onclick="toggleLinkArrow(7)" title="左 (←)">←</button>
+                      <div class="link-center-badge"><span id="linkRatingBadge">LINK-3</span></div>
+                      <button type="button" class="link-arrow-btn" id="larr_3" data-arrow="3" onclick="toggleLinkArrow(3)" title="右 (→)">→</button>
+                      <button type="button" class="link-arrow-btn active" id="larr_6" data-arrow="6" onclick="toggleLinkArrow(6)" title="左下 (↙)">↙</button>
+                      <button type="button" class="link-arrow-btn active" id="larr_5" data-arrow="5" onclick="toggleLinkArrow(5)" title="下 (↓)">↓</button>
+                      <button type="button" class="link-arrow-btn active" id="larr_4" data-arrow="4" onclick="toggleLinkArrow(4)" title="右下 (↘)">↘</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 面板 B: 若是魔法卡（选择是什么魔法，来决定卡面显示标识） -->
+              <div id="panelSpellFields" class="glass-card mb-4" style="display:none;">
+                <div class="card-section-title">
+                  <span class="icon">🔮</span>
+                  <h3>魔法卡类型（决定卡面右上角标识）</h3>
+                </div>
+                <div class="spell-trap-grid">
+                  <button type="button" class="sub-type-btn active" data-type="2" onclick="selectSpellSubtype(2, '通常魔法')">
+                    <span class="st-icon">📜</span>
+                    <span class="st-name">通常魔法</span>
+                    <span class="st-tag">【魔法卡】</span>
+                  </button>
+                  <button type="button" class="sub-type-btn" data-type="65538" onclick="selectSpellSubtype(65538, '速攻魔法')">
+                    <span class="st-icon">⚡</span>
+                    <span class="st-name">速攻魔法</span>
+                    <span class="st-tag">【魔法卡 ⚡】</span>
+                  </button>
+                  <button type="button" class="sub-type-btn" data-type="131074" onclick="selectSpellSubtype(131074, '永续魔法')">
+                    <span class="st-icon">♾️</span>
+                    <span class="st-name">永续魔法</span>
+                    <span class="st-tag">【魔法卡 ♾️】</span>
+                  </button>
+                  <button type="button" class="sub-type-btn" data-type="262146" onclick="selectSpellSubtype(262146, '装备魔法')">
+                    <span class="st-icon">➕</span>
+                    <span class="st-name">装备魔法</span>
+                    <span class="st-tag">【魔法卡 ➕】</span>
+                  </button>
+                  <button type="button" class="sub-type-btn" data-type="524290" onclick="selectSpellSubtype(524290, '场地魔法')">
+                    <span class="st-icon">🧭</span>
+                    <span class="st-name">场地魔法</span>
+                    <span class="st-tag">【魔法卡 🧭】</span>
+                  </button>
+                  <button type="button" class="sub-type-btn" data-type="130" onclick="selectSpellSubtype(130, '仪式魔法')">
+                    <span class="st-icon">🔥</span>
+                    <span class="st-name">仪式魔法</span>
+                    <span class="st-tag">【魔法卡 🔥】</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 面板 C: 若是陷阱卡（选择是什么陷阱，来决定卡面显示标识） -->
+              <div id="panelTrapFields" class="glass-card mb-4" style="display:none;">
+                <div class="card-section-title">
+                  <span class="icon">🛡️</span>
+                  <h3>陷阱卡类型（决定卡面右上角标识）</h3>
+                </div>
+                <div class="spell-trap-grid">
+                  <button type="button" class="sub-type-btn active" data-type="4" onclick="selectTrapSubtype(4, '通常陷阱')">
+                    <span class="st-icon">🛡️</span>
+                    <span class="st-name">通常陷阱</span>
+                    <span class="st-tag">【陷阱卡】</span>
+                  </button>
+                  <button type="button" class="sub-type-btn" data-type="131076" onclick="selectTrapSubtype(131076, '永续陷阱')">
+                    <span class="st-icon">♾️</span>
+                    <span class="st-name">永续陷阱</span>
+                    <span class="st-tag">【陷阱卡 ♾️】</span>
+                  </button>
+                  <button type="button" class="sub-type-btn" data-type="1048580" onclick="selectTrapSubtype(1048580, '反击陷阱')">
+                    <span class="st-icon">↩️</span>
+                    <span class="st-name">反击陷阱</span>
+                    <span class="st-tag">【陷阱卡 ↩️】</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 填写卡面上显示的卡片效果文本 -->
+              <div class="glass-card">
+                <div class="card-section-title">
+                  <span class="icon">📝</span>
+                  <h3>卡面上显示的卡片效果文本</h3>
+                </div>
+                <div class="input-field">
+                  <textarea id="cardDesc" rows="4" placeholder="在此输入或通过步骤2向导自动生成卡面效果卡文...">①：只要这张卡在场上表侧表示存在，不受对方卡的效果影响。&#10;②：一回合一次，可以破坏对方场上所有卡片。&#10;③：这张卡战斗破坏怪兽送去墓地时，给予对方4000点基本分伤害。</textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- 步骤2: 效果设计逻辑 (前置全局规则 + 顺次单效果设计向导) -->
+            <div class="step-section" id="step2-content">
+              <!-- 效果外文本独立选择区 (置于所有效果选择前的最上方，不写死字段，独立勾选) -->
+              <div class="glass-card mb-4" id="panelRuleTexts">
+                <div class="card-section-title">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="icon">📜</span>
+                    <h3 style="margin:0;">效果外文本 / 独立规则条款 (Rule Texts)</h3>
+                  </div>
+                </div>
+
+                <div class="rule-texts-grid" style="display:grid;grid-template-columns:1fr;gap:12px;">
+                  <!-- 1. 规则视作其他卡名 -->
+                  <div class="rule-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleAliasEnabled" onchange="onRuleTextsChanged()">
+                      <label for="ruleAliasEnabled" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        🏷️ 规则视作其他卡名 (Rule Treated As Other Name)
+                      </label>
+                    </div>
+                    <div id="wrapRuleAliasInput" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
+                      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <label style="font-size:13px;color:#cbd5e1;">视作的目标卡名：</label>
+                        <input type="text" id="ruleAliasName" placeholder="例如：青眼白龙、暗黑骑士 盖亚、海、光之黄金柜" style="flex:1;min-width:180px;" oninput="onRuleTextsChanged()">
+                        <input type="number" id="ruleAliasId" placeholder="对应密码 (选填)" style="width:130px;" oninput="onRuleTextsChanged()">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 2. 同名卡1回合特召1次限制 -->
+                  <div class="rule-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleSsOnceEnabled" onchange="onRuleTextsChanged()">
+                      <label for="ruleSsOnceEnabled" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        ⚡ 同名卡1回合特召1次限制 (c:SetSPSummonOnce)
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- 3. 特殊召唤怪兽限制 / 召限 -->
+                  <div class="rule-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleNomiEnabled" onchange="onRuleTextsChanged()">
+                      <label for="ruleNomiEnabled" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        🔒 特殊召唤怪兽限制 (不能通常召唤 / 苏生限制)
+                      </label>
+                    </div>
+                    <div id="wrapRuleNomiSelect" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
+                      <select id="ruleNomiType" class="form-select" onchange="onRuleTextsChanged()">
+                        <option value="self_effect" selected>不能通常召唤。只有用自身效果/召唤手续才能特殊召唤</option>
+                        <option value="extra_only">不能通常召唤。只能以原本召唤方式（融合/同调/超量/连接）特殊召唤</option>
+                        <option value="cannot_ns_any">不能通常召唤（仅不能通常召唤，其余特召无限制）</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- 4. 额外卡组特殊召唤素材限制 -->
+                  <div class="rule-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleMaterialLimitEnabled" onchange="onRuleTextsChanged()">
+                      <label for="ruleMaterialLimitEnabled" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        🚫 额外卡组特殊召唤素材限制
+                      </label>
+                    </div>
+                    <div id="wrapRuleMaterialSelect" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
+                      <select id="ruleMaterialType" class="form-select" onchange="onRuleTextsChanged()">
+                        <option value="all_extra" selected>这张卡不能作为融合·同调·超量·连接召唤的素材</option>
+                        <option value="synchro_only">这张卡不能作为同调召唤的素材</option>
+                        <option value="xyz_only">这张卡不能作为超量召唤的素材</option>
+                        <option value="link_only">这张卡不能作为连接召唤的素材</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- 5. 卡组投入张数限制 -->
+                  <div class="rule-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleDeckLimitOne" onchange="onRuleTextsChanged()">
+                      <label for="ruleDeckLimitOne" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        ⚖️ 卡组投入张数限制 (同名卡在卡组中最多只能投入1张)
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- 6. 自由定义规则条款 -->
+                  <div class="rule-box" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <div class="toggle-switch-row" style="display:flex;align-items:center;gap:10px;">
+                      <input type="checkbox" id="ruleCustomEnabled" onchange="onRuleTextsChanged()">
+                      <label for="ruleCustomEnabled" style="font-weight:600;cursor:pointer;color:#f8fafc;">
+                        ✍️ 自定义独有规则条款 (不绑定具体字段，自由定义)
+                      </label>
+                    </div>
+                    <div id="wrapRuleCustomInput" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);padding-left:26px;">
+                      <input type="text" id="ruleCustomText" placeholder="例如：这张卡的属性在规则上也当作「光」使用。" style="width:100%;" oninput="onRuleTextsChanged()">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 阶段 1: 全局效果数量与频次限制设定 -->
+              <div class="glass-card mb-4" id="globalPreRulesCard">
+                <div class="card-section-title">
+                  <span class="icon">⚖️</span>
+                  <h3>效果数量与发动频次限制</h3>
+                </div>
+
+                <!-- 选择有几个效果 -->
+                <div class="pre-rule-item">
+                  <label class="d-block mb-2"><strong>选择有几个效果 (Total Effects Count)：</strong></label>
+                  <div class="effect-count-buttons">
+                    <button type="button" class="count-btn" data-count="1" onclick="setTotalEffectsCount(1)">1 个效果</button>
+                    <button type="button" class="count-btn active" data-count="2" onclick="setTotalEffectsCount(2)">2 个效果</button>
+                    <button type="button" class="count-btn" data-count="3" onclick="setTotalEffectsCount(3)">3 个效果</button>
+                    <button type="button" class="count-btn" data-count="4" onclick="setTotalEffectsCount(4)">4 个效果</button>
+                  </div>
+                </div>
+
+                <!-- 分别各个效果能使用的限制（次数数字可改） -->
+                <div class="pre-rule-item mt-3">
+                  <label class="d-block mb-2"><strong>分别各个效果的发动频次限制（次数数字可自由修改）：</strong></label>
+                  <div id="effectLimitsConfigGrid" class="effect-limits-grid">
+                    <!-- 由 JavaScript 根据效果数量自动动态生成 -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- 阶段 1.5: （若是灵摆怪兽）灵摆效果独立设计器 -->
+              <div class="glass-card mb-4" id="panelPendulumWizard" style="display:none;border-left: 4px solid #10b981;">
+                <div class="card-section-title">
+                  <span class="icon">⚖️</span>
+                  <div>
+                    <h3 style="color:#34d399;">灵摆效果独立设计器 (Pendulum Effect)</h3>
+                  </div>
+                </div>
+
+                <div class="form-grid-2 mt-3">
+                  <div class="input-field">
+                    <label>灵摆效果发动频次限制</label>
+                    <select id="penLimit" onchange="onPendulumFieldChanged('countLimit', this.value)">
+                      <option value="hopt" selected>这个卡名的灵摆效果1回合只能使用1次 (HOPT)</option>
+                      <option value="sopt">1回合1次 (SOPT 场上一回合一次)</option>
+                      <option value="none">无限制 (只要符合条件即可发动)</option>
+                    </select>
+                  </div>
+
+                  <div class="input-field">
+                    <label>灵摆效果起效场合 (Timing)</label>
+                    <select id="penTiming" onchange="onPendulumFieldChanged('timing', this.value)">
+                      <option value="ignition" selected>自己主要阶段才能发动 (起动效果)</option>
+                      <option value="other_pzone">另一边的自己灵摆区域有卡存在的场合才能发动</option>
+                      <option value="direct_atk">对方怪兽直接攻击宣言时才能发动</option>
+                      <option value="free">双方回合自由时点才能发动 (二速速攻)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-grid-3 mt-3">
+                  <div class="input-field">
+                    <label>灵摆发动代价 (Cost)</label>
+                    <select id="penCost" onchange="onPendulumCostChanged(this.value)">
+                      <option value="destroy_self" selected>把这张卡破坏 (常见摆区自爆)</option>
+                      <option value="pay_lp">支付基本分 (LP)</option>
+                      <option value="release_one">把自己场上1只怪兽解放</option>
+                      <option value="none">无代价</option>
+                    </select>
+                  </div>
+
+                  <div class="input-field" id="penLpWrap" style="display:none;">
+                    <label>支付基本分数值 (LP)</label>
+                    <input type="number" id="penLpCost" value="1000" step="500" min="100" oninput="onPendulumFieldChanged('costLp', this.value)">
+                  </div>
+
+                  <div class="input-field">
+                    <label>灵摆效果对象 (Target)</label>
+                    <select id="penTarget" onchange="onPendulumFieldChanged('target', this.value)">
+                      <option value="none" selected>不取对象 (全体或从卡组/手牌处理)</option>
+                      <option value="target_field">以场上1张卡为对象</option>
+                      <option value="target_oppo_monster">以对方场上1只怪兽为对象</option>
+                      <option value="target_self_monster">以自己场上1只怪兽为对象</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-grid-2 mt-3">
+                  <div class="input-field">
+                    <label>灵摆效果本体动作 (Action)</label>
+                    <select id="penAction" onchange="onPendulumFieldChanged('action', this.value)">
+                      <option value="search_deck" selected>从卡组把1只怪兽加入手牌 (检索)</option>
+                      <option value="special_summon_self">这张卡在怪兽区域特殊召唤 (特召自身)</option>
+                      <option value="salvage_extra">从额外卡组把1只表侧表示灵摆怪兽加入手牌</option>
+                      <option value="destroy_target">选场上1张卡破坏</option>
+                    </select>
+                  </div>
+
+                  <div class="input-field">
+                    <label>处理后的动作 (Follow-up)</label>
+                    <select id="penFollowup" onchange="onPendulumFieldChanged('followup', this.value)">
+                      <option value="none" selected>无后续动作</option>
+                      <option value="draw_one">那之后，从卡组抽1张卡</option>
+                      <option value="destroy_oppo">那之后，选对方场上1张卡破坏</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="wizard-preview-box mt-3" style="background:rgba(16,185,129,0.06);border:1px dashed rgba(16,185,129,0.3);border-radius:8px;padding:12px 16px;">
+                  <div style="font-size:12px;color:#34d399;font-weight:bold;margin-bottom:4px;">✨ 实时灵摆效果卡文预览 (独立渲染至卡面灵摆框)：</div>
+                  <div id="pendulumEffectTextPreview" style="color:var(--text-main);font-size:14px;line-height:1.5;"></div>
+                  <div id="pendulumJaEffectTextPreviewWrap" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(245,158,11,0.25);">
+                    <div style="font-size:11px;color:#fbbf24;font-weight:bold;margin-bottom:3px;">🇯🇵 卡面实时映射日文 OCG 灵摆卡文：</div>
+                    <div id="pendulumJaEffectTextPreview" style="color:#f8fafc;font-size:13px;line-height:1.5;font-family:serif;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 阶段 2: 顺次单怪兽效果独立设计向导 -->
+              <div class="glass-card wizard-card" id="stepByStepWizardCard">
+                <div class="wizard-header">
+                  <div class="wizard-title-group">
+                    <span class="wizard-badge" id="wizardOrdinalBadge">效果 ①</span>
+                    <div>
+                      <h3 id="wizardStepTitle">当前设计：效果 ①</h3>
+                    </div>
+                  </div>
+                  <!-- 顺次进度选项卡 -->
+                  <div class="wizard-nav-chips" id="wizardNavChips"></div>
+                </div>
+
+                <div class="wizard-form-body mt-4">
+                  <!-- 1. 效果起效场合与时点模式 -->
+                  <div class="form-grid-2 mb-3">
+                    <div class="input-field">
+                      <label>1. 效果起效场合 (Timing / Occasion) <span class="req">*</span></label>
+                      <select id="wizardTiming" onchange="onWizardTimingChanged(this.value)">
+                        <optgroup label="🌟 自身回合一速 (起动效果)">
+                          <option value="ignition_omit" selected>自身回合一速 (现代官方规范：默认省略「主要阶段」前缀)</option>
+                          <option value="ignition_explicit">自己主要阶段才能发动 (显式标明)</option>
+                          <option value="ignition_no_monsters">自己场上没有怪兽存在的场合</option>
+                          <option value="ignition_oppo_more_cards">对方场上的卡数量比自己场上的卡多的场合</option>
+                          <option value="ignition_oppo_monsters_count">对方场上的怪兽在指定数量(X只)以上的场合</option>
+                        </optgroup>
+                        <optgroup label="⚡ 登场诱发 (召 / 特召 / 额外召唤)">
+                          <option value="summon_both">这张卡召唤·特殊召唤成功 (召/特召通用)</option>
+                          <option value="summon_ns">这张卡召唤成功 (仅通常召唤)</option>
+                          <option value="summon_ss">这张卡特殊召唤成功 (仅特殊召唤)</option>
+                          <option value="summon_fusion">这张卡融合召唤成功</option>
+                          <option value="summon_ritual">这张卡仪式召唤成功</option>
+                          <option value="summon_synchro">这张卡同调召唤成功</option>
+                          <option value="summon_xyz">这张卡超量召唤成功</option>
+                          <option value="summon_link">这张卡连接召唤成功</option>
+                          <option value="summon_with_mat">以特定素材特殊召唤成功</option>
+                        </optgroup>
+                        <optgroup label="⚰️ 离场·转移诱发 (送墓 / 除外 / 破坏)">
+                          <option value="to_grave_general">这张卡被送去墓地</option>
+                          <option value="to_grave_from_field_summoned">XX召唤的这张卡从场上送去墓地</option>
+                          <option value="destroyed_battle_or_effect">这张卡被战斗·效果破坏</option>
+                          <option value="destroyed_by_oppo">这张卡被对方破坏 (战斗或对方效果)</option>
+                          <option value="banished_self">这张卡被除外</option>
+                          <option value="field_card_destroyed">自己场上的表侧表示的卡被战斗·效果破坏</option>
+                          <option value="field_card_banished">自己场上的表侧表示的卡被除外</option>
+                          <option value="battle_destroy_oppo">战斗破坏对方怪兽送去墓地</option>
+                        </optgroup>
+                        <optgroup label="🛡️ 二速即时 / 对方回合 (Quick Timing)">
+                          <option value="quick_free">双方回合自由时点才能发动 (二速速攻)</option>
+                          <option value="quick_oppo_turn">对方回合才能发动 (对方回合诱发即时)</option>
+                          <option value="quick_oppo_main">对方主要阶段才能发动</option>
+                          <option value="quick_chain">对方把怪兽效果·魔法·陷阱卡发动时 (连锁反制)</option>
+                        </optgroup>
+                        <optgroup label="👑 常驻在场适用 (永续 / 特殊在场条件)">
+                          <option value="continuous_faceup">只要在怪兽区域表侧表示存在常驻适用</option>
+                          <option value="continuous_summoned_faceup">只要XX召唤的这张卡在怪兽区域表侧表示存在</option>
+                        </optgroup>
+                        <optgroup label="📜 魔法·陷阱专属时点">
+                          <option value="spell_trap_act">作为这张卡的发动时 (魔陷登场发动)</option>
+                          <option value="spell_trap_continuous">只要在魔法与陷阱区域表侧表示存在常驻适用</option>
+                        </optgroup>
+                      </select>
+                    </div>
+
+                    <div class="input-field" id="wrapTimingMode">
+                      <label>时点严格度 (时点卡位防空判) <span class="req">*</span></label>
+                      <select id="wizardTimingMode" onchange="onWizardFieldChanged('timingMode', this.value)">
+                        <option value="if" selected>「…场合 (If)」(推荐：第9~12期现代规范，绝不卡时点)</option>
+                        <option value="when">「…时 (When)」(严格卡时点：可选效果若非末尾会错失时点)</option>
+                      </select>
+                      <small id="timingModeHint">现代卡牌绝大多数使用「场合」，不会被后续处理或连锁卡掉时点</small>
+                    </div>
+                  </div>
+
+                  <!-- 动态上下文附加参数输入区 -->
+                  <div id="timingContextualParamsWrap" class="form-grid-2 mb-3" style="display:none;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+                    <!-- A. 额外召唤方式选择 -->
+                    <div class="input-field" id="wrapSummonType" style="display:none;">
+                      <label>对应召唤方式类别</label>
+                      <select id="wizardSummonType" onchange="onWizardFieldChanged('summonTypeParam', this.value)">
+                        <option value="fusion" selected>融合召唤 (Fusion)</option>
+                        <option value="synchro">同调召唤 (Synchro)</option>
+                        <option value="xyz">超量召唤 (Xyz)</option>
+                        <option value="link">连接召唤 (Link)</option>
+                        <option value="ritual">仪式召唤 (Ritual)</option>
+                      </select>
+                    </div>
+                    <!-- B. 特定素材名称 -->
+                    <div class="input-field" id="wrapMaterialName" style="display:none;">
+                      <label>作为素材的特定卡名 / 字段 / 种族</label>
+                      <input type="text" id="wizardMaterialName" placeholder="例如：青眼白龙、龙族怪兽、光属性怪兽" oninput="onWizardFieldChanged('materialName', this.value)">
+                    </div>
+                    <!-- C. 对方怪兽数量阈值 -->
+                    <div class="input-field" id="wrapOppoMonsterCount" style="display:none;">
+                      <label>对方怪兽数量阈值 (X 只以上)</label>
+                      <input type="number" id="wizardOppoMonsterCount" value="2" min="1" max="6" oninput="onWizardFieldChanged('oppoMonsterCount', this.value)">
+                    </div>
+                  </div>
+
+                  <!-- 2. 发动代价 (cost) -->
+                  <div class="form-grid-2 mb-3">
+                    <div class="input-field">
+                      <label>2. 发动代价 (Cost) <span class="req">*</span></label>
+                      <select id="wizardCost" onchange="onWizardCostChanged(this.value)">
+                        <option value="none" selected>无代价 (无需支付费用或丢弃)</option>
+                        <option value="pay_lp">支付基本分 (数值自定义)</option>
+                        <option value="discard_self">把手卡的这张卡送去墓地 (手坑舍弃)</option>
+                        <option value="release_self">把场上的这张卡解放 (自身解放)</option>
+                        <option value="discard_one">把 1 张手卡送去墓地</option>
+                        <option value="banish_one_gy">把自己墓地 1 张卡除外</option>
+                        <option value="detach_xyz">去除此卡的 1 个超量素材 (超量怪兽专属)</option>
+                      </select>
+                    </div>
+
+                    <div class="input-field" id="wizardLpCostWrap" style="display:none;">
+                      <label>支付基本分数值 (LP)</label>
+                      <input type="number" id="wizardCostLpVal" value="1000" min="100" max="8000" step="500" oninput="onWizardFieldChanged('costLp', this.value)">
+                    </div>
+                  </div>
+
+                  <!-- 3. 效果对象 (Target) -->
+                  <div class="input-field mb-3">
+                    <label>3. 效果对象 (Target) <span class="req">*</span></label>
+                    <select id="wizardTarget" onchange="onWizardFieldChanged('target', this.value)">
+                      <option value="none" selected>不取对象 (连锁处理时选定 或 全场适用)</option>
+                      <option value="target_field_card">以场上 1 张卡为对象</option>
+                      <option value="target_oppo_card">以对方场上 1 张卡为对象</option>
+                      <option value="target_oppo_monster">以对方场上 1 只怪兽为对象</option>
+                      <option value="target_grave_monster">以墓地 1 只怪兽为对象</option>
+                      <option value="target_self_monster">以自己场上 1 只怪兽为对象</option>
+                      <option value="target_banished">以除外状态的 1 张自己卡片为对象</option>
+                    </select>
+                  </div>
+
+                  <!-- 4. 效果本体 (Effect Body / Action) -->
+                  <div class="input-field mb-3">
+                    <label>4. 效果本体 (Action) <span class="req">*</span></label>
+                    <select id="wizardAction" onchange="onWizardFieldChanged('action', this.value)">
+                      <option value="search_deck" selected>检索：从卡组把卡片加入手牌</option>
+                      <option value="special_summon_self">特召：这张卡从手卡特殊召唤</option>
+                      <option value="special_summon_hand">特召：从手卡把 1 只怪兽特殊召唤</option>
+                      <option value="revive_grave">苏生：所选墓地怪兽在自己场上特殊召唤</option>
+                      <option value="destroy_target">点破：所选对象破坏</option>
+                      <option value="banish_target">除外：所选对象除外</option>
+                      <option value="to_hand_target">弹手：所选对象回到手牌</option>
+                      <option value="wipe_oppo_monsters">全灭：对方场上的怪兽全部破坏</option>
+                      <option value="wipe_oppo_spells">清后场：对方场上的魔法·陷阱卡全部破坏</option>
+                      <option value="wipe_oppo_all">大开辟全场灭：对方场上的卡全部破坏</option>
+                      <option value="negate_and_destroy">打断反制：那个发动无效并破坏</option>
+                      <option value="negate_activation">纯反制：那个发动无效</option>
+                      <option value="draw_cards">补充：从卡组抽 2 张卡</option>
+                      <option value="burn_damage">追伤：给对方造成 1000 点伤害</option>
+                      <option value="immune_all">永续全抗：不受对方卡的效果影响</option>
+                      <option value="atk_boost">永续增幅：攻击力·守备力上升 1000</option>
+                      <optgroup label="🎯 二选一 / 多选一选项效果 (支持 YGOPro 弹窗精准文字)">
+                        <option value="choice_search_or_dump">二选一：从卡组检索手牌 / 从卡组送去墓地</option>
+                        <option value="choice_ss_or_search">二选一：从卡组特召怪兽 / 从卡组检索手牌</option>
+                        <option value="choice_destroy_or_banish">二选一：破坏场上卡片 / 除外场上卡片</option>
+                        <option value="choice_draw_or_burn">二选一：从卡组抽2张卡 / 造成2000点伤害</option>
+                      </optgroup>
+                    </select>
+                  </div>
+
+                  <!-- 5. （处理后的动作）(Follow-up Action) -->
+                  <div class="input-field mb-3">
+                    <label>5. （处理后的动作）(Follow-up Action)</label>
+                    <select id="wizardFollowup" onchange="onWizardFieldChanged('followup', this.value)">
+                      <option value="none" selected>无后续动作</option>
+                      <option value="draw_one">那之后，从卡组抽 1 张卡</option>
+                      <option value="banish_oppo">那之后，选对方场上 1 张卡除外</option>
+                      <option value="send_oppo_gy">那之后，选对方场上 1 张卡送去墓地</option>
+                      <option value="damage_self">那之后，自己受到 1000 点伤害</option>
+                      <option value="destroy_self">那之后，这张卡破坏</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- 实时 OCG 卡文预览与确认进入下一效果 -->
+                <div class="wizard-live-preview mt-3">
+                  <div class="preview-label">📜 当前效果生成的官方 OCG 中文卡文预览：</div>
+                  <div class="preview-text-box" id="wizardEffectTextPreview">①：...</div>
+                </div>
+
+                <div class="wizard-live-preview mt-2" id="wizardJaEffectTextPreviewWrap" style="display:none;background:rgba(245,158,11,0.06);border:1px dashed rgba(245,158,11,0.3);border-radius:8px;padding:10px 14px;">
+                  <div style="font-size:12px;color:#fbbf24;font-weight:bold;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                    <span>🇯🇵 卡面实时映射日文 OCG 文本：</span>
+                    <span style="font-size:11px;color:#94a3b8;font-weight:normal;">[卡面语言设为日文时将直接打印本段文本]</span>
+                  </div>
+                  <div id="wizardJaEffectTextPreview" style="color:var(--text-main);font-size:13px;line-height:1.5;font-family:serif;">①：...</div>
+                </div>
+
+                <div class="wizard-footer-actions mt-4">
+                  <button type="button" class="btn btn-secondary" id="btnWizardPrev" onclick="prevWizardEffect()" style="display:none;">
+                    ← 返回上一个效果
+                  </button>
+                  <div class="spacer"></div>
+                  <button type="button" class="btn btn-gold" id="btnWizardNext" onclick="confirmCurrentWizardEffect()">
+                    <span>✅ 确定效果 ①，进入效果 ② 设计 →</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 步骤3: 卡图上传与工艺调整 (完全整合 YGOLD 原生制卡引擎) -->
+            <div class="step-section" id="step3-content">
+              <!-- A. 插图上传与快速载入 -->
+              <div class="glass-card mb-4">
+                <div class="card-section-title">
+                  <span class="icon">🖼️</span>
+                  <h3>卡面插图设置 (Artwork)</h3>
+                  <div style="margin-left:auto;display:flex;gap:8px;">
+                    <button type="button" class="btn-sm btn-outline" onclick="loadDemoArtwork()" title="载入官方母版预设高清原画">🎨 载入精美原画</button>
+                  </div>
+                </div>
+
+                <div class="artwork-dropzone" id="artworkDropArea">
+                  <input type="file" id="artworkFileInput" accept="image/*" style="display:none;">
+                  <div class="dropzone-content">
+                    <span class="drop-icon">📤</span>
+                    <h4>点击或拖拽卡面插图至此处</h4>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">
+                      <button type="button" class="btn btn-outline" onclick="document.getElementById('artworkFileInput').click()">选择本地图片</button>
+                      <button type="button" class="btn btn-gold" onclick="loadDemoArtwork()">载入示例原画</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="uploadedImagePreviewWrap" class="image-meta-bar" style="display:none;margin-top:12px;padding:8px 14px;background:rgba(255,255,255,0.04);border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+                  <span id="imageMetaText" style="color:#38bdf8;font-size:13px;font-weight:500;">🖼️ 已加载配图</span>
+                  <button type="button" class="btn-sm btn-danger" onclick="clearUploadedImage()">✕ 移除配图</button>
+                </div>
+
+                <!-- 构图画幅与交互式插图微调 -->
+                <div class="art-transform-box mt-3" style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <span style="font-size:14px;font-weight:600;color:#f8fafc;">🔍 卡图构图画幅与位置微调 (YGOLD 标尺原生整合)</span>
+                    <button type="button" class="btn-sm btn-outline" onclick="resetArtworkTransform()" style="font-size:12px;">↺ 重置微调</button>
+                  </div>
+
+                  <div class="form-grid-2 mb-3">
+                    <div class="input-field">
+                      <label style="color:#fbbf24;font-weight:600;">📐 卡面排版画幅 (Framing Mode)</label>
+                      <select id="cardOverframeSelect" onchange="onOverframeChanged()">
+                        <option value="standard" selected>官方标准框 (1054×1054 经典规整)</option>
+                        <option value="overframe">艺术出框全画 (Overframe 破框全幅穿透)</option>
+                      </select>
+                    </div>
+                    <div class="input-field">
+                      <label>插图填充模式 (Fit Mode)</label>
+                      <select id="artFitSelect" onchange="onArtTransformChanged()">
+                        <option value="cover" selected>充满裁剪 (Cover - 推荐满框)</option>
+                        <option value="contain">完整居中 (Contain - 留黑边)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-grid-3">
+                    <div class="input-field">
+                      <div style="display:flex;justify-content:space-between;">
+                        <label>缩放比例 (Scale)</label>
+                        <span id="artScaleVal" style="color:#f59e0b;font-size:12px;font-family:monospace;">100%</span>
+                      </div>
+                      <input type="range" id="artScaleInput" min="50" max="250" value="100" step="1" oninput="onArtTransformChanged()">
+                    </div>
+
+                    <div class="input-field">
+                      <div style="display:flex;justify-content:space-between;">
+                        <label>水平位移 (X Offset)</label>
+                        <span id="artOffsetXVal" style="color:#f59e0b;font-size:12px;font-family:monospace;">0px</span>
+                      </div>
+                      <input type="range" id="artOffsetXInput" min="-300" max="300" value="0" step="1" oninput="onArtTransformChanged()">
+                    </div>
+
+                    <div class="input-field">
+                      <div style="display:flex;justify-content:space-between;">
+                        <label>垂直位移 (Y Offset)</label>
+                        <span id="artOffsetYVal" style="color:#f59e0b;font-size:12px;font-family:monospace;">0px</span>
+                      </div>
+                      <input type="range" id="artOffsetYInput" min="-300" max="300" value="0" step="1" oninput="onArtTransformChanged()">
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2 mt-2">
+                    <div class="input-field">
+                      <label>卡包识别编号 (Set Pack Code)</label>
+                      <input type="text" id="cardPackCodeInput" placeholder="例如：BETB-JP028, ROTD-SC001" value="" oninput="onPackCodeChanged(this.value)">
+                    </div>
+                    <div class="input-field">
+                      <label style="color:#38bdf8;font-weight:600;">🖋️ 卡名字体工艺 (Foil Name Style)</label>
+                      <select id="cardFoilNameSelect" onchange="onFoilNameChanged()">
+                        <option value="auto" selected>自动匹配罕贵度 (推荐)</option>
+                        <option value="none">标准纯色 (黑/白字体)</option>
+                        <option value="gold">金字烫金 (UR / GR 奢华金光立体)</option>
+                        <option value="silver">银字闪烁 (SER / CR 碎闪白金折光)</option>
+                        <option value="red">红碎红字 (20th / PSER2 20周年红字立体烫印)</option>
+                        <option value="blue">蓝碎蓝字 (Special Blue / 蓝字稀有立体烫印)</option>
+                        <option value="holo">全息幻彩 (HR 彩虹幻境光谱)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- B. 原生整合 YGOLD 罕贵工艺覆膜与防伪水印 -->
+              <div class="glass-card mb-4">
+                <div class="card-section-title">
+                  <span class="icon">✨</span>
+                  <h3>罕贵度工艺闪膜与限定暗纹防伪 (内置 YGOLD 原生特效库)</h3>
+                </div>
+
+                <div class="form-grid-2">
+                  <!-- 罕贵工艺 -->
+                  <div class="input-field">
+                    <label>罕贵度工艺闪膜 (Rare Foil)</label>
+                    <select id="cardRareSelect" onchange="onRareFoilChanged()">
+                      <option value="none" selected>平卡 (Normal / N) - 无闪膜</option>
+                      <option value="UR">金字闪卡 (Ultra Rare / UR)</option>
+                      <option value="SER">银碎 / 斜碎 (Secret Rare / SER)</option>
+                      <option value="PSER">棱镜白碎 (Prismatic Secret / PSER)</option>
+                      <option value="PSER2">棱镜红碎 (Prismatic Secret 2 / PSER2)</option>
+                      <option value="20TH">20周年红碎 (20th Secret Rare / 20TH)</option>
+                      <option value="BLUE">蓝字稀有 (Special Blue Version / BLUE)</option>
+                      <option value="CR">收藏家罕贵 (Collector's Rare / CR)</option>
+                      <option value="HR">全息罕贵 (Holographic Rare / HR)</option>
+                      <option value="MR">极光暗纹 (Millennium Rare / MR)</option>
+                      <option value="KC">海马波纹 (Kaiba Corp / KC)</option>
+                      <option value="GR">黄金罕贵 (Gold Rare / GR)</option>
+                      <option value="GSER">黄金白碎 (Gold Secret / GSER)</option>
+                      <option value="ESR">额外金碎 (Extra Secret / ESR)</option>
+                      <option value="DT">决斗终端点阵 (Duel Terminal / DT)</option>
+                      <option value="NPR">平爆闪 (Normal Parallel / NPR)</option>
+                      <option value="PP">印刷碎闪 (PSER Print / PP)</option>
+                    </select>
+                  </div>
+
+                  <!-- 闪膜透明度 -->
+                  <div class="input-field">
+                    <div style="display:flex;justify-content:space-between;">
+                      <label>闪膜工艺强度 (Foil Intensity)</label>
+                      <span id="rareOpacityVal" style="color:#f59e0b;font-size:12px;font-family:monospace;">65%</span>
+                    </div>
+                    <input type="range" id="cardRareOpacityInput" min="10" max="100" value="65" step="1" oninput="onRareOpacityChanged()">
+                  </div>
+                </div>
+
+                <div class="form-grid-2 mt-3">
+                  <!-- 水印样式 -->
+                  <div class="input-field">
+                    <label>官方纪念暗纹 / 防伪水印 (Watermark)</label>
+                    <select id="cardWatermarkSelect" onchange="onWatermarkChanged()">
+                      <option value="none" selected>无水印</option>
+                      <option value="20th">20 周年纪念暗纹 (20th Anniversary)</option>
+                      <option value="25th">25 周年世纪纪念暗纹 (Quarter Century)</option>
+                      <option value="10000">10000 种卡牌突破纪念 (10000th)</option>
+                      <option value="DIY">DIY 专属同人印记</option>
+                      <option value="sample">SAMPLE 官方试作样品水印</option>
+                      <option value="sample2">SAMPLE 2 样品印记</option>
+                      <option value="secret">SECRET 专属暗纹</option>
+                      <option value="star">五角星同人水印</option>
+                    </select>
+                  </div>
+
+                  <!-- 水印透明度 -->
+                  <div class="input-field">
+                    <div style="display:flex;justify-content:space-between;">
+                      <label>暗纹水印透明度 (Watermark Opacity)</label>
+                      <span id="watermarkOpacityVal" style="color:#f59e0b;font-size:12px;font-family:monospace;">22%</span>
+                    </div>
+                    <input type="range" id="cardWatermarkOpacityInput" min="5" max="60" value="22" step="1" oninput="onWatermarkOpacityChanged()">
+                  </div>
+                </div>
+
+                <div class="form-grid-2 mt-3">
+                  <!-- 右下角防伪镭射标签样式 -->
+                  <div class="input-field">
+                    <label>右下角立体防伪镭射标签 (Holo Stamp)</label>
+                    <select id="cardHoloSelect" onchange="onHoloChanged()">
+                      <option value="laser1" selected>样式一：金色防伪标 (1st Edition 金标)</option>
+                      <option value="laser2">样式二：银色防伪标 (Unlimited 银标)</option>
+                      <option value="laser3">样式三：炫彩彩虹标 (YGOLD Rainbow)</option>
+                      <option value="laser4">样式四：复古暗银标</option>
+                      <option value="laser5">样式五：暗金限定标</option>
+                      <option value="laser6">样式六：水晶折射标</option>
+                      <option value="laser7">样式七：典藏千禧标</option>
+                    </select>
+                  </div>
+
+                  <div class="input-field" style="display:flex;flex-direction:column;justify-content:flex-end;">
+                    <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:6px;padding:9px 14px;font-size:12px;color:#7dd3fc;display:flex;align-items:center;gap:8px;">
+                      <span>💎 本地内置 YGOLD 渲染管线：多层闪膜覆层、防遮挡文字框与立体金属边框全部由 HTML5 硬件引擎实时合成渲染。</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 步骤4: 导出与卡包下载 -->
+            <div class="step-section" id="step4-content">
+              <div class="glass-card">
+                <div class="card-section-title">
+                  <span class="icon">📦</span>
+                  <h3>导出扩展包与 YGOPro 数据</h3>
+                </div>
+
+                <div class="export-options-grid">
+                  <div class="export-tile" onclick="downloadSingleLua()">
+                    <div class="tile-icon">📜</div>
+                    <div class="tile-info">
+                      <h4>Lua 逻辑脚本</h4>
+                      <p>c<span class="cur-card-id">100000001</span>.lua</p>
+                    </div>
+                    <button class="btn-sm btn-outline">下载</button>
+                  </div>
+
+                  <div class="export-tile" onclick="downloadSinglePng()">
+                    <div class="tile-icon">🖼️</div>
+                    <div class="tile-info">
+                      <h4>高清卡面 PNG</h4>
+                    </div>
+                    <button class="btn-sm btn-outline">下载</button>
+                  </div>
+
+                  <div class="export-tile" onclick="downloadSingleCdb()">
+                    <div class="tile-icon">🗄️</div>
+                    <div class="tile-info">
+                      <h4>CDB 数据库</h4>
+                    </div>
+                    <button class="btn-sm btn-outline">下载</button>
+                  </div>
+
+                  <div class="export-tile highlight" onclick="downloadFullZipPackage()">
+                    <div class="tile-icon">🎁</div>
+                    <div class="tile-info">
+                      <h4>一键 YGOPro 扩展包 (.zip)</h4>
+                    </div>
+                    <button class="btn-sm btn-gold">打包下载</button>
+                  </div>
+
+                  <div class="export-tile highlight" onclick="downloadMdpro3Package(false)" style="border-color:#10b981;background:rgba(16,185,129,0.08);">
+                    <div class="tile-icon">📱</div>
+                    <div class="tile-info">
+                      <h4>手机端 MDPro3 扩展包 (.ypk)</h4>
+                    </div>
+                    <button class="btn-sm" style="background:#10b981;color:#fff;border:none;">生成 .ypk</button>
+                  </div>
+
+                  <div class="export-tile" onclick="downloadMdpro3Package(true)" style="border-color:#6366f1;background:rgba(99,102,241,0.08);">
+                    <div class="tile-icon">🎴</div>
+                    <div class="tile-info">
+                      <h4>整套卡包工程合集导出 (.ypk)</h4>
+                    </div>
+                    <button class="btn-sm" style="background:#6366f1;color:#fff;border:none;">导出全包</button>
+                  </div>
+                </div>
+
+                <div class="script-preview-collapse">
+                  <h4>📜 生成的 Lua 脚本预览：</h4>
+                  <pre><code id="liveGeneratedLuaPreview">-- 点击下方按钮或步骤自动生成</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- 底部工作台导航按钮栏 -->
+            <div class="step-nav-toolbar">
+              <button class="btn btn-secondary" id="btnPrevStep" onclick="stepPrev()" style="display:none;">← 上一步</button>
+              <div class="toolbar-spacer"></div>
+              <button class="btn btn-gold" id="btnNextStep" onclick="stepNext()">下一步 →</button>
+              <button class="btn btn-emerald" id="btnSaveToLib" onclick="saveCurrentCardToLibrary()">💾 保存至卡牌库</button>
+            </div>
+          </div>
+
+          <!-- 右栏：实时卡面预览（Sticky） -->
+          <div class="studio-preview-pane">
+            <div class="preview-card-frame">
+              <div class="preview-header">
+                <span class="pulse-indicator"></span>
+                <span>实时卡面同步预览</span>
+              </div>
+              
+              <div class="canvas-stage">
+                <canvas id="liveCardCanvas"></canvas>
+              </div>
+
+              <!-- 卡面快速操作栏 -->
+              <div class="quick-action-bar">
+                <button class="btn-chip" onclick="downloadSinglePng()" title="直接保存卡图">🖼️ 保存图片</button>
+                <button class="btn-chip" onclick="downloadSingleLua()" title="保存脚本">📜 导出脚本</button>
+                <button class="btn-chip btn-chip-gold" onclick="downloadFullZipPackage()" title="导出完整卡包">📦 一键打包</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 脚本设计器页面 -->
+      <div class="page" id="script-designer">
+        <div class="page-topbar">
+          <div class="topbar-title">
+            <h2>独立脚本设计器</h2>
+            <p class="subtitle">无需卡面，专为 YGOPro 复杂效果编写、语法校验与测试而生</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-outline" onclick="navigateTo('card-maker')">← 返回制卡工作台</button>
+            <button class="btn btn-outline" onclick="loadScriptTemplate()">模板库</button>
+            <button class="btn btn-gold" onclick="exportScript()">导出 .lua</button>
+          </div>
+        </div>
+
+        <div class="designer-layout">
+          <div class="editor-column">
+            <div class="glass-card">
+              <div class="form-group">
+                <label>脚本名称 / ID</label>
+                <input type="text" id="scriptName" placeholder="例如：c100000001 或 spell_search">
+              </div>
+              <div class="form-group">
+                <label>代码编辑器</label>
+                <textarea id="scriptEditor" class="code-editor" rows="18" spellcheck="false"></textarea>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-secondary" onclick="newScript()">新建脚本</button>
+                <button class="btn btn-primary" onclick="validateScript()">语法逻辑自检</button>
+                <button class="btn btn-gold" onclick="saveScript()">暂存脚本</button>
+              </div>
+            </div>
+          </div>
+          <div class="preview-column">
+            <div class="glass-card">
+              <h3>📊 结构与自检信息</h3>
+              <div id="scriptPreview" class="script-audit-box">
+                <p>在此编写或载入脚本后，右侧将呈现函数结构与诊断建议。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡牌库页面 -->
+      <div class="page" id="card-library">
+        <div class="page-topbar">
+          <div class="topbar-title">
+            <h2>本地卡牌收藏库</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-outline" onclick="openCustomArchetypeModal()" title="新建并管理专属系列字段">+ 新建自定义字段</button>
+            <button class="btn btn-outline" onclick="navigateTo('card-maker')">← 返回制卡工作台</button>
+            <button class="btn btn-gold" onclick="navigateTo('card-maker')">+ 制作新卡</button>
+          </div>
+        </div>
+
+        <div class="library-container">
+          <div class="stats-row">
+            <div class="stat-pill"><span class="val" id="totalCards">0</span> 张卡片已归档</div>
+            <div class="stat-pill"><span class="val" id="archetypeCount">0</span> 个系列字段</div>
+          </div>
+          <div class="card-grid" id="cardGrid">
+            <div class="empty-state">
+              <p>暂无卡片，快去制作你的第一张专属王牌吧！</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设置页面 -->
+      <div class="page" id="settings">
+        <div class="page-topbar">
+          <div class="topbar-title">
+            <h2>全局偏好与引擎配置</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-outline" onclick="navigateTo('card-maker')">← 返回制卡工作台</button>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="glass-card">
+            <h3>🤖 AI 密钥与端点配置</h3>
+            <div class="form-group">
+              <label>服务提供方</label>
+              <select id="aiProvider">
+                <option value="openai">OpenAI (GPT-4o)</option>
+                <option value="deepseek">DeepSeek (V3 / R1)</option>
+                <option value="custom">自定义兼容端点</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>API Key</label>
+              <input type="password" id="apiKey" placeholder="sk-...">
+            </div>
+            <div class="form-group">
+              <label>API Endpoint (可选)</label>
+              <input type="text" id="apiEndpoint" placeholder="https://api.openai.com/v1">
+            </div>
+            <button class="btn btn-gold" onclick="saveApiSettings()">保存配置</button>
+          </div>
+
+          <div class="glass-card" id="settingsCustomArchetypeCard">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+              <h3 style="margin:0;">🎴 自定义系列字段管理 (Custom Archetypes)</h3>
+              <button type="button" class="btn btn-sm btn-gold" onclick="openCustomArchetypeModal()">+ 新建自定义字段</button>
+            </div>
+            <div id="settingsArchetypeList" style="display:flex;flex-direction:column;gap:8px;">
+              <!-- 动态加载已保存自制字段 -->
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <h3>💾 数据备份与清空</h3>
+            <div class="action-row">
+              <button class="btn btn-outline" onclick="exportAllCards()">📤 导出全库 JSON</button>
+              <button class="btn btn-outline" onclick="importCards()">📥 导入 JSON</button>
+              <button class="btn btn-danger" onclick="clearAllData()">🗑️ 清空全库</button>
+            </div>
+          </div>
+
+          <!-- 仅在移动端展示此配置卡片，电脑端彻底隐藏 -->
+          <div class="glass-card mobile-only-feature" id="mobileSettingsCard">
+            <h3>📱 移动端与触控交互配置</h3>
+            <div class="action-row">
+              <button type="button" class="btn btn-outline" onclick="openMobileUiSettings()">⚙️ 打开手机 UI 配置面板</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 全局提示框与 Loading -->
+  <div id="notification" class="notification-toast"><span id="notificationText"></span></div>
+  <div id="loading" class="loading-overlay">
+    <div class="spinner-gold"></div>
+    <div class="loading-text">正在实时编译渲染...</div>
+  </div>
+
+  <!-- 自定义组合效果模态弹窗 (多部件架构) -->
+  <div id="customEffectModal" class="modal-backdrop">
+    <div class="modal-container custom-effect-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">🛠️</span>
+          <div>
+            <h3>YGOPro 多部件效果组合构建器</h3>
+            <p>基于官方 OCGCore 规范，自由组合触发时机、发动条件、发动代价、对象与效果处理</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeCustomEffectModal()">✕</button>
+      </div>
+
+      <div class="modal-body custom-effect-body">
+        <div class="builder-inputs-pane">
+          <div class="input-field">
+            <label>效果名称 / 简述</label>
+            <input type="text" id="builderEffectName" value="自定义组合效果" placeholder="例如：主阶段取对象除外">
+          </div>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label>1. 触发类型与时机 (Timing)</label>
+              <select id="builderTiming" onchange="updateCustomEffectPreview()">
+                <option value="trigger_summon">诱发: 召唤·特殊召唤成功时 (召/特召触发)</option>
+                <option value="ignition" selected>起动: 主阶段自己回合主动发动 (常规起动)</option>
+                <option value="quick_chain">二速诱发即时: 对方发动效果时连锁反制 (二速打断)</option>
+                <option value="quick_free">二速诱发即时: 双方回合自由时点发动 (自由时点)</option>
+                <option value="trigger_grave">诱发: 这张卡被送去墓地时 (送墓诱发)</option>
+                <option value="battle_destroy">诱发: 战斗破坏对方怪兽时 (战破诱发)</option>
+                <option value="continuous">永续适用: 在怪兽区域表侧存在时 (永续效果)</option>
+              </select>
+            </div>
+
+            <div class="input-field">
+              <label>2. 频次限制 (CountLimit)</label>
+              <select id="builderCountLimit" onchange="updateCustomEffectPreview()">
+                <option value="hopt" selected>同名卡1回合1次 (HOPT - SetCountLimit(1, id))</option>
+                <option value="sopt">场上卡片1回合1次 (SOPT - SetCountLimit(1))</option>
+                <option value="none">无次数限制 (可多次发动)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label>3. 发动前置条件 (Condition - con)</label>
+              <select id="builderCondition" onchange="updateCustomEffectPreview()">
+                <option value="none" selected>无特殊条件 (可随时合法发动)</option>
+                <option value="no_monsters">自己场上没有怪兽存在 (自己空场)</option>
+                <option value="chain_oppo">对方发动怪兽/魔陷效果时 (连锁反击)</option>
+              </select>
+            </div>
+
+            <div class="input-field">
+              <label>4. 发动代价 (Cost - cost)</label>
+              <select id="builderCost" onchange="updateCustomEffectPreview()">
+                <option value="none" selected>无代价 (无需支付费用或丢弃)</option>
+                <option value="discard_self">把手卡的这张卡送去墓地 (手卡舍弃)</option>
+                <option value="release_self">把场上的这张卡解放 (自身解放)</option>
+                <option value="pay_1000">支付 1000 基本分 (代价支付)</option>
+                <option value="discard_one">丢弃 1 张手卡 (手卡舍弃)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label>5. 目标与检查 (Target - tg)</label>
+              <select id="builderTarget" onchange="updateCustomEffectPreview()">
+                <option value="none" selected>不取对象 (处理时再选择或全场适用)</option>
+                <option value="target_field_card">以场上 1 张卡为对象 (取对象解场)</option>
+                <option value="target_oppo_card">以对方场上 1 张卡为对象 (对敌压制)</option>
+                <option value="target_grave_monster">以自己或对方墓地 1 只怪兽为对象 (苏生/除外)</option>
+              </select>
+            </div>
+
+            <div class="input-field">
+              <label>6. 效果动作处理 (Operation - op)</label>
+              <select id="builderAction" onchange="updateCustomEffectPreview()">
+                <option value="search_deck" selected>从卡组把系列卡片加入手牌 (检索)</option>
+                <option value="special_summon_self">这张卡从手卡特殊召唤 (自身特召)</option>
+                <option value="special_summon_hand">从手卡把1只怪兽特殊召唤 (手卡特召)</option>
+                <option value="revive_grave">所选墓地怪兽特殊召唤 (墓地苏生)</option>
+                <option value="destroy_target">所选对象破坏 (点破)</option>
+                <option value="to_hand_target">所选对象回到持有者手牌 (弹手)</option>
+                <option value="banish_target">所选对象除外 (除外)</option>
+                <option value="negate_and_destroy">无效那个发动并破坏 (全速反击)</option>
+                <option value="wipe_oppo_monsters">对方场上的怪兽全部破坏 (怪兽全灭)</option>
+                <option value="wipe_oppo_spells">对方场上的魔陷全部破坏 (魔陷全清)</option>
+                <option value="draw_cards">从卡组抽 2 张卡 (抽卡补充)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="builder-preview-pane">
+          <label>📜 实时拼装之 YGOPro Lua 代码预览：</label>
+          <pre id="customEffectLuaPreview" class="builder-code-box">-- 选择上方部件实时装配官方 Lua 脚本...</pre>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeCustomEffectModal()">取消</button>
+        <button type="button" class="btn btn-gold" onclick="addCustomEffectToStack()">➕ 将此多部件效果加入卡片</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI 灵感制作模态弹窗 -->
+  <div id="aiWorkflowModal" class="modal-backdrop">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">⚡</span>
+          <div>
+            <h3>AI 自动工作流 · 灵感一键生卡</h3>
+            <p>输入你的构想主题或原卡设计，AI 将全自动拆解属性、效果词条与卡面插图</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeAIWorkflow()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-field">
+          <label>卡片构想描述 / 效果灵感 <span class="req">*</span></label>
+          <textarea id="aiPrompt" rows="4" placeholder="例如：龙族暗属性8阶超量怪兽，二速取对方场上卡片除外，战斗破坏怪兽送墓时给予攻击力伤害..."></textarea>
+        </div>
+        <div class="form-grid-2">
+          <div class="input-field">
+            <label>卡片大类</label>
+            <select id="aiCardType">
+              <option value="1">效果怪兽 (Monster)</option>
+              <option value="2">魔法卡 (Spell)</option>
+              <option value="4">陷阱卡 (Trap)</option>
+            </select>
+          </div>
+          <div class="input-field">
+            <label>卡片风格主题</label>
+            <select id="aiTheme">
+              <option value="cyberpunk">科幻机甲 (Mecha/Cyber)</option>
+              <option value="fantasy">暗黑幻想 (Dark Fantasy)</option>
+              <option value="dragon">龙族史诗 (Dragon Epic)</option>
+              <option value="anime">经典日漫 (Anime OCG)</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-field-checkbox" style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+          <input type="checkbox" id="aiGenerateImage" checked>
+          <label for="aiGenerateImage" style="font-size:13px;color:var(--text-muted);cursor:pointer;">同步生成配套 DALL-E / 绘画插图提示词</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeAIWorkflow()">取消</button>
+        <button type="button" class="btn btn-gold" onclick="startAIGeneration()">🚀 开始 AI 推理制作</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自定义字段新建与管理模态框 -->
+  <div class="modal-backdrop" id="customArchetypeModalBackdrop" onclick="closeCustomArchetypeModal()"></div>
+  <div class="modal custom-archetype-modal" id="customArchetypeModal">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">🎴</span>
+        <div>
+          <h3>新建自定义字段 / 系列 (Custom Archetype)</h3>
+          <p>创建属于你的独有系列字段，系统将自动分配不与官方 595 系列冲突的专属 Setcode</p>
+        </div>
+      </div>
+      <button type="button" class="btn-close-modal" onclick="closeCustomArchetypeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="input-field">
+        <label>字段中文名称 <span class="req">*</span></label>
+        <input type="text" id="diyArchetypeNameZh" placeholder="例如：星界巡者、深渊遗民、机械灵狐" oninput="onDiyArchetypeInput()">
+        <small>此名称将出现在卡片卡文及检索匹配中</small>
+      </div>
+      <div class="input-field mt-2">
+        <label>字段日文名称 (选填)</label>
+        <input type="text" id="diyArchetypeNameJa" placeholder="例如：アストラル・ワンダラー">
+        <small>日文模式卡片制卡时自动匹配</small>
+      </div>
+      <div class="form-grid-2 mt-2">
+        <div class="input-field">
+          <label>自定义 Setcode (十六进制)</label>
+          <input type="text" id="diyArchetypeHex" placeholder="例如：0x7f01" style="font-family:monospace;" oninput="onDiyHexInput(this.value)">
+          <small>系统默认从 0x7f01 起始分配，绝对不与官方实卡冲突</small>
+        </div>
+        <div class="input-field">
+          <label>对应十进制数值</label>
+          <input type="text" id="diyArchetypeDec" placeholder="32513" readonly style="background:rgba(0,0,0,0.2);color:#94a3b8;font-family:monospace;">
+        </div>
+      </div>
+      <div id="diyArchetypeConflictTip" style="display:none;margin-top:10px;padding:8px 12px;border-radius:6px;font-size:12px;"></div>
+
+      <!-- 已保存自制字段管理列表 -->
+      <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:12px;font-weight:600;color:#94a3b8;">已保存的自制字段列表：</span>
+          <span id="modalArchetypeCount" style="font-size:11px;color:#f59e0b;">0 个字段</span>
+        </div>
+        <div id="modalCustomArchetypesList" style="max-height:130px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;">
+          <!-- 动态加载已保存自制字段 -->
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" onclick="closeCustomArchetypeModal()">取消</button>
+      <button type="button" class="btn btn-gold" onclick="saveCustomArchetype()">💾 保存并应用此字段</button>
+    </div>
+  </div>
+  <!-- 手机端/移动端专属：悬浮卡面快捷预览按钮 -->
+  <button type="button" class="mobile-preview-fab" id="mobilePreviewFab" onclick="openMobileCardDrawer()" title="查看卡面效果">
+    <span class="fab-icon">🎴</span>
+    <span class="fab-text">查看卡图</span>
+  </button>
+
+  <!-- 手机端/移动端专属：卡面全景抽屉式检视器 (Bottom Sheet / Drawer) -->
+  <div class="mobile-card-drawer-backdrop" id="mobileCardDrawerBackdrop" onclick="closeMobileCardDrawer()"></div>
+  <div class="mobile-card-drawer" id="mobileCardDrawer">
+    <div class="drawer-drag-handle" onclick="closeMobileCardDrawer()"></div>
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <span class="drawer-badge">HD 实时同步</span>
+        <h4 class="drawer-title" id="drawerCardName">当前卡面检视</h4>
+      </div>
+      <button type="button" class="drawer-close-btn" onclick="closeMobileCardDrawer()" title="关闭预览">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-canvas-wrap">
+        <canvas id="mobileDrawerCanvas"></canvas>
+      </div>
+      <div class="drawer-actions">
+        <button type="button" class="btn btn-outline" onclick="downloadSinglePng()">🖼️ 保存卡图</button>
+        <button type="button" class="btn btn-gold" onclick="downloadMdpro3Package(false)">📱 导出 MDPro3</button>
+        <button type="button" class="btn btn-secondary" onclick="closeMobileCardDrawer()">返回编辑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端多页面工作流专属吸底操作栏 (Mobile Flow Action Bar) -->
+  <div class="mobile-flow-action-bar" id="mobileFlowActionBar">
+    <button type="button" class="btn btn-secondary mobile-flow-btn-prev" id="btnMobileFlowPrev" onclick="mobileFlowPrev()">
+      <span>← 上一步</span>
+    </button>
+    <button type="button" class="mobile-flow-btn-inspect" onclick="openMobileCardDrawer()" title="展开卡面全景大图">
+      <span>🎴</span>
+    </button>
+    <button type="button" class="btn btn-gold mobile-flow-btn-next" id="btnMobileFlowNext" onclick="mobileFlowNext()">
+      <span>进入效果规则 →</span>
+    </button>
+  </div>
+
+  <!-- 手机端单手触控吸底导航栏 (Bottom Navigation Bar) -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <button type="button" class="mobile-nav-item active" data-step="1">
+      <span class="mobile-nav-icon">🏷️</span>
+      <span class="mobile-nav-label">基础属性</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-step="2">
+      <span class="mobile-nav-icon">✨</span>
+      <span class="mobile-nav-label">效果向导</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-step="3">
+      <span class="mobile-nav-icon">🎨</span>
+      <span class="mobile-nav-label">卡面工艺</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-step="4">
+      <span class="mobile-nav-icon">📦</span>
+      <span class="mobile-nav-label">发布打包</span>
+    </button>
+    <button type="button" class="mobile-nav-item highlight" data-action="preview">
+      <span class="mobile-nav-icon">🎴</span>
+      <span class="mobile-nav-label">大图检视</span>
+    </button>
+  </nav>
+
+  <!-- 移动端专属 UI 交互配置弹窗 (Mobile UI Settings Modal) -->
+  <div class="mobile-settings-modal" id="mobileUiSettingsModal" onclick="if(event.target===this)closeMobileUiSettings()">
+    <div class="mobile-settings-dialog">
+      <div class="mobile-settings-header">
+        <h3><span>📱</span> 移动端专属 UI 与触控体验配置</h3>
+        <button type="button" class="drawer-close-btn" onclick="closeMobileUiSettings()">✕</button>
+      </div>
+      <div class="mobile-settings-body">
+        <!-- 布局模式选择 -->
+        <div class="mobile-opt-group">
+          <div class="mobile-opt-title"><span>📐</span> 手机编辑布局架构</div>
+          <div class="mobile-opt-desc">针对不同尺寸屏幕提供三种量身定制的单手操作与排版模式：</div>
+          <div class="mobile-radio-cards">
+            <label class="mobile-radio-card">
+              <input type="radio" name="mobileLayoutOption" value="tabs" checked>
+              <span class="icon">📑</span>
+              <span class="label">单手分页</span>
+            </label>
+            <label class="mobile-radio-card">
+              <input type="radio" name="mobileLayoutOption" value="scroll">
+              <span class="icon">📜</span>
+              <span class="label">长卷轴流</span>
+            </label>
+            <label class="mobile-radio-card">
+              <input type="radio" name="mobileLayoutOption" value="split">
+              <span class="icon">🌓</span>
+              <span class="label">上下分屏</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 触控与交互开关 -->
+        <div class="mobile-opt-group">
+          <div class="mobile-opt-title"><span>⚡</span> 触控与高效辅助</div>
+          <div class="mobile-toggle-item">
+            <div class="mobile-toggle-info">
+              <h5>吸顶微型动态卡片</h5>
+              <p>编辑表单时在顶部常驻显示卡名、属性、星级与攻防微缩胶囊</p>
+            </div>
+            <input type="checkbox" id="chkMobileStickyHeader" checked>
+          </div>
+          <div class="mobile-toggle-item">
+            <div class="mobile-toggle-info">
+              <h5>触觉微震反馈 (Haptics)</h5>
+              <p>按钮点击与步骤流转时触发物理级轻微马达震动</p>
+            </div>
+            <input type="checkbox" id="chkMobileHaptics" checked>
+          </div>
+        </div>
+
+        <!-- 预览画质与性能 -->
+        <div class="mobile-opt-group">
+          <div class="mobile-opt-title"><span>🔋</span> 渲染画质与省电模式</div>
+          <div class="mobile-opt-desc">平衡移动设备发热、电量与高清制卡需求：</div>
+          <div class="mobile-radio-cards" style="grid-template-columns: repeat(2, 1fr);">
+            <label class="mobile-radio-card">
+              <input type="radio" name="mobileRenderOption" value="1" checked>
+              <span class="icon">⚡</span>
+              <span class="label">极速流畅 (1x 省电)</span>
+            </label>
+            <label class="mobile-radio-card">
+              <input type="radio" name="mobileRenderOption" value="2">
+              <span class="icon">💎</span>
+              <span class="label">视网膜 (2x HD)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 大图检视形态 -->
+        <div class="mobile-opt-group">
+          <div class="mobile-opt-title"><span>🎴</span> 卡面大图抽屉形态</div>
+          <div class="mobile-radio-cards" style="grid-template-columns: repeat(2, 1fr);">
+            <label class="mobile-radio-card">
+              <input type="radio" name="mobileDrawerOption" value="sheet" checked>
+              <span class="icon">🪟</span>
+              <span class="label">半屏抽屉 (Sheet)</span>
+            </label>
+            <label class="mobile-radio-card">
+              <input type="radio" name="mobileDrawerOption" value="fullscreen">
+              <span class="icon">📱</span>
+              <span class="label">全屏沉浸 (Full)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="mobile-settings-footer">
+        <button type="button" class="btn btn-outline" onclick="closeMobileUiSettings()">取消</button>
+        <button type="button" class="btn btn-gold" onclick="saveMobileUiSettings()">💾 保存并应用</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 电脑端专属退出确认与未保存修改提醒模态弹窗 -->
+  <div id="desktopExitModal" class="modal-backdrop" style="display: none; align-items: center; justify-content: center; z-index: 10000;">
+    <div class="modal-container" style="max-width: 480px; border-radius: 12px; background: #161b22; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 16px 36px rgba(0,0,0,0.7); padding: 24px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+        <h3 id="exitModalTitle" style="margin: 0; font-size: 17px; font-weight: 600; color: #f0f6fc; display: flex; align-items: center; gap: 8px;">
+          🚪 退出程序确认
+        </h3>
+        <button type="button" class="btn-close" onclick="closeExitModal()" style="background: none; border: none; color: #8b949e; cursor: pointer; font-size: 18px; padding: 4px 8px;">✕</button>
+      </div>
+      <div id="exitModalMsg" style="font-size: 14px; line-height: 1.6; color: #c9d1d9; margin-bottom: 24px;">
+        确定要关闭并退出游戏王AI制卡器吗？
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+        <button type="button" class="btn btn-secondary" onclick="closeExitModal()" style="padding: 8px 16px;">
+          取消
+        </button>
+        <button type="button" id="exitSaveAndQuitBtn" class="btn btn-primary" onclick="confirmExitApp(true)" style="display: none; padding: 8px 16px; background: #238636; border-color: #2ea043; color: #fff;">
+          💾 保存并退出
+        </button>
+        <button type="button" id="exitDirectQuitBtn" class="btn btn-danger" onclick="confirmExitApp(false)" style="padding: 8px 16px; background: #da3633; border-color: #f85149; color: #fff;">
+          🚪 确定退出
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 核心交互脚本 -->
+  <script src="./js/card-renderer.js"></script>
+  <script src="./js/client-assembler.js"></script>
+  <script src="./js/client-cdb.js"></script>
+  <script src="./js/settings.js"></script>
+  <script src="./js/library.js"></script>
+  <script src="./js/ai-workflow.js"></script>
+  <script src="./js/output.js"></script>
+  <script src="./js/furigana-service.js"></script>
+  <script src="./js/mobile-ui.js"></script>
+  <script src="./js/mobile-enhancements.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

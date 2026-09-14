@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+# 保留 package-lock.json 以便复现依赖
+pnpm-lock.yaml
+yarn.lock
+
+# Build output
+dist/
+release/
+temp/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+
+# Workspace & generated output
+workspace/
+images/
+
+# 卡面素材（体积与版权原因不入库，见 docs/ASSETS.md）
+src/web/public/assets/yugioh/image/
+src/web/public/assets/yugioh/font/
+
+# Capacitor / Android
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/public/
+android/local.properties
+android/app/*.jks
+android/app/*.keystore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
