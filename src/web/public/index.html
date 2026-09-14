@@ -1303,20 +1303,35 @@
             <div class="form-group">
               <label>服务提供方</label>
               <select id="aiProvider">
-                <option value="openai">OpenAI (GPT-4o)</option>
-                <option value="deepseek">DeepSeek (V3 / R1)</option>
+                <option value="openai">OpenAI</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="zhipu">智谱 GLM</option>
+                <option value="anthropic">Anthropic Claude</option>
                 <option value="custom">自定义兼容端点</option>
               </select>
             </div>
             <div class="form-group">
               <label>API Key</label>
-              <input type="password" id="apiKey" placeholder="sk-...">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="password" id="apiKey" placeholder="sk-..." style="flex:1;">
+                <button type="button" class="btn btn-outline btn-sm" id="btnToggleApiKey" onclick="toggleApiKeyVisibility()" title="显示 / 隐藏密钥">👁️ 显示</button>
+              </div>
             </div>
             <div class="form-group">
-              <label>API Endpoint (可选)</label>
+              <label>模型名称</label>
+              <input type="text" id="modelName" placeholder="例如 gpt-4o-mini / deepseek-chat / glm-4-flash">
+            </div>
+            <div class="form-group">
+              <label>API Endpoint（可选，留空则用服务方默认）</label>
               <input type="text" id="apiEndpoint" placeholder="https://api.openai.com/v1">
             </div>
-            <button class="btn btn-gold" onclick="saveApiSettings()">保存配置</button>
+            <div class="action-row">
+              <button class="btn btn-gold" onclick="saveApiSettings()">保存配置</button>
+              <button class="btn btn-outline" onclick="testApiConnection()">🔌 测试连接</button>
+            </div>
+            <p style="font-size:12px;color:var(--text-muted);margin:8px 0 0;">
+              说明：AI 生成需通过本地服务端发送请求，因此手机 APK / 纯静态部署下不可用。密钥仅保存在本机浏览器中。
+            </p>
           </div>
 
           <div class="glass-card" id="settingsCustomArchetypeCard">

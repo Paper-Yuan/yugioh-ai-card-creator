@@ -318,8 +318,8 @@ app.post('/api/ai-generate-card', async (req, res) => {
     if (!aiConfig || !aiConfig.apiKey) {
       return res.status(400).json({ error: 'AI API not configured' });
     }
-    
-    const aiGenerator = new AICardGenerator(aiConfig.apiKey);
+
+    const aiGenerator = new AICardGenerator(aiConfig);
     
     const cardData = await aiGenerator.generateCard({
       prompt,
@@ -363,20 +363,21 @@ app.post('/api/ai-suggest-effects', async (req, res) => {
   }
 });
 
-// 测试AI连接
+// 测试AI连接（发起真实请求验证配置）
 app.post('/api/test-ai', async (req, res) => {
   try {
     const { provider, apiKey, endpoint, model } = req.body;
-    
+
     if (!apiKey) {
       return res.status(400).json({ success: false, error: 'API Key is required' });
     }
-    
-    // 简单的连接测试
-    res.json({ success: true, message: 'Connection test passed' });
+
+    const aiGenerator = new AICardGenerator({ provider, apiKey, endpoint, model });
+    const result = await aiGenerator.testConnection();
+    res.json(result);
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       error: error instanceof Error ? error.message : String(error)
     });
   }
@@ -388,7 +389,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok', 
     timestamp: new Date().toISOString(),
     modulesCount: EFFECT_MODULES.length,
-    version: '1.0.0'
+    version: '2.0.0'
   });
 });
 

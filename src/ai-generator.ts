@@ -1,40 +1,71 @@
 import { OpenAI } from 'openai';
 import { CardData, CardType, Race, Attribute, AICardRequest } from './types.js';
 
-export class AICardGenerator {
-  private openai: OpenAI;
+/**
+ * 各 AI 服务方的默认端点与模型。
+ * - openai / deepseek / zhipu 走 OpenAI 兼容接口（智谱 GLM 亦提供 OpenAI 兼容模式）
+ * - anthropic 使用其原生 Messages 接口（非 OpenAI 兼容，单独分支处理）
+ */
+export const AI_PROVIDER_DEFAULTS: Record<string, { endpoint: string; model: string }> = {
+  openai: { endpoint: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
+  deepseek: { endpoint: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
+  zhipu: { endpoint: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash' },
+  anthropic: { endpoint: 'https://api.anthropic.com/v1', model: 'claude-3-5-sonnet-20241022' },
+  custom: { endpoint: '', model: '' }
+};
 
-  constructor(apiKey?: string) {
-    this.openai = new OpenAI({
-      apiKey: apiKey || process.env.OPENAI_API_KEY
-    });
+/** 支持 response_format=json_object 的服务方；其余不传该参数以保证兼容性 */
+const JSON_MODE_PROVIDERS = new Set(['openai', 'deepseek', 'zhipu']);
+
+export interface AIConfig {
+  provider?: string;
+  apiKey: string;
+  endpoint?: string;
+  model?: string;
+}
+
+export class AICardGenerator {
+  private readonly provider: string;
+  private readonly apiKey: string;
+  private readonly endpoint: string;
+  private readonly model: string;
+  private readonly openai?: OpenAI;
+
+  /** 兼容旧调用：传入字符串视为 apiKey（默认 OpenAI） */
+  constructor(config: AIConfig | string) {
+    const cfg: AIConfig = typeof config === 'string' ? { apiKey: config } : config;
+    this.provider = (cfg.provider || 'openai').toLowerCase();
+    this.apiKey = cfg.apiKey || process.env.OPENAI_API_KEY || '';
+
+    const defaults = AI_PROVIDER_DEFAULTS[this.provider] || AI_PROVIDER_DEFAULTS.custom;
+    this.endpoint = (cfg.endpoint || defaults.endpoint || '').trim();
+    this.model = (cfg.model || defaults.model || '').trim() || 'gpt-4o-mini';
+
+    if (this.provider !== 'anthropic') {
+      this.openai = new OpenAI({
+        apiKey: this.apiKey,
+        baseURL: this.endpoint || undefined
+      });
+    }
+  }
+
+  /** 真实发起一次最小请求，用于「测试连接」 */
+  async testConnection(): Promise<{ success: boolean; message: string }> {
+    try {
+      const reply = await this.chat('You are a connectivity test.', 'Reply with the single word: ok');
+      return { success: true, message: (reply.trim() || 'ok').slice(0, 60) };
+    } catch (err) {
+      return { success: false, message: err instanceof Error ? err.message : String(err) };
+    }
   }
 
   async generateCard(request: AICardRequest): Promise<CardData> {
     const prompt = this.buildPrompt(request);
-    
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a Yu-Gi-Oh! card designer. Generate balanced, creative cards with proper OCG formatting. Return valid JSON only.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.8,
-      response_format: { type: 'json_object' }
-    });
-
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error('No response from AI');
-    }
-
-    const cardJson = JSON.parse(content);
+    const content = await this.chat(
+      'You are a Yu-Gi-Oh! card designer. Generate balanced, creative cards with proper OCG formatting. Return valid JSON only.',
+      prompt
+    );
+    const cardJson = this.extractJson(content);
     return this.parseCardData(cardJson, request.startId || 100000000);
   }
 
@@ -53,13 +84,107 @@ export class AICardGenerator {
     return cards;
   }
 
+  /** 按服务方选择接口：Anthropic 用原生 Messages API，其余走 OpenAI 兼容接口 */
+  private async chat(system: string, user: string): Promise<string> {
+    if (this.provider === 'anthropic') {
+      return this.chatAnthropic(system, user);
+    }
+    return this.chatOpenAICompatible(system, user);
+  }
+
+  private async chatOpenAICompatible(system: string, user: string): Promise<string> {
+    if (!this.openai) {
+      throw new Error('AI 客户端未初始化（缺少 API Key 或端点）');
+    }
+
+    const messages = [
+      { role: 'system' as const, content: system },
+      { role: 'user' as const, content: user }
+    ];
+    const useJsonMode = JSON_MODE_PROVIDERS.has(this.provider);
+
+    try {
+      const resp = await this.openai.chat.completions.create({
+        model: this.model,
+        messages,
+        temperature: 0.8,
+        ...(useJsonMode ? { response_format: { type: 'json_object' as const } } : {})
+      });
+      return resp.choices[0]?.message?.content || '';
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      // 部分兼容端点不支持 response_format，遇到相关报错时去掉该参数重试一次
+      if (useJsonMode && /response_format|json_object|json mode/i.test(msg)) {
+        const retry = await this.openai.chat.completions.create({
+          model: this.model,
+          messages,
+          temperature: 0.8
+        });
+        return retry.choices[0]?.message?.content || '';
+      }
+      throw err;
+    }
+  }
+
+  private async chatAnthropic(system: string, user: string): Promise<string> {
+    const base = this.endpoint || 'https://api.anthropic.com/v1';
+    const res = await fetch(`${base.replace(/\/$/, '')}/messages`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': this.apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: this.model,
+        max_tokens: 2048,
+        system,
+        messages: [{ role: 'user', content: user }]
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error(`Anthropic API ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    }
+
+    const data: any = await res.json();
+    return (data.content || [])
+      .filter((part: any) => part && part.type === 'text')
+      .map((part: any) => part.text || '')
+      .join('');
+  }
+
+  /** 从模型返回中稳健提取 JSON（兼容代码块围栏与前后多余文本） */
+  private extractJson(text: string): any {
+    if (!text || !text.trim()) {
+      throw new Error('AI 返回内容为空');
+    }
+    let t = text.trim();
+
+    const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fence) {
+      t = fence[1].trim();
+    }
+
+    try {
+      return JSON.parse(t);
+    } catch {
+      const start = t.indexOf('{');
+      const end = t.lastIndexOf('}');
+      if (start !== -1 && end > start) {
+        return JSON.parse(t.slice(start, end + 1));
+      }
+      throw new Error('AI 返回内容不是合法 JSON');
+    }
+  }
+
   private buildPrompt(request: AICardRequest): string {
     let prompt = `Generate a Yu-Gi-Oh! card based on: "${request.prompt}"\n\n`;
-    
+
     if (request.cardType) {
       prompt += `Card type: ${request.cardType}\n`;
     }
-    
+
     if (request.theme) {
       prompt += `Theme: ${request.theme}\n`;
     }
@@ -128,10 +253,10 @@ Make sure effects are balanced and follow Yu-Gi-Oh! card text conventions.`;
     } else {
       type = CardType.MONSTER;
       const monsterType = json.monsterType || 'effect';
-      
+
       if (monsterType === 'normal') type |= CardType.NORMAL;
       else type |= CardType.EFFECT;
-      
+
       if (monsterType === 'fusion') type |= CardType.FUSION;
       else if (monsterType === 'synchro') type |= CardType.SYNCHRO;
       else if (monsterType === 'xyz') type |= CardType.XYZ;
@@ -170,7 +295,7 @@ Make sure effects are balanced and follow Yu-Gi-Oh! card text conventions.`;
       'cyberse': Race.CYBERSE
     };
 
-    return raceMap[race.toLowerCase()] || Race.WARRIOR;
+    return raceMap[String(race).toLowerCase()] || Race.WARRIOR;
   }
 
   private parseAttribute(attr: string): Attribute {
@@ -184,6 +309,6 @@ Make sure effects are balanced and follow Yu-Gi-Oh! card text conventions.`;
       'divine': Attribute.DIVINE
     };
 
-    return attrMap[attr.toLowerCase()] || Attribute.DARK;
+    return attrMap[String(attr).toLowerCase()] || Attribute.DARK;
   }
 }

@@ -1,17 +1,36 @@
 // ========== 设置管理 ==========
+
+// 各服务方默认端点与模型（与后端 src/ai-generator.ts 的 AI_PROVIDER_DEFAULTS 保持一致）
+const AI_PROVIDER_DEFAULTS = {
+  openai: { endpoint: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
+  deepseek: { endpoint: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
+  zhipu: { endpoint: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash' },
+  anthropic: { endpoint: 'https://api.anthropic.com/v1', model: 'claude-3-5-sonnet-20241022' },
+  custom: { endpoint: '', model: '' }
+};
+
 class Settings {
   constructor() {
     this.settings = this.loadSettings();
     this.applySettings();
   }
 
-  // 加载设置
+  // 加载设置（与默认值合并，避免旧版本缺失字段）
   loadSettings() {
+    const defaults = this.getDefaultSettings();
     const saved = localStorage.getItem('yugioh_settings');
-    if (saved) {
-      return JSON.parse(saved);
+    if (!saved) return defaults;
+
+    try {
+      const parsed = JSON.parse(saved);
+      return {
+        ai: { ...defaults.ai, ...(parsed.ai || {}) },
+        ui: { ...defaults.ui, ...(parsed.ui || {}) },
+        workspace: { ...defaults.workspace, ...(parsed.workspace || {}) }
+      };
+    } catch {
+      return defaults;
     }
-    return this.getDefaultSettings();
   }
 
   // 默认设置
@@ -20,11 +39,11 @@ class Settings {
       ai: {
         provider: 'openai',
         apiKey: '',
-        endpoint: 'https://api.openai.com/v1',
-        model: 'gpt-4'
+        endpoint: AI_PROVIDER_DEFAULTS.openai.endpoint,
+        model: AI_PROVIDER_DEFAULTS.openai.model
       },
       ui: {
-        theme: 'light',
+        theme: 'dark',
         language: 'zh-CN'
       },
       workspace: {
@@ -39,7 +58,7 @@ class Settings {
     this.applySettings();
   }
 
-  // 应用设置
+  // 应用设置（所有控件访问前判空，页面上不存在的控件跳过即可）
   applySettings() {
     // 应用主题
     if (this.settings.ui.theme === 'dark') {
@@ -48,16 +67,18 @@ class Settings {
       document.body.classList.remove('dark-theme');
     }
 
-    // 填充表单
-    if (document.getElementById('aiProvider')) {
-      document.getElementById('aiProvider').value = this.settings.ai.provider;
-      document.getElementById('apiKey').value = this.settings.ai.apiKey;
-      document.getElementById('apiEndpoint').value = this.settings.ai.endpoint;
-      document.getElementById('modelName').value = this.settings.ai.model;
-      document.getElementById('theme').value = this.settings.ui.theme;
-      document.getElementById('language').value = this.settings.ui.language;
-      document.getElementById('workspaceDir').value = this.settings.workspace.dir;
-    }
+    const setVal = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.value = value;
+    };
+
+    setVal('aiProvider', this.settings.ai.provider);
+    setVal('apiKey', this.settings.ai.apiKey);
+    setVal('apiEndpoint', this.settings.ai.endpoint);
+    setVal('modelName', this.settings.ai.model);
+    setVal('theme', this.settings.ui.theme);
+    setVal('language', this.settings.ui.language);
+    setVal('workspaceDir', this.settings.workspace.dir);
   }
 
   // 获取AI配置
@@ -72,32 +93,46 @@ const settings = new Settings();
 // 保存API设置
 function saveApiSettings() {
   const provider = document.getElementById('aiProvider').value;
-  const apiKey = document.getElementById('apiKey').value;
-  const endpoint = document.getElementById('apiEndpoint').value;
-  const model = document.getElementById('modelName').value;
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const endpointEl = document.getElementById('apiEndpoint');
+  const modelEl = document.getElementById('modelName');
+  const endpoint = endpointEl ? endpointEl.value.trim() : '';
+  const model = modelEl ? modelEl.value.trim() : '';
 
   if (!apiKey) {
-    showNotification('请输入API Key', 'error');
+    showNotification('请输入 API Key', 'error');
     return;
   }
 
   settings.settings.ai = {
     provider,
     apiKey,
-    endpoint,
-    model
+    endpoint: endpoint || (AI_PROVIDER_DEFAULTS[provider] || {}).endpoint || '',
+    model: model || (AI_PROVIDER_DEFAULTS[provider] || {}).model || ''
   };
 
   settings.saveSettings();
-  showNotification('API设置已保存', 'success');
+  showNotification('API 设置已保存', 'success');
 }
 
-// 测试API连接
+// 测试API连接（由后端发起真实请求）
 async function testApiConnection() {
-  const config = settings.getAIConfig();
-  
+  // 先采用当前表单值，避免用户改了输入却没保存导致测的是旧配置
+  const provider = document.getElementById('aiProvider').value;
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const endpointEl = document.getElementById('apiEndpoint');
+  const modelEl = document.getElementById('modelName');
+  const config = {
+    provider,
+    apiKey,
+    endpoint: (endpointEl ? endpointEl.value.trim() : '') ||
+      (AI_PROVIDER_DEFAULTS[provider] || {}).endpoint || '',
+    model: (modelEl ? modelEl.value.trim() : '') ||
+      (AI_PROVIDER_DEFAULTS[provider] || {}).model || ''
+  };
+
   if (!config.apiKey) {
-    showNotification('请先设置API Key', 'error');
+    showNotification('请先填写 API Key', 'error');
     return;
   }
 
@@ -113,9 +148,9 @@ async function testApiConnection() {
     const result = await response.json();
 
     if (result.success) {
-      showNotification('✅ API连接成功！', 'success');
+      showNotification('✅ API 连接成功！', 'success');
     } else {
-      showNotification('❌ 连接失败: ' + result.error, 'error');
+      showNotification('❌ 连接失败: ' + (result.error || result.message || '未知错误'), 'error');
     }
   } catch (error) {
     showNotification('❌ 连接失败: ' + error.message, 'error');
@@ -127,21 +162,23 @@ async function testApiConnection() {
 // 切换API Key显示
 function toggleApiKeyVisibility() {
   const input = document.getElementById('apiKey');
-  const btn = event.target;
-  
+  const btn = document.getElementById('btnToggleApiKey');
+  if (!input) return;
+
   if (input.type === 'password') {
     input.type = 'text';
-    btn.textContent = '🔒 隐藏';
+    if (btn) btn.textContent = '🔒 隐藏';
   } else {
     input.type = 'password';
-    btn.textContent = '👁️ 显示';
+    if (btn) btn.textContent = '👁️ 显示';
   }
 }
 
 // 更改主题
 function changeTheme() {
-  const theme = document.getElementById('theme').value;
-  settings.settings.ui.theme = theme;
+  const el = document.getElementById('theme');
+  if (!el) return;
+  settings.settings.ui.theme = el.value;
   settings.saveSettings();
   showNotification('主题已更改', 'success');
 }
@@ -157,7 +194,6 @@ async function selectWorkspaceDir() {
   );
   if (dir) {
     settings.settings.workspace.dir = dir;
-    document.getElementById('workspaceDir').value = dir;
     settings.saveSettings();
     showNotification('工作目录已设置', 'success');
   }
@@ -171,30 +207,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const provider = e.target.value;
       const endpointInput = document.getElementById('apiEndpoint');
       const modelInput = document.getElementById('modelName');
+      const defaults = AI_PROVIDER_DEFAULTS[provider];
 
-      // 根据提供商设置默认值
-      const defaults = {
-        openai: {
-          endpoint: 'https://api.openai.com/v1',
-          model: 'gpt-4'
-        },
-        anthropic: {
-          endpoint: 'https://api.anthropic.com/v1',
-          model: 'claude-3-sonnet-20240229'
-        },
-        zhipu: {
-          endpoint: 'https://open.bigmodel.cn/api/paas/v4',
-          model: 'glm-4'
-        },
-        custom: {
-          endpoint: '',
-          model: ''
-        }
-      };
-
-      if (defaults[provider]) {
-        endpointInput.value = defaults[provider].endpoint;
-        modelInput.value = defaults[provider].model;
+      if (defaults) {
+        if (endpointInput) endpointInput.value = defaults.endpoint;
+        if (modelInput) modelInput.value = defaults.model;
       }
     });
   }

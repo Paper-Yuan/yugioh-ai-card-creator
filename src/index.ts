@@ -11,7 +11,7 @@ export class YuGiOhCardCreator {
   private imageGenerator: CardImageGenerator;
 
   constructor(openaiApiKey?: string) {
-    this.aiGenerator = new AICardGenerator(openaiApiKey);
+    this.aiGenerator = new AICardGenerator({ apiKey: openaiApiKey || process.env.OPENAI_API_KEY || '' });
     this.cdbManager = new CDBManager();
     this.imageGenerator = new CardImageGenerator();
   }
