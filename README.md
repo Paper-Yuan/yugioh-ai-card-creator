@@ -149,9 +149,12 @@ yugioh-ai-card-creator/
 │   └── desktop/                   # C# 启动器 / 安装向导
 ├── electron/                      # Electron 主进程
 ├── scripts/                       # 资源下载 / 提取 / 打包脚本
-│   └── mine-rule-texts.js         # 扫描 YGOPro 全量卡脚本，统计效果外文本机制
+│   ├── mine-rule-texts.js         # 扫描 YGOPro 全量卡脚本，统计效果外文本机制
+│   └── split-corpus-by-type.js    # 依 cards.cdb 将卡脚本切分为怪兽/魔法/陷阱
 └── docs/
-    └── RULE_TEXTS.md              # 效果外文本支持范围与语料库统计依据
+    ├── RULE_TEXTS.md              # 效果外文本支持范围与语料库统计依据
+    ├── EFFECT_CAPABILITY_CATALOG.md  # 效果能力全集与参数规范（基于全量语料库）
+    └── effect-reports/            # 怪兽/魔法/陷阱三份原始分析报告
 ```
 
 ---

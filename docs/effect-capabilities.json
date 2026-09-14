@@ -1,0 +1,5834 @@
+{
+  "generatedFrom": {
+    "monster": 8552,
+    "spell": 2843,
+    "trap": 2059
+  },
+  "convention": {
+    "hitsMetric": "files (命中文件数)",
+    "note": "怪兽报告原始为 count/fileCount 双口径，本文件统一取 fileCount=命中文件数。示例文档中的怪兽 3161 为 CATEGORY_DESTROY 出现次数，其文件数为 1521。个别仅有出现次数的低频条目按次记录。数值为 0 表示对应报告未统计该项。"
+  },
+  "dimensions": {
+    "effectType": [
+      {
+        "id": "continuous",
+        "name": "常驻效果",
+        "hits": {
+          "monster": 1308,
+          "spell": 1428,
+          "trap": 416
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "ignition",
+        "name": "起动效果",
+        "hits": {
+          "monster": 3342,
+          "spell": 660,
+          "trap": 1
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "trigger_optional",
+        "name": "诱发效果(可选)",
+        "hits": {
+          "monster": 4130,
+          "spell": 547,
+          "trap": 221
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "trigger_mandatory",
+        "name": "诱发效果(必发)",
+        "hits": {
+          "monster": 1363,
+          "spell": 202,
+          "trap": 136
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "quick_optional",
+        "name": "诱发即时效果(可选)",
+        "hits": {
+          "monster": 1451,
+          "spell": 16,
+          "trap": 470
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "quick_mandatory",
+        "name": "诱发即时效果(必发)",
+        "hits": {
+          "monster": 15,
+          "spell": 1,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "activate",
+        "name": "卡的发动本体",
+        "hits": {
+          "monster": 0,
+          "spell": 2419,
+          "trap": 2009
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "flip",
+        "name": "反转效果",
+        "hits": {
+          "monster": 193,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "equip_state",
+        "name": "装备状态效果",
+        "hits": {
+          "monster": 178,
+          "spell": 216,
+          "trap": 62
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "grant",
+        "name": "效果赋予",
+        "hits": {
+          "monster": 13,
+          "spell": 13,
+          "trap": 4
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "pendulum_effect",
+        "name": "摆区效果",
+        "hits": {
+          "monster": 374,
+          "spell": 37,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "procedure",
+        "name": "召唤手续",
+        "hits": {
+          "monster": 3538,
+          "spell": 221,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P0"
+      }
+    ],
+    "timing": [
+      {
+        "id": "summon_ns",
+        "name": "召唤成功",
+        "hits": {
+          "monster": 564,
+          "spell": 67,
+          "trap": 13
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "summon_ss",
+        "name": "特殊召唤成功",
+        "hits": {
+          "monster": 1377,
+          "spell": 164,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "summon_both",
+        "name": "通常或特召成功",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "summon_flip",
+        "name": "反转召唤成功",
+        "hits": {
+          "monster": 54,
+          "spell": 9,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "summon_fusion",
+        "name": "融合召唤成功",
+        "hits": {
+          "monster": 638,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "summon_ritual",
+        "name": "仪式召唤成功",
+        "hits": {
+          "monster": 31,
+          "spell": 92,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "summon_synchro",
+        "name": "同调召唤成功",
+        "hits": {
+          "monster": 559,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "summon_xyz",
+        "name": "超量召唤成功",
+        "hits": {
+          "monster": 635,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "summon_link",
+        "name": "连接召唤成功",
+        "hits": {
+          "monster": 492,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "summon_with_mat",
+        "name": "含素材召唤",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "summon_negated",
+        "name": "召唤被无效",
+        "hits": {
+          "monster": 22,
+          "spell": 0,
+          "trap": 27
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "mset",
+        "name": "盖放",
+        "hits": {
+          "monster": 23,
+          "spell": 5,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "destroyed_battle_or_effect",
+        "name": "被破坏",
+        "hits": {
+          "monster": 1521,
+          "spell": 108,
+          "trap": 75
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "destroyed_by_oppo",
+        "name": "被对手破坏",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "battle_destroy_oppo",
+        "name": "战斗破坏对手怪兽",
+        "hits": {
+          "monster": 277,
+          "spell": 33,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "battle_destroyed_self",
+        "name": "自身被战斗破坏",
+        "hits": {
+          "monster": 277,
+          "spell": 24,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "field_card_destroyed",
+        "name": "场上卡被破坏",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "to_grave_general",
+        "name": "送去墓地",
+        "hits": {
+          "monster": 0,
+          "spell": 185,
+          "trap": 113
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "to_grave_from_field_summoned",
+        "name": "场上特召后被送墓",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "to_grave_self",
+        "name": "自身被送去墓地",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "discarded",
+        "name": "被丢弃",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 3
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "deck_to_grave",
+        "name": "卡组送墓",
+        "hits": {
+          "monster": 201,
+          "spell": 23,
+          "trap": 23
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "banished_self",
+        "name": "自身被除外",
+        "hits": {
+          "monster": 0,
+          "spell": 28,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "field_card_banished",
+        "name": "场上卡被除外",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "temporary_banish",
+        "name": "暂时除外",
+        "hits": {
+          "monster": 0,
+          "spell": 8,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "attack_announce",
+        "name": "攻击宣言",
+        "hits": {
+          "monster": 0,
+          "spell": 65,
+          "trap": 144
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "be_battle_target",
+        "name": "成为攻击对象",
+        "hits": {
+          "monster": 115,
+          "spell": 0,
+          "trap": 25
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "pre_damage_calculate",
+        "name": "伤害计算前",
+        "hits": {
+          "monster": 94,
+          "spell": 18,
+          "trap": 20
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "battle_damage",
+        "name": "战斗伤害发生",
+        "hits": {
+          "monster": 0,
+          "spell": 23,
+          "trap": 22
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "battled",
+        "name": "战斗结束",
+        "hits": {
+          "monster": 121,
+          "spell": 26,
+          "trap": 13
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "damage_step_end",
+        "name": "伤害步骤结束",
+        "hits": {
+          "monster": 107,
+          "spell": 26,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "attack_disabled",
+        "name": "攻击被无效",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "standby_phase",
+        "name": "准备阶段",
+        "hits": {
+          "monster": 0,
+          "spell": 65,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "predraw",
+        "name": "抽牌阶段前",
+        "hits": {
+          "monster": 0,
+          "spell": 10,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "end_phase",
+        "name": "结束阶段",
+        "hits": {
+          "monster": 0,
+          "spell": 179,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "phase_event",
+        "name": "阶段通用",
+        "hits": {
+          "monster": 874,
+          "spell": 265,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "turn_event",
+        "name": "回合/轮次",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 43
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "chaining",
+        "name": "发动时(反击时点)",
+        "hits": {
+          "monster": 616,
+          "spell": 67,
+          "trap": 278
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "chain_solving",
+        "name": "连锁结算中",
+        "hits": {
+          "monster": 85,
+          "spell": 35,
+          "trap": 22
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "chain_solved",
+        "name": "连锁结算后",
+        "hits": {
+          "monster": 93,
+          "spell": 0,
+          "trap": 21
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "chain_end",
+        "name": "连锁结束",
+        "hits": {
+          "monster": 17,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "chain_negated",
+        "name": "发动被无效",
+        "hits": {
+          "monster": 0,
+          "spell": 6,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "free_chain",
+        "name": "自由时点",
+        "hits": {
+          "monster": 940,
+          "spell": 2362,
+          "trap": 1519
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "continuous_faceup",
+        "name": "表侧在场常驻",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "continuous_summoned_faceup",
+        "name": "特召成功表侧常驻",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "spell_trap_act",
+        "name": "魔陷发动",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "spell_trap_continuous",
+        "name": "魔陷常驻",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "leave_field",
+        "name": "离开场上",
+        "hits": {
+          "monster": 0,
+          "spell": 72,
+          "trap": 87
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "change_pos",
+        "name": "表示形式改变",
+        "hits": {
+          "monster": 0,
+          "spell": 11,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "control_changed",
+        "name": "控制权变更",
+        "hits": {
+          "monster": 0,
+          "spell": 1,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "be_material",
+        "name": "成为素材",
+        "hits": {
+          "monster": 2,
+          "spell": 2,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "detach_material",
+        "name": "取除素材",
+        "hits": {
+          "monster": 2,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "equip_event",
+        "name": "装备",
+        "hits": {
+          "monster": 7,
+          "spell": 7,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "to_hand_event",
+        "name": "加入手卡",
+        "hits": {
+          "monster": 0,
+          "spell": 18,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "to_deck_event",
+        "name": "返回卡组",
+        "hits": {
+          "monster": 0,
+          "spell": 8,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "to_extra_event",
+        "name": "返回额外卡组",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "draw_event",
+        "name": "抽卡",
+        "hits": {
+          "monster": 0,
+          "spell": 13,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "move_event",
+        "name": "移动",
+        "hits": {
+          "monster": 0,
+          "spell": 4,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "add_counter_event",
+        "name": "放置指示物",
+        "hits": {
+          "monster": 0,
+          "spell": 1,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "remove_counter_event",
+        "name": "取除指示物",
+        "hits": {
+          "monster": 0,
+          "spell": 4,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "toss_coin_event",
+        "name": "掷硬币",
+        "hits": {
+          "monster": 0,
+          "spell": 1,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "toss_dice_event",
+        "name": "掷骰子",
+        "hits": {
+          "monster": 0,
+          "spell": 1,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "release_event",
+        "name": "解放",
+        "hits": {
+          "monster": 0,
+          "spell": 12,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      }
+    ],
+    "cost": [
+      {
+        "id": "none",
+        "name": "无代价",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "pay_lp",
+        "name": "支付生命值",
+        "hits": {
+          "monster": 69,
+          "spell": 78,
+          "trap": 47
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "discard",
+        "name": "丢弃手卡",
+        "hits": {
+          "monster": 378,
+          "spell": 157,
+          "trap": 82
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "release_self",
+        "name": "解放自身",
+        "hits": {
+          "monster": 277,
+          "spell": 1,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "release_monster_n",
+        "name": "解放怪兽N",
+        "hits": {
+          "monster": 503,
+          "spell": 115,
+          "trap": 238
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "detach_xyz",
+        "name": "取除超量素材",
+        "hits": {
+          "monster": 164,
+          "spell": 0,
+          "trap": 72
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "banish_gy_n",
+        "name": "除外墓地N张",
+        "hits": {
+          "monster": 0,
+          "spell": 219,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "self_banish",
+        "name": "自身除外",
+        "hits": {
+          "monster": 0,
+          "spell": 219,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "self_to_grave",
+        "name": "自身送墓",
+        "hits": {
+          "monster": 0,
+          "spell": 27,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "self_to_deck",
+        "name": "自身回卡组",
+        "hits": {
+          "monster": 0,
+          "spell": 2,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "reveal",
+        "name": "展示手卡",
+        "hits": {
+          "monster": 0,
+          "spell": 2,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "mill_deck_n",
+        "name": "卡组顶送墓",
+        "hits": {
+          "monster": 97,
+          "spell": 20,
+          "trap": 18
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "banish_hand_n",
+        "name": "除外手卡N张",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "send_to_grave_n",
+        "name": "送墓N张",
+        "hits": {
+          "monster": 1159,
+          "spell": 385,
+          "trap": 271
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "discard_self",
+        "name": "弃置自身",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "cost_and",
+        "name": "组合代价",
+        "hits": {
+          "monster": 0,
+          "spell": 5,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "activate_cost",
+        "name": "发动/召唤代价施加",
+        "hits": {
+          "monster": 0,
+          "spell": 4,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "remove_counter",
+        "name": "取除指示物作代价",
+        "hits": {
+          "monster": 33,
+          "spell": 19,
+          "trap": 5
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "other_costs",
+        "name": "其他低频代价",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      }
+    ],
+    "action": [
+      {
+        "id": "search_deck",
+        "name": "卡组检索加入手卡",
+        "hits": {
+          "monster": 1196,
+          "spell": 505,
+          "trap": 113
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "search_multi_zone",
+        "name": "多区域合并检索",
+        "hits": {
+          "monster": 0,
+          "spell": 193,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "salvage_grave",
+        "name": "墓地回收",
+        "hits": {
+          "monster": 0,
+          "spell": 103,
+          "trap": 23
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "salvage_banished",
+        "name": "除外区回收",
+        "hits": {
+          "monster": 943,
+          "spell": 193,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "salvage_extra",
+        "name": "额外/灵摆回收",
+        "hits": {
+          "monster": 48,
+          "spell": 14,
+          "trap": 14
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "dump_deck",
+        "name": "卡组送墓/堆墓",
+        "hits": {
+          "monster": 201,
+          "spell": 23,
+          "trap": 23
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "discard_deck",
+        "name": "削卡组",
+        "hits": {
+          "monster": 97,
+          "spell": 20,
+          "trap": 18
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "send_to_grave",
+        "name": "场上/手卡送墓",
+        "hits": {
+          "monster": 499,
+          "spell": 189,
+          "trap": 97
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "to_deck",
+        "name": "返回卡组",
+        "hits": {
+          "monster": 394,
+          "spell": 201,
+          "trap": 131
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "to_extra",
+        "name": "返回额外卡组",
+        "hits": {
+          "monster": 48,
+          "spell": 14,
+          "trap": 14
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "excavate",
+        "name": "反转卡组顶并处理",
+        "hits": {
+          "monster": 98,
+          "spell": 44,
+          "trap": 15
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "sort_decktop",
+        "name": "卡组顶排序",
+        "hits": {
+          "monster": 22,
+          "spell": 14,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "sort_deckbottom",
+        "name": "卡组底排序",
+        "hits": {
+          "monster": 30,
+          "spell": 0,
+          "trap": 8
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "move_deck_top",
+        "name": "置于卡组顶",
+        "hits": {
+          "monster": 6,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "move_deck_bottom",
+        "name": "置于卡组底",
+        "hits": {
+          "monster": 23,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "shuffle_hand",
+        "name": "洗切手卡",
+        "hits": {
+          "monster": 291,
+          "spell": 156,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "shuffle_deck",
+        "name": "洗切卡组",
+        "hits": {
+          "monster": 124,
+          "spell": 113,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "shuffle_extra",
+        "name": "洗切额外",
+        "hits": {
+          "monster": 23,
+          "spell": 13,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "special_summon",
+        "name": "从指定区域特召",
+        "hits": {
+          "monster": 3581,
+          "spell": 937,
+          "trap": 716
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "revive_grave",
+        "name": "墓地复活",
+        "hits": {
+          "monster": 0,
+          "spell": 751,
+          "trap": 642
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "special_summon_banished",
+        "name": "除外区特召",
+        "hits": {
+          "monster": 943,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "special_summon_extra",
+        "name": "额外卡组特召",
+        "hits": {
+          "monster": 124,
+          "spell": 124,
+          "trap": 72
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "special_summon_multi",
+        "name": "多体同时特召",
+        "hits": {
+          "monster": 401,
+          "spell": 162,
+          "trap": 215
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "special_summon_oppo",
+        "name": "给对方特召",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "token_summon",
+        "name": "展开衍生物",
+        "hits": {
+          "monster": 137,
+          "spell": 63,
+          "trap": 36
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "special_summon_procedure",
+        "name": "执行手续召唤",
+        "hits": {
+          "monster": 0,
+          "spell": 126,
+          "trap": 17
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "trap_monster",
+        "name": "陷阱怪兽化",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 76
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "set_monster",
+        "name": "盖放怪兽",
+        "hits": {
+          "monster": 23,
+          "spell": 123,
+          "trap": 147
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "summon_normal",
+        "name": "通常召唤",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 13
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "destroy_target",
+        "name": "破坏",
+        "hits": {
+          "monster": 1521,
+          "spell": 340,
+          "trap": 493
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "destroy_dynamic",
+        "name": "动态数量破坏",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "banish_target",
+        "name": "除外",
+        "hits": {
+          "monster": 474,
+          "spell": 184,
+          "trap": 156
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "to_hand_target",
+        "name": "弹回手卡",
+        "hits": {
+          "monster": 1878,
+          "spell": 747,
+          "trap": 267
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "release_target",
+        "name": "解放(作为效果)",
+        "hits": {
+          "monster": 40,
+          "spell": 13,
+          "trap": 7
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "discard_hand",
+        "name": "效果弃手",
+        "hits": {
+          "monster": 149,
+          "spell": 76,
+          "trap": 42
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "attach_overlay",
+        "name": "吸素材/挂载超量素材",
+        "hits": {
+          "monster": 164,
+          "spell": 0,
+          "trap": 72
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "detach_overlay_effect",
+        "name": "取除超量素材(效果)",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 9
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "move_to_field",
+        "name": "直接置场",
+        "hits": {
+          "monster": 147,
+          "spell": 59,
+          "trap": 33
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "move_sequence",
+        "name": "换位",
+        "hits": {
+          "monster": 0,
+          "spell": 30,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "select_disable_field",
+        "name": "区域封锁",
+        "hits": {
+          "monster": 0,
+          "spell": 11,
+          "trap": 11
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "return_to_field",
+        "name": "返回场上",
+        "hits": {
+          "monster": 40,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "atk_change",
+        "name": "攻击力增减",
+        "hits": {
+          "monster": 1319,
+          "spell": 434,
+          "trap": 159
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "def_change",
+        "name": "守备力增减",
+        "hits": {
+          "monster": 292,
+          "spell": 143,
+          "trap": 38
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "atk_set",
+        "name": "攻击力设定",
+        "hits": {
+          "monster": 262,
+          "spell": 60,
+          "trap": 41
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "def_set",
+        "name": "守备力设定",
+        "hits": {
+          "monster": 0,
+          "spell": 16,
+          "trap": 20
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "atk_def_swap",
+        "name": "攻守交换/减半",
+        "hits": {
+          "monster": 6,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "level_change",
+        "name": "等级/阶级变动",
+        "hits": {
+          "monster": 338,
+          "spell": 69,
+          "trap": 32
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "change_attribute",
+        "name": "属性变更/追加",
+        "hits": {
+          "monster": 76,
+          "spell": 14,
+          "trap": 10
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "change_race",
+        "name": "种族变更/追加",
+        "hits": {
+          "monster": 35,
+          "spell": 16,
+          "trap": 13
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "change_type",
+        "name": "种类变更/追加",
+        "hits": {
+          "monster": 154,
+          "spell": 21,
+          "trap": 10
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "change_code",
+        "name": "卡名/卡号变更",
+        "hits": {
+          "monster": 146,
+          "spell": 17,
+          "trap": 9
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "add_setcode",
+        "name": "追加字段",
+        "hits": {
+          "monster": 5,
+          "spell": 0,
+          "trap": 5
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "scale_change",
+        "name": "灵摆刻度变动",
+        "hits": {
+          "monster": 29,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "reverse_damage",
+        "name": "伤害/回复反转",
+        "hits": {
+          "monster": 6,
+          "spell": 0,
+          "trap": 3
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "double_damage",
+        "name": "伤害翻倍",
+        "hits": {
+          "monster": 0,
+          "spell": 39,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "direct_attack",
+        "name": "直接攻击",
+        "hits": {
+          "monster": 163,
+          "spell": 27,
+          "trap": 4
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "extra_attack",
+        "name": "追加攻击",
+        "hits": {
+          "monster": 172,
+          "spell": 30,
+          "trap": 11
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "attack_all",
+        "name": "攻击所有怪兽",
+        "hits": {
+          "monster": 38,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "pierce",
+        "name": "贯穿",
+        "hits": {
+          "monster": 157,
+          "spell": 22,
+          "trap": 8
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "defense_attack",
+        "name": "守备表示攻击",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 2
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "bp_twice",
+        "name": "两次战斗阶段",
+        "hits": {
+          "monster": 2,
+          "spell": 0,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "change_battle_damage",
+        "name": "战斗伤害改写",
+        "hits": {
+          "monster": 62,
+          "spell": 17,
+          "trap": 9
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "avoid_battle_damage",
+        "name": "战斗伤害防止",
+        "hits": {
+          "monster": 95,
+          "spell": 20,
+          "trap": 21
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "no_battle_damage",
+        "name": "无战斗伤害",
+        "hits": {
+          "monster": 17,
+          "spell": 0,
+          "trap": 5
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "change_damage",
+        "name": "效果伤害改写",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 26
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "no_effect_damage",
+        "name": "效果伤害归零",
+        "hits": {
+          "monster": 0,
+          "spell": 13,
+          "trap": 14
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "reflect_battle_damage",
+        "name": "反射战斗伤害",
+        "hits": {
+          "monster": 23,
+          "spell": 0,
+          "trap": 3
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "negate_attack",
+        "name": "无效攻击",
+        "hits": {
+          "monster": 64,
+          "spell": 15,
+          "trap": 45
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "change_attack_target",
+        "name": "攻击对象转移",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 17
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "must_attack",
+        "name": "强制攻击",
+        "hits": {
+          "monster": 55,
+          "spell": 0,
+          "trap": 22
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "attack_restriction",
+        "name": "攻击限制",
+        "hits": {
+          "monster": 208,
+          "spell": 111,
+          "trap": 33
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "change_control",
+        "name": "控制权转移",
+        "hits": {
+          "monster": 119,
+          "spell": 36,
+          "trap": 38
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "swap_control",
+        "name": "控制权交换",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 7
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "change_position",
+        "name": "表示形式变更",
+        "hits": {
+          "monster": 295,
+          "spell": 64,
+          "trap": 80
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "set_position_forced",
+        "name": "强制表示形式",
+        "hits": {
+          "monster": 9,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "negate_activation",
+        "name": "无效卡的发动",
+        "hits": {
+          "monster": 229,
+          "spell": 3,
+          "trap": 156
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "negate_effect",
+        "name": "无效效果",
+        "hits": {
+          "monster": 151,
+          "spell": 36,
+          "trap": 72
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "negate_summon",
+        "name": "无效召唤",
+        "hits": {
+          "monster": 22,
+          "spell": 0,
+          "trap": 28
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "negate_and_destroy",
+        "name": "无效并破坏",
+        "hits": {
+          "monster": 229,
+          "spell": 3,
+          "trap": 93
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "negate_punish",
+        "name": "无效后惩罚",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "negate_related_chain",
+        "name": "相关连锁无效",
+        "hits": {
+          "monster": 63,
+          "spell": 9,
+          "trap": 31
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "disable_effect",
+        "name": "效果无效化挂载",
+        "hits": {
+          "monster": 604,
+          "spell": 176,
+          "trap": 168
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "disable_trapmonster",
+        "name": "陷阱怪兽无效",
+        "hits": {
+          "monster": 40,
+          "spell": 0,
+          "trap": 10
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "cannot_activate",
+        "name": "封锁发动",
+        "hits": {
+          "monster": 200,
+          "spell": 73,
+          "trap": 46
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "cannot_trigger",
+        "name": "封锁触发",
+        "hits": {
+          "monster": 62,
+          "spell": 30,
+          "trap": 20
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "cannot_disable",
+        "name": "不可被无效",
+        "hits": {
+          "monster": 47,
+          "spell": 278,
+          "trap": 10
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "ignore_immune",
+        "name": "无视免疫",
+        "hits": {
+          "monster": 379,
+          "spell": 163,
+          "trap": 103
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "immune_effect",
+        "name": "效果免疫",
+        "hits": {
+          "monster": 165,
+          "spell": 38,
+          "trap": 42
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "indestructible",
+        "name": "不可破坏",
+        "hits": {
+          "monster": 801,
+          "spell": 152,
+          "trap": 108
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "destroy_replace",
+        "name": "破坏替代",
+        "hits": {
+          "monster": 170,
+          "spell": 72,
+          "trap": 24
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "leave_field_redirect",
+        "name": "离场去向改写",
+        "hits": {
+          "monster": 216,
+          "spell": 16,
+          "trap": 44
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "to_grave_redirect",
+        "name": "送墓/除外重定向",
+        "hits": {
+          "monster": 62,
+          "spell": 5,
+          "trap": 8
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "self_destroy",
+        "name": "自我离场/自毁",
+        "hits": {
+          "monster": 0,
+          "spell": 11,
+          "trap": 18
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "untargetable",
+        "name": "不可取对象",
+        "hits": {
+          "monster": 279,
+          "spell": 62,
+          "trap": 29
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "cannot_remove",
+        "name": "区域/动作禁止",
+        "hits": {
+          "monster": 11,
+          "spell": 0,
+          "trap": 13
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_special_summon",
+        "name": "特召封锁",
+        "hits": {
+          "monster": 615,
+          "spell": 217,
+          "trap": 76
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "lock_summon",
+        "name": "召唤封锁",
+        "hits": {
+          "monster": 115,
+          "spell": 88,
+          "trap": 39
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "skip_phase",
+        "name": "跳过阶段/回合",
+        "hits": {
+          "monster": 43,
+          "spell": 19,
+          "trap": 22
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "extra_summon_count",
+        "name": "追加召唤/盖放次数",
+        "hits": {
+          "monster": 56,
+          "spell": 22,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "tribute_modify",
+        "name": "祭品相关",
+        "hits": {
+          "monster": 58,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "unreleasable",
+        "name": "不可解放/不可作素材",
+        "hits": {
+          "monster": 252,
+          "spell": 38,
+          "trap": 29
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_misc",
+        "name": "不可变形式/控制权",
+        "hits": {
+          "monster": 52,
+          "spell": 12,
+          "trap": 22
+        },
+        "support": "partial",
+        "priority": "P2"
+      },
+      {
+        "id": "draw_count_rewrite",
+        "name": "抽卡/手牌上限改写",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 8
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "unique_on_field",
+        "name": "场地唯一",
+        "hits": {
+          "monster": 0,
+          "spell": 34,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "add_counter",
+        "name": "放置指示物",
+        "hits": {
+          "monster": 160,
+          "spell": 77,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "remove_counter_effect",
+        "name": "取除指示物",
+        "hits": {
+          "monster": 86,
+          "spell": 19,
+          "trap": 5
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "counter_permit",
+        "name": "指示物许可/放大",
+        "hits": {
+          "monster": 0,
+          "spell": 63,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "equip",
+        "name": "装备",
+        "hits": {
+          "monster": 258,
+          "spell": 269,
+          "trap": 72
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "equip_procedure",
+        "name": "装备手续",
+        "hits": {
+          "monster": 0,
+          "spell": 250,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "equip_limit",
+        "name": "装备限制",
+        "hits": {
+          "monster": 135,
+          "spell": 50,
+          "trap": 60
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "union",
+        "name": "同盟",
+        "hits": {
+          "monster": 40,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "field_zone",
+        "name": "场地驻留",
+        "hits": {
+          "monster": 0,
+          "spell": 330,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "continuous_residence",
+        "name": "永续驻留",
+        "hits": {
+          "monster": 0,
+          "spell": 649,
+          "trap": 547
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "spsummon_proc",
+        "name": "自身特召手续",
+        "hits": {
+          "monster": 635,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "normal_summon_procedure",
+        "name": "通常召唤手续替代",
+        "hits": {
+          "monster": 94,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "fusion_procedure",
+        "name": "融合手续",
+        "hits": {
+          "monster": 357,
+          "spell": 86,
+          "trap": 17
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "synchro_procedure",
+        "name": "同调手续",
+        "hits": {
+          "monster": 559,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "xyz_procedure",
+        "name": "超量手续",
+        "hits": {
+          "monster": 635,
+          "spell": 0,
+          "trap": 10
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "link_procedure",
+        "name": "连接手续",
+        "hits": {
+          "monster": 492,
+          "spell": 0,
+          "trap": 7
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "ritual_procedure",
+        "name": "仪式手续",
+        "hits": {
+          "monster": 31,
+          "spell": 95,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "pendulum_procedure",
+        "name": "灵摆手续",
+        "hits": {
+          "monster": 390,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "material_check",
+        "name": "素材检查与替代",
+        "hits": {
+          "monster": 166,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "spsummon_condition",
+        "name": "苏生限制/特召条件",
+        "hits": {
+          "monster": 504,
+          "spell": 0,
+          "trap": 2
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "pendulum_move",
+        "name": "置于摆区",
+        "hits": {
+          "monster": 147,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "toss_coin",
+        "name": "掷硬币",
+        "hits": {
+          "monster": 40,
+          "spell": 8,
+          "trap": 9
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "toss_dice",
+        "name": "掷骰子",
+        "hits": {
+          "monster": 28,
+          "spell": 9,
+          "trap": 6
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "random_select",
+        "name": "随机选择",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "win_condition",
+        "name": "胜利条件",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 7
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "break_effect",
+        "name": "分段结算",
+        "hits": {
+          "monster": 911,
+          "spell": 478,
+          "trap": 351
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "set_label",
+        "name": "标签传参",
+        "hits": {
+          "monster": 874,
+          "spell": 418,
+          "trap": 305
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "get_chain_info",
+        "name": "取链上信息",
+        "hits": {
+          "monster": 995,
+          "spell": 402,
+          "trap": 322
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "select_effect",
+        "name": "分支选择",
+        "hits": {
+          "monster": 0,
+          "spell": 127,
+          "trap": 73
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "select_yes_no",
+        "name": "是/否选择",
+        "hits": {
+          "monster": 0,
+          "spell": 334,
+          "trap": 219
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "select_unselect_group",
+        "name": "多选组",
+        "hits": {
+          "monster": 427,
+          "spell": 0,
+          "trap": 105
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "chain_limit",
+        "name": "连锁封锁",
+        "hits": {
+          "monster": 60,
+          "spell": 10,
+          "trap": 10
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "delayed_operation",
+        "name": "延迟处理",
+        "hits": {
+          "monster": 30,
+          "spell": 20,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "register_flag_effect",
+        "name": "标记效果/全局检查",
+        "hits": {
+          "monster": 181,
+          "spell": 294,
+          "trap": 66
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "hint_timing",
+        "name": "提示时点",
+        "hits": {
+          "monster": 0,
+          "spell": 347,
+          "trap": 1519
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "persistent_target",
+        "name": "持续目标锁定",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 23
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "burn_damage",
+        "name": "造成伤害",
+        "hits": {
+          "monster": 493,
+          "spell": 123,
+          "trap": 129
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "gain_lp",
+        "name": "回复LP",
+        "hits": {
+          "monster": 134,
+          "spell": 62,
+          "trap": 54
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "set_lp",
+        "name": "设定LP",
+        "hits": {
+          "monster": 30,
+          "spell": 37,
+          "trap": 14
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "draw_cards",
+        "name": "抽卡",
+        "hits": {
+          "monster": 424,
+          "spell": 0,
+          "trap": 126
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "announce",
+        "name": "宣言",
+        "hits": {
+          "monster": 102,
+          "spell": 40,
+          "trap": 35
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "client_hint",
+        "name": "客户提示",
+        "hits": {
+          "monster": 1036,
+          "spell": 0,
+          "trap": 214
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "oath",
+        "name": "誓约",
+        "hits": {
+          "monster": 219,
+          "spell": 589,
+          "trap": 26
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "reset",
+        "name": "持续时长/重置",
+        "hits": {
+          "monster": 3390,
+          "spell": 996,
+          "trap": 700
+        },
+        "support": "none",
+        "priority": "P0"
+      }
+    ],
+    "target": [
+      {
+        "id": "none",
+        "name": "不取对象",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "target_field_card",
+        "name": "取场上卡为对象",
+        "hits": {
+          "monster": 3535,
+          "spell": 1086,
+          "trap": 879
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "target_oppo_card",
+        "name": "取对手场上卡",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "target_oppo_monster",
+        "name": "取对手怪兽",
+        "hits": {
+          "monster": 3419,
+          "spell": 997,
+          "trap": 752
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "target_self_monster",
+        "name": "取自己怪兽",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "target_grave_monster",
+        "name": "取墓地怪兽",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "target_banished",
+        "name": "取除外卡",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "target_player",
+        "name": "取玩家为对象",
+        "hits": {
+          "monster": 0,
+          "spell": 570,
+          "trap": 316
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "target_hand",
+        "name": "取手卡",
+        "hits": {
+          "monster": 0,
+          "spell": 864,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "target_extra",
+        "name": "取额外卡组",
+        "hits": {
+          "monster": 0,
+          "spell": 368,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "target_pzone",
+        "name": "取灵摆区",
+        "hits": {
+          "monster": 0,
+          "spell": 37,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "target_overlay",
+        "name": "取超量素材",
+        "hits": {
+          "monster": 0,
+          "spell": 6,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "count_any",
+        "name": "任意张(1-99)",
+        "hits": {
+          "monster": 5,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "set_target_range",
+        "name": "常驻目标范围",
+        "hits": {
+          "monster": 0,
+          "spell": 761,
+          "trap": 402
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "select_unselect_group",
+        "name": "多组联动选择",
+        "hits": {
+          "monster": 427,
+          "spell": 0,
+          "trap": 105
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "target_filter",
+        "name": "目标筛选",
+        "hits": {
+          "monster": 0,
+          "spell": 1164,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P0"
+      }
+    ],
+    "continuous": [
+      {
+        "id": "range",
+        "name": "驻留区域",
+        "hits": {
+          "monster": 84,
+          "spell": 1377,
+          "trap": 547
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "targetRange",
+        "name": "常驻适用目标范围",
+        "hits": {
+          "monster": 0,
+          "spell": 761,
+          "trap": 402
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "property",
+        "name": "结算标志",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "value",
+        "name": "常驻值",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "setAvailable",
+        "name": "里侧也可适用",
+        "hits": {
+          "monster": 123,
+          "spell": 55,
+          "trap": 65
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "cannotDisable",
+        "name": "不可被无效",
+        "hits": {
+          "monster": 2122,
+          "spell": 278,
+          "trap": 232
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "uncopyable",
+        "name": "不可复制",
+        "hits": {
+          "monster": 1327,
+          "spell": 28,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "singleRange",
+        "name": "单一范围",
+        "hits": {
+          "monster": 1486,
+          "spell": 71,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      }
+    ],
+    "valueSource": [
+      {
+        "id": "fixed",
+        "name": "固定值",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P0"
+      },
+      {
+        "id": "delta",
+        "name": "增量(可负)",
+        "hits": {
+          "monster": 1319,
+          "spell": 434,
+          "trap": 159
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "count_times",
+        "name": "计数×倍率",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "field_count",
+        "name": "场上数量×N",
+        "hits": {
+          "monster": 234,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "level_ref",
+        "name": "等级参照",
+        "hits": {
+          "monster": 0,
+          "spell": 241,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "atk_ref",
+        "name": "攻守参照",
+        "hits": {
+          "monster": 0,
+          "spell": 216,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "overlay_count",
+        "name": "素材数×N",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "ratio",
+        "name": "当前值比例",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "lp_diff",
+        "name": "LP差值",
+        "hits": {
+          "monster": 106,
+          "spell": 82,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "counter_count",
+        "name": "指示物数×N",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "dice_coin_result",
+        "name": "掷骰/硬币结果",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "paid_lp",
+        "name": "支付LP值换算",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "chosen_value",
+        "name": "选择/宣言值",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "formula",
+        "name": "公式表达式",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      }
+    ],
+    "restriction": [
+      {
+        "id": "lock_special_summon",
+        "name": "不能特召(群体)",
+        "hits": {
+          "monster": 615,
+          "spell": 217,
+          "trap": 76
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "lock_summon",
+        "name": "不能通常召唤",
+        "hits": {
+          "monster": 71,
+          "spell": 45,
+          "trap": 19
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_mset",
+        "name": "不能里侧盖放",
+        "hits": {
+          "monster": 23,
+          "spell": 16,
+          "trap": 6
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_sset",
+        "name": "不能盖放魔陷",
+        "hits": {
+          "monster": 7,
+          "spell": 17,
+          "trap": 3
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_flip_summon",
+        "name": "不能反转召唤",
+        "hits": {
+          "monster": 14,
+          "spell": 10,
+          "trap": 11
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_attack",
+        "name": "不能攻击",
+        "hits": {
+          "monster": 208,
+          "spell": 111,
+          "trap": 33
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_attack_announce",
+        "name": "不能攻击宣言",
+        "hits": {
+          "monster": 63,
+          "spell": 34,
+          "trap": 14
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_direct_attack",
+        "name": "不能直接攻击",
+        "hits": {
+          "monster": 62,
+          "spell": 18,
+          "trap": 20
+        },
+        "support": "partial",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_must_attack",
+        "name": "必须攻击",
+        "hits": {
+          "monster": 55,
+          "spell": 0,
+          "trap": 22
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_only_attack_monster",
+        "name": "只能攻击某怪",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 3
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_battle_target",
+        "name": "不能成为攻击对象",
+        "hits": {
+          "monster": 55,
+          "spell": 55,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_select_battle_target",
+        "name": "不能选择战斗目标",
+        "hits": {
+          "monster": 93,
+          "spell": 21,
+          "trap": 11
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_ignore_battle_target",
+        "name": "无视战斗目标",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 4
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_cannot_activate",
+        "name": "不能发动",
+        "hits": {
+          "monster": 200,
+          "spell": 73,
+          "trap": 46
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "lock_cannot_trigger",
+        "name": "不能触发",
+        "hits": {
+          "monster": 62,
+          "spell": 30,
+          "trap": 20
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_change_position",
+        "name": "不能变更表示形式",
+        "hits": {
+          "monster": 41,
+          "spell": 12,
+          "trap": 22
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_change_control",
+        "name": "不能变更控制权",
+        "hits": {
+          "monster": 11,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_turn_set",
+        "name": "不能里侧变",
+        "hits": {
+          "monster": 6,
+          "spell": 0,
+          "trap": 2
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_unreleasable_sum",
+        "name": "不能解放(上级)",
+        "hits": {
+          "monster": 39,
+          "spell": 23,
+          "trap": 8
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_unreleasable_nonsum",
+        "name": "不能解放(非上级)",
+        "hits": {
+          "monster": 26,
+          "spell": 15,
+          "trap": 8
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_unreleasable_effect",
+        "name": "不能解放(效果)",
+        "hits": {
+          "monster": 1,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_remove",
+        "name": "不能除外",
+        "hits": {
+          "monster": 11,
+          "spell": 0,
+          "trap": 4
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_to_grave",
+        "name": "不能送墓",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_to_hand",
+        "name": "不能回手",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 3
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_to_deck",
+        "name": "不能回卡组",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 3
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_draw",
+        "name": "不能抽卡",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 2
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_synchro_material",
+        "name": "不能作同调素材",
+        "hits": {
+          "monster": 64,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_xyz_material",
+        "name": "不能作超量素材",
+        "hits": {
+          "monster": 40,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_fusion_material",
+        "name": "不能作融合素材",
+        "hits": {
+          "monster": 17,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_link_material",
+        "name": "不能作连接素材",
+        "hits": {
+          "monster": 45,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_be_material",
+        "name": "不能作任意素材",
+        "hits": {
+          "monster": 21,
+          "spell": 0,
+          "trap": 5
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "lock_synchro_mat_restriction",
+        "name": "同调素材限制",
+        "hits": {
+          "monster": 13,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_battle_phase",
+        "name": "不能战斗阶段",
+        "hits": {
+          "monster": 23,
+          "spell": 19,
+          "trap": 7
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "skip_phase",
+        "name": "跳过阶段/回合",
+        "hits": {
+          "monster": 43,
+          "spell": 19,
+          "trap": 22
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "extra_summon_count",
+        "name": "追加召唤次数",
+        "hits": {
+          "monster": 51,
+          "spell": 22,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "extra_set_count",
+        "name": "追加盖放次数",
+        "hits": {
+          "monster": 5,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "set_summon_count_limit",
+        "name": "召唤次数上限",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "double_tribute",
+        "name": "双祭品",
+        "hits": {
+          "monster": 25,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "decrease_tribute",
+        "name": "减祭品",
+        "hits": {
+          "monster": 4,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "extra_tribute",
+        "name": "追加祭品",
+        "hits": {
+          "monster": 20,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "tribute_limit",
+        "name": "祭品上限",
+        "hits": {
+          "monster": 9,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_field_zone",
+        "name": "区域封锁",
+        "hits": {
+          "monster": 0,
+          "spell": 11,
+          "trap": 11
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "lock_unique",
+        "name": "场地唯一",
+        "hits": {
+          "monster": 0,
+          "spell": 34,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "rule_rewrite",
+        "name": "规则改写",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 8
+        },
+        "support": "none",
+        "priority": "P2"
+      }
+    ],
+    "resistance": [
+      {
+        "id": "immune_all",
+        "name": "效果免疫(全部)",
+        "hits": {
+          "monster": 165,
+          "spell": 38,
+          "trap": 42
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "immune_by_source",
+        "name": "效果免疫(按来源)",
+        "hits": {
+          "monster": 165,
+          "spell": 38,
+          "trap": 42
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "indestructible_battle",
+        "name": "不可战斗破坏",
+        "hits": {
+          "monster": 408,
+          "spell": 54,
+          "trap": 54
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "indestructible_effect",
+        "name": "不可效果破坏",
+        "hits": {
+          "monster": 325,
+          "spell": 70,
+          "trap": 45
+        },
+        "support": "none",
+        "priority": "P0"
+      },
+      {
+        "id": "indestructible_count",
+        "name": "不可破坏(可数)",
+        "hits": {
+          "monster": 68,
+          "spell": 28,
+          "trap": 9
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "indestructible",
+        "name": "不可破坏(通用)",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "destroy_replace",
+        "name": "破坏替代",
+        "hits": {
+          "monster": 155,
+          "spell": 67,
+          "trap": 23
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "destroy_substitute",
+        "name": "代破",
+        "hits": {
+          "monster": 15,
+          "spell": 5,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "leave_field_redirect",
+        "name": "离场改写",
+        "hits": {
+          "monster": 216,
+          "spell": 16,
+          "trap": 44
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "to_grave_redirect",
+        "name": "送墓改写",
+        "hits": {
+          "monster": 39,
+          "spell": 5,
+          "trap": 6
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "remove_redirect",
+        "name": "除外改写",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "battle_destroy_redirect",
+        "name": "战破改写",
+        "hits": {
+          "monster": 14,
+          "spell": 0,
+          "trap": 2
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "send_replace",
+        "name": "送去替代",
+        "hits": {
+          "monster": 3,
+          "spell": 0,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "cost_replace",
+        "name": "代价替代",
+        "hits": {
+          "monster": 4,
+          "spell": 0,
+          "trap": 2
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "overlay_remove_replace",
+        "name": "素材取除替代",
+        "hits": {
+          "monster": 3,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "to_hand_redirect",
+        "name": "回手改写",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "to_deck_redirect",
+        "name": "回卡组改写",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "cannot_be_effect_target",
+        "name": "不可取效果对象",
+        "hits": {
+          "monster": 224,
+          "spell": 62,
+          "trap": 29
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "cannot_be_battle_target",
+        "name": "不可取攻击对象",
+        "hits": {
+          "monster": 55,
+          "spell": 55,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "self_leave",
+        "name": "自我离场/留场",
+        "hits": {
+          "monster": 0,
+          "spell": 11,
+          "trap": 18
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "immune_condition",
+        "name": "抗性豁免条件",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      }
+    ],
+    "chain": [
+      {
+        "id": "set_label",
+        "name": "标签传参",
+        "hits": {
+          "monster": 874,
+          "spell": 418,
+          "trap": 305
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "set_target_card",
+        "name": "目标卡保持",
+        "hits": {
+          "monster": 0,
+          "spell": 160,
+          "trap": 192
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "set_target_player",
+        "name": "目标玩家保持",
+        "hits": {
+          "monster": 0,
+          "spell": 244,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "set_target_param",
+        "name": "参数保持",
+        "hits": {
+          "monster": 0,
+          "spell": 248,
+          "trap": 141
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "get_chain_info",
+        "name": "取链上信息",
+        "hits": {
+          "monster": 995,
+          "spell": 402,
+          "trap": 322
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "break_effect",
+        "name": "分段结算",
+        "hits": {
+          "monster": 911,
+          "spell": 478,
+          "trap": 351
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "set_chain_limit",
+        "name": "连锁封锁",
+        "hits": {
+          "monster": 60,
+          "spell": 10,
+          "trap": 10
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "set_chain_limit_till_end",
+        "name": "连锁至结束封锁",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "change_chain_operation",
+        "name": "改写连锁操作",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 7
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "select_effect",
+        "name": "分支选择",
+        "hits": {
+          "monster": 0,
+          "spell": 127,
+          "trap": 73
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "select_yes_no",
+        "name": "是/否选择",
+        "hits": {
+          "monster": 0,
+          "spell": 334,
+          "trap": 219
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "select_option",
+        "name": "选项选择",
+        "hits": {
+          "monster": 0,
+          "spell": 59,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "select_unselect_group",
+        "name": "多选组",
+        "hits": {
+          "monster": 427,
+          "spell": 0,
+          "trap": 105
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "delayed_operation",
+        "name": "延迟处理",
+        "hits": {
+          "monster": 30,
+          "spell": 20,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "register_flag_effect",
+        "name": "标记效果",
+        "hits": {
+          "monster": 181,
+          "spell": 294,
+          "trap": 66
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "global_check",
+        "name": "全局检查",
+        "hits": {
+          "monster": 90,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "persistent_target",
+        "name": "持续目标锁定",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 23
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "set_hint_timing",
+        "name": "提示时点",
+        "hits": {
+          "monster": 0,
+          "spell": 347,
+          "trap": 1519
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "set_possible_operation_info",
+        "name": "可能操作声明",
+        "hits": {
+          "monster": 0,
+          "spell": 283,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P2"
+      },
+      {
+        "id": "raise_event",
+        "name": "公告事件",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 26
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "get_operated_group",
+        "name": "取操作过的卡组",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 63
+        },
+        "support": "none",
+        "priority": "P2"
+      }
+    ],
+    "ruleTexts": [
+      {
+        "id": "alias",
+        "name": "规则视作其他卡名",
+        "hits": {
+          "monster": 6,
+          "spell": 0,
+          "trap": 5
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "ssOncePerTurn",
+        "name": "同名卡一回合特召一次",
+        "hits": {
+          "monster": 77,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "cannotNormalSummon",
+        "name": "不能通常召唤/苏生限制",
+        "hits": {
+          "monster": 3705,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "cannotSpecialSummon",
+        "name": "不能特殊召唤",
+        "hits": {
+          "monster": 1055,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "cannotMSet",
+        "name": "不能里侧盖放",
+        "hits": {
+          "monster": 83,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "cannotTrigger",
+        "name": "效果不能发动",
+        "hits": {
+          "monster": 198,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "materialRestriction",
+        "name": "不能作为素材",
+        "hits": {
+          "monster": 139,
+          "spell": 0,
+          "trap": 5
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "cannotBeReleased",
+        "name": "不能解放",
+        "hits": {
+          "monster": 226,
+          "spell": 38,
+          "trap": 16
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "cannotChangePosition",
+        "name": "不能变更表示形式",
+        "hits": {
+          "monster": 137,
+          "spell": 12,
+          "trap": 22
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "cannotAttack",
+        "name": "不能攻击",
+        "hits": {
+          "monster": 731,
+          "spell": 111,
+          "trap": 33
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "cannotBeAttacked",
+        "name": "不能成为攻击对象",
+        "hits": {
+          "monster": 114,
+          "spell": 55,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "canDirectAttack",
+        "name": "可以直接攻击",
+        "hits": {
+          "monster": 411,
+          "spell": 27,
+          "trap": 4
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "addMonsterType",
+        "name": "规则上追加种类",
+        "hits": {
+          "monster": 179,
+          "spell": 16,
+          "trap": 3
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "ruleAttribute",
+        "name": "规则上变更属性",
+        "hits": {
+          "monster": 153,
+          "spell": 14,
+          "trap": 10
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "ruleRace",
+        "name": "规则上变更种族",
+        "hits": {
+          "monster": 157,
+          "spell": 16,
+          "trap": 13
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "ruleLevel",
+        "name": "规则上变更等级",
+        "hits": {
+          "monster": 308,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "full",
+        "priority": "P1"
+      },
+      {
+        "id": "procSummonType",
+        "name": "召唤方式手续",
+        "hits": {
+          "monster": 3538,
+          "spell": 221,
+          "trap": 17
+        },
+        "support": "partial",
+        "priority": "P0"
+      },
+      {
+        "id": "customRule",
+        "name": "自定义独有规则",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P2"
+      },
+      {
+        "id": "trapActInSetTurn",
+        "name": "陷阱盖放回合可发动",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 28
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "trapActInHand",
+        "name": "陷阱可从手牌发动",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 30
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "ruleScale",
+        "name": "灵摆刻度",
+        "hits": {
+          "monster": 529,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "cannotBeNegated",
+        "name": "效果不可被无效",
+        "hits": {
+          "monster": 47,
+          "spell": 288,
+          "trap": 10
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "countCodeDuel",
+        "name": "决斗一次",
+        "hits": {
+          "monster": 39,
+          "spell": 7,
+          "trap": 4
+        },
+        "support": "partial",
+        "priority": "P1"
+      },
+      {
+        "id": "countCodeChain",
+        "name": "每连锁一次",
+        "hits": {
+          "monster": 28,
+          "spell": 6,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "oath",
+        "name": "誓约",
+        "hits": {
+          "monster": 219,
+          "spell": 589,
+          "trap": 26
+        },
+        "support": "none",
+        "priority": "P1"
+      },
+      {
+        "id": "uniqueOnField",
+        "name": "场地唯一",
+        "hits": {
+          "monster": 0,
+          "spell": 34,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "materialCheck",
+        "name": "素材检查/属性保存",
+        "hits": {
+          "monster": 166,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "fusionSubstitute",
+        "name": "融合素材替代",
+        "hits": {
+          "monster": 12,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "extraMaterial",
+        "name": "额外素材",
+        "hits": {
+          "monster": 32,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "synchroMaterialCustom",
+        "name": "同调素材自定义",
+        "hits": {
+          "monster": 9,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "multipleTuners",
+        "name": "多重调整/非调整",
+        "hits": {
+          "monster": 40,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "xyzLevel",
+        "name": "超量等级",
+        "hits": {
+          "monster": 17,
+          "spell": 0,
+          "trap": 0
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "publicCard",
+        "name": "公开手卡/里侧适用",
+        "hits": {
+          "monster": 0,
+          "spell": 8,
+          "trap": 7
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "drawCount",
+        "name": "抽卡数改写",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 4
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "handLimit",
+        "name": "手牌上限",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 1
+        },
+        "support": "none",
+        "priority": "P2"
+      },
+      {
+        "id": "winCondition",
+        "name": "胜利条件",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 7
+        },
+        "support": "none",
+        "priority": "P2"
+      }
+    ]
+  },
+  "parameters": [
+    {
+      "name": "count",
+      "meaning": "操作/选择数量",
+      "domain": "1~5;任意用 1,99",
+      "default": "1",
+      "appliesTo": [
+        "search_deck",
+        "destroy_target",
+        "banish_target",
+        "special_summon",
+        "draw_cards",
+        "release_monster_n",
+        "discard"
+      ],
+      "support": true
+    },
+    {
+      "name": "who",
+      "meaning": "对象/受益归属",
+      "domain": "self/oppo/both/PLAYER_ALL",
+      "default": "oppo(除去)/self(增益)",
+      "appliesTo": [
+        "全部"
+      ],
+      "support": false
+    },
+    {
+      "name": "filter",
+      "meaning": "卡筛选",
+      "domain": "卡种/种族/属性/等级/攻守/字段/卡名",
+      "default": "无",
+      "appliesTo": [
+        "全部目标类"
+      ],
+      "support": true
+    },
+    {
+      "name": "zone_from",
+      "meaning": "来源区域",
+      "domain": "DECK/HAND/GRAVE/REMOVED/EXTRA/MZONE/SZONE/FZONE/PZONE/ONFIELD(多选)",
+      "default": "随能力",
+      "appliesTo": [
+        "检索",
+        "特召",
+        "回收",
+        "除去"
+      ],
+      "support": false
+    },
+    {
+      "name": "zone_to",
+      "meaning": "目的地区域",
+      "domain": "GRAVE/REMOVED/HAND/DECK(TOP/BOTTOM/SHUFFLE)/EXTRA/MZONE/SZONE/PZONE/EQUIP",
+      "default": "随能力",
+      "appliesTo": [
+        "除去",
+        "移动",
+        "回收",
+        "重定向"
+      ],
+      "support": false
+    },
+    {
+      "name": "category",
+      "meaning": "效果分类 CATEGORY_*",
+      "domain": "SPECIAL_SUMMON/DESTROY/TOHAND/SEARCH/DRAW/...",
+      "default": "自动推导",
+      "appliesTo": [
+        "全部效果"
+      ],
+      "support": false
+    },
+    {
+      "name": "timing_event",
+      "meaning": "触发事件",
+      "domain": "EVENT_* (见 timing 维度)",
+      "default": "随 timing",
+      "appliesTo": [
+        "全部诱发"
+      ],
+      "support": false
+    },
+    {
+      "name": "countLimit",
+      "meaning": "频次限制",
+      "domain": "n;scope=self/same_name_card/group/DUEL/CHAIN/SINGLE",
+      "default": "1,same_name_card",
+      "appliesTo": [
+        "全部"
+      ],
+      "support": false
+    },
+    {
+      "name": "reset",
+      "meaning": "持续时长/重置",
+      "domain": "STANDARD/PHASE_END/TURN_END/OPPO_TURN/SELF_TURN/CHAIN/never(+轮数)",
+      "default": "STANDARD",
+      "appliesTo": [
+        "数值",
+        "抗性",
+        "封锁",
+        "控制权"
+      ],
+      "support": false
+    },
+    {
+      "name": "value",
+      "meaning": "数值量",
+      "domain": "正负整数 / 函数",
+      "default": "0",
+      "appliesTo": [
+        "攻守",
+        "伤害",
+        "回复",
+        "等级"
+      ],
+      "support": false
+    },
+    {
+      "name": "valueSource",
+      "meaning": "数值来源",
+      "domain": "fixed/count_times/field_count/level_ref/atk_ref/overlay_count/ratio/lp_diff/counter_count/dice_coin_result/paid_lp/chosen_value/formula",
+      "default": "fixed",
+      "appliesTo": [
+        "数值类"
+      ],
+      "support": false
+    },
+    {
+      "name": "targeted",
+      "meaning": "是否取对象",
+      "domain": "true/false",
+      "default": "true",
+      "appliesTo": [
+        "除去",
+        "回收",
+        "特召",
+        "数值"
+      ],
+      "support": false
+    },
+    {
+      "name": "targetRange",
+      "meaning": "常驻适用范围",
+      "domain": "SetTargetRange(loc,who): 1,0 / 0,1 / 1,1 / LOCATION_MZONE,0 / LOCATION_ONFIELD,LOCATION_ONFIELD",
+      "default": "1,0",
+      "appliesTo": [
+        "常驻",
+        "免疫",
+        "封锁",
+        "数值",
+        "装备"
+      ],
+      "support": false
+    },
+    {
+      "name": "property",
+      "meaning": "结算标志 EFFECT_FLAG_*",
+      "domain": "CARD_TARGET/PLAYER_TARGET/CANNOT_DISABLE/DAMAGE_STEP/DAMAGE_CAL/DELAY/IGNORE_IMMUNE/SET_AVAILABLE/SINGLE_RANGE/UNCOPYABLE",
+      "default": "按需自动",
+      "appliesTo": [
+        "全部"
+      ],
+      "support": false
+    },
+    {
+      "name": "reason_filter",
+      "meaning": "触发原因筛选",
+      "domain": "REASON_EFFECT/BATTLE/DESTROY/COST/MATERIAL/RELEASE及组合取反",
+      "default": "REASON_EFFECT",
+      "appliesTo": [
+        "由XX送去墓地/被破坏类"
+      ],
+      "support": false
+    },
+    {
+      "name": "costType",
+      "meaning": "发动代价类型",
+      "domain": "见 cost 维度 20+ 种",
+      "default": "none",
+      "appliesTo": [
+        "全部主动效果"
+      ],
+      "support": false
+    },
+    {
+      "name": "pos",
+      "meaning": "表示形式",
+      "domain": "POS_FACEUP_ATTACK/FACEUP_DEFENSE/FACEDOWN_DEFENSE/FACEDOWN_ATTACK/FACEUP/FACEDOWN",
+      "default": "POS_FACEUP",
+      "appliesTo": [
+        "特召",
+        "变形式",
+        "除外",
+        "盖放"
+      ],
+      "support": false
+    },
+    {
+      "name": "summonType",
+      "meaning": "召唤类型/标记",
+      "domain": "SUMMON_TYPE_SPECIAL/FUSION/SYNCHRO/XYZ/LINK/RITUAL/PENDULUM/TRIBUTE",
+      "default": "SUMMON_TYPE_SPECIAL",
+      "appliesTo": [
+        "特召",
+        "手续"
+      ],
+      "support": false
+    },
+    {
+      "name": "delay",
+      "meaning": "是否错开时点",
+      "domain": "true/false(EFFECT_FLAG_DELAY)",
+      "default": "true",
+      "appliesTo": [
+        "触发类"
+      ],
+      "support": false
+    },
+    {
+      "name": "range",
+      "meaning": "效果驻留区域",
+      "domain": "LOCATION_SZONE/FZONE/GRAVE/MZONE/PZONE/HAND/REMOVED",
+      "default": "随卡种",
+      "appliesTo": [
+        "常驻",
+        "装备",
+        "场地",
+        "墓地起效"
+      ],
+      "support": false
+    },
+    {
+      "name": "hintTiming",
+      "meaning": "可发动时点",
+      "domain": "位掩码 TIMING_DAMAGE_STEP/TIMING_END_PHASE/TIMING_MAIN_END/TIMINGS_CHECK_MONSTER_E",
+      "default": "0(任意)",
+      "appliesTo": [
+        "发动条件",
+        "战斗"
+      ],
+      "support": false
+    },
+    {
+      "name": "ignoreImmune",
+      "meaning": "是否无视抗性",
+      "domain": "true/false",
+      "default": "false",
+      "appliesTo": [
+        "除去",
+        "无效"
+      ],
+      "support": false
+    },
+    {
+      "name": "branches",
+      "meaning": "分支数/各分支",
+      "domain": "2~4;SelectEffect/SelectYesNo",
+      "default": "2",
+      "appliesTo": [
+        "复合",
+        "二选一"
+      ],
+      "support": false
+    },
+    {
+      "name": "segments",
+      "meaning": "多段结算顺序",
+      "domain": "Duel.BreakEffect()",
+      "default": "1段",
+      "appliesTo": [
+        "复合效果"
+      ],
+      "support": false
+    },
+    {
+      "name": "params",
+      "meaning": "跨段传参",
+      "domain": "SetLabel/SetTargetParam/GetChainInfo",
+      "default": "无",
+      "appliesTo": [
+        "复合效果"
+      ],
+      "support": false
+    },
+    {
+      "name": "confirm_shuffle",
+      "meaning": "是否展示/洗牌",
+      "domain": "ConfirmCards/ShuffleDeck/ShuffleHand/DisableShuffleCheck",
+      "default": "confirm=true,shuffle=false",
+      "appliesTo": [
+        "检索",
+        "回收",
+        "卡组操作"
+      ],
+      "support": false
+    },
+    {
+      "name": "deckPosition",
+      "meaning": "回卡组位置",
+      "domain": "SEQ_DECKTOP/SEQ_DECKBOTTOM/SEQ_DECKSHUFFLE",
+      "default": "SEQ_DECKSHUFFLE",
+      "appliesTo": [
+        "回卡组",
+        "回收"
+      ],
+      "support": false
+    },
+    {
+      "name": "resistScope",
+      "meaning": "免疫/抗性范围",
+      "domain": "all/oppo_only/spell/trap/monster_effect/battle/target;battle/effect/both/once/count_n",
+      "default": "all",
+      "appliesTo": [
+        "抗性"
+      ],
+      "support": false
+    },
+    {
+      "name": "negateKind",
+      "meaning": "无效类型",
+      "domain": "activation/effect/summon/attack",
+      "default": "activation",
+      "appliesTo": [
+        "反制"
+      ],
+      "support": false
+    },
+    {
+      "name": "controlTo",
+      "meaning": "控制权归属",
+      "domain": "self/oppo",
+      "default": "self",
+      "appliesTo": [
+        "控制权"
+      ],
+      "support": false
+    },
+    {
+      "name": "controlDuration",
+      "meaning": "控制权时长",
+      "domain": "permanent/phase_end/turn_end",
+      "default": "permanent",
+      "appliesTo": [
+        "控制权"
+      ],
+      "support": false
+    },
+    {
+      "name": "counterType",
+      "meaning": "指示物种类",
+      "domain": "COUNTER_A/SPELL/...自定义",
+      "default": "无",
+      "appliesTo": [
+        "指示物"
+      ],
+      "support": false
+    },
+    {
+      "name": "counterCount",
+      "meaning": "指示物数量",
+      "domain": "1~N",
+      "default": "1",
+      "appliesTo": [
+        "指示物"
+      ],
+      "support": false
+    },
+    {
+      "name": "tokenSpec",
+      "meaning": "衍生物参数",
+      "domain": "atk/def/level/race/attribute/type/count/setcode",
+      "default": "无",
+      "appliesTo": [
+        "衍生物"
+      ],
+      "support": false
+    },
+    {
+      "name": "scaleValue",
+      "meaning": "灵摆刻度",
+      "domain": "0~13;left/right;变动量",
+      "default": "卡数据",
+      "appliesTo": [
+        "灵摆"
+      ],
+      "support": false
+    },
+    {
+      "name": "announceKind",
+      "meaning": "宣言类型",
+      "domain": "card/attribute/race/level/number/number_range",
+      "default": "无",
+      "appliesTo": [
+        "宣言"
+      ],
+      "support": false
+    },
+    {
+      "name": "coinDiceSpec",
+      "meaning": "骰/币参数",
+      "domain": "个数/成功条件/分支",
+      "default": "无",
+      "appliesTo": [
+        "运气类"
+      ],
+      "support": false
+    },
+    {
+      "name": "extraAttackN",
+      "meaning": "追加攻击次数",
+      "domain": "1~N;是否攻击全部",
+      "default": "1",
+      "appliesTo": [
+        "战斗"
+      ],
+      "support": false
+    },
+    {
+      "name": "lockType",
+      "meaning": "封锁类型",
+      "domain": "special_summon/summon/attack/activate/trigger/release/material",
+      "default": "无",
+      "appliesTo": [
+        "限制封锁"
+      ],
+      "support": false
+    },
+    {
+      "name": "redirectTo",
+      "meaning": "离场重定向去向",
+      "domain": "DECKTOP/DECKBOT/HAND/REMOVED/GRAVE",
+      "default": "无",
+      "appliesTo": [
+        "抗性",
+        "替代"
+      ],
+      "support": false
+    },
+    {
+      "name": "spSummonCond",
+      "meaning": "特召条件",
+      "domain": "允许/禁止(aux.FALSE);限定召唤法/素材",
+      "default": "允许",
+      "appliesTo": [
+        "特召手续"
+      ],
+      "support": false
+    },
+    {
+      "name": "extraSummonN",
+      "meaning": "追加召唤/盖放次数",
+      "domain": "1~N",
+      "default": "1",
+      "appliesTo": [
+        "召唤限制"
+      ],
+      "support": false
+    },
+    {
+      "name": "skipPhase",
+      "meaning": "跳过阶段",
+      "domain": "BP/DP/M1/M2/TURN",
+      "default": "无",
+      "appliesTo": [
+        "封锁"
+      ],
+      "support": false
+    },
+    {
+      "name": "chainLimit",
+      "meaning": "连锁封锁",
+      "domain": "允许/禁止对手连锁",
+      "default": "无",
+      "appliesTo": [
+        "时点",
+        "连锁"
+      ],
+      "support": false
+    },
+    {
+      "name": "materialSpec",
+      "meaning": "素材规格",
+      "domain": "数量min/max;筛选;来源区;等级判定 RITPROC_*",
+      "default": "无",
+      "appliesTo": [
+        "召唤手续"
+      ],
+      "support": false
+    },
+    {
+      "name": "hintMsg",
+      "meaning": "选择提示文本",
+      "domain": "HINTMSG_*",
+      "default": "自动",
+      "appliesTo": [
+        "需选择的效果"
+      ],
+      "support": false
+    },
+    {
+      "name": "labelData",
+      "meaning": "运行时数据传递",
+      "domain": "任意",
+      "default": "无",
+      "appliesTo": [
+        "条件与操作联动"
+      ],
+      "support": false
+    },
+    {
+      "name": "lpAmount",
+      "meaning": "支付LP数额",
+      "domain": "正整数",
+      "default": "1000",
+      "appliesTo": [
+        "pay_lp"
+      ],
+      "support": true
+    }
+  ],
+  "apiCorrections": [
+    {
+      "wrong": "Duel.ChangeControl",
+      "actual": "Duel.GetControl (转移) / Duel.SwapControl (交换)",
+      "evidence": 321
+    },
+    {
+      "wrong": "Duel.AddCounter",
+      "actual": "Card:AddCounter / tc:AddCounter",
+      "evidence": 237
+    },
+    {
+      "wrong": "Duel.DisableEffect",
+      "actual": "注册 EFFECT_DISABLE / EFFECT_DISABLE_EFFECT",
+      "evidence": 0
+    },
+    {
+      "wrong": "EFFECT_TYPE_TRAPMONSTER / EFFECT_TRAP_MONSTER",
+      "actual": "AddMonsterAttribute(TYPE_EFFECT|TYPE_TRAP) + SpecialSummonStep",
+      "evidence": 73
+    },
+    {
+      "wrong": "EFFECT_TRAP_CANNOT_ACTIVATE",
+      "actual": "EFFECT_CANNOT_ACTIVATE (通用)",
+      "evidence": 46
+    },
+    {
+      "wrong": "Ritual.AddWholeLevelTribute",
+      "actual": "两套并存: Ritual.CreateProc/AddProc* 或 RITPROC_* 参数表",
+      "evidence": 10
+    },
+    {
+      "wrong": "Fusion.AddProcMix (魔法侧)",
+      "actual": "Fusion.CreateSummonEff (魔法/陷阱侧)",
+      "evidence": 86
+    },
+    {
+      "wrong": "Duel.DelayedOperation",
+      "actual": "aux.DelayedOperation / RegisterFlagEffect",
+      "evidence": 50
+    },
+    {
+      "wrong": "Duel.NegateEffect (用于无效发动)",
+      "actual": "Duel.NegateActivation (无效卡的发动) / Duel.NegateEffect (无效效果)",
+      "evidence": 156
+    },
+    {
+      "wrong": "Duel.ChangeLP",
+      "actual": "Duel.SetLP / Duel.Recover / Duel.Damage",
+      "evidence": 81
+    }
+  ],
+  "gaps": {
+    "P0": [
+      {
+        "dimension": "action",
+        "identifier": "token_summon",
+        "name": "衍生物生成",
+        "missing": "无 action",
+        "hits": {
+          "monster": 137,
+          "spell": 63,
+          "trap": 36
+        },
+        "priority": "P0",
+        "suggestion": "新增 action + tokenSpec"
+      },
+      {
+        "dimension": "action",
+        "identifier": "to_deck",
+        "name": "返回卡组",
+        "missing": "无 action",
+        "hits": {
+          "monster": 394,
+          "spell": 201,
+          "trap": 131
+        },
+        "priority": "P0",
+        "suggestion": "新增 action + deckPosition"
+      },
+      {
+        "dimension": "action",
+        "identifier": "special_summon_banished",
+        "name": "除外区特召",
+        "missing": "无来源区",
+        "hits": {
+          "monster": 943,
+          "spell": 0,
+          "trap": 0
+        },
+        "priority": "P0",
+        "suggestion": "扩展 special_summon.from=REMOVED"
+      },
+      {
+        "dimension": "action",
+        "identifier": "disable_effect",
+        "name": "效果无效化挂载",
+        "missing": "仅发动无效",
+        "hits": {
+          "monster": 604,
+          "spell": 176,
+          "trap": 168
+        },
+        "priority": "P0",
+        "suggestion": "新增 action + duration/scope"
+      },
+      {
+        "dimension": "action",
+        "identifier": "cannot_activate",
+        "name": "封锁发动",
+        "missing": "无效果层",
+        "hits": {
+          "monster": 200,
+          "spell": 73,
+          "trap": 46
+        },
+        "priority": "P0",
+        "suggestion": "新增 restriction 生成 EFFECT_CANNOT_ACTIVATE"
+      },
+      {
+        "dimension": "restriction",
+        "identifier": "lock_special_summon",
+        "name": "特召封锁",
+        "missing": "无效果层",
+        "hits": {
+          "monster": 615,
+          "spell": 217,
+          "trap": 76
+        },
+        "priority": "P0",
+        "suggestion": "新增 restriction + SetTargetRange"
+      },
+      {
+        "dimension": "resistance",
+        "identifier": "indestructible",
+        "name": "不可破坏",
+        "missing": "无",
+        "hits": {
+          "monster": 801,
+          "spell": 152,
+          "trap": 108
+        },
+        "priority": "P0",
+        "suggestion": "新增 resistance + kind"
+      },
+      {
+        "dimension": "resistance",
+        "identifier": "immune_by_source",
+        "name": "效果免疫(按来源)",
+        "missing": "仅 all",
+        "hits": {
+          "monster": 165,
+          "spell": 38,
+          "trap": 42
+        },
+        "priority": "P0",
+        "suggestion": "扩展 immune_all.scope"
+      },
+      {
+        "dimension": "valueSource",
+        "identifier": "valueSource",
+        "name": "数值来源",
+        "missing": "仅固定值",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 0
+        },
+        "priority": "P0",
+        "suggestion": "新增 valueSource 维度"
+      },
+      {
+        "dimension": "action",
+        "identifier": "reset",
+        "name": "持续时长",
+        "missing": "无",
+        "hits": {
+          "monster": 3390,
+          "spell": 996,
+          "trap": 700
+        },
+        "priority": "P0",
+        "suggestion": "新增全局 reset 参数"
+      },
+      {
+        "dimension": "action",
+        "identifier": "atk_set",
+        "name": "攻守设定与负值",
+        "missing": "仅固定增量",
+        "hits": {
+          "monster": 1700,
+          "spell": 500,
+          "trap": 300
+        },
+        "priority": "P0",
+        "suggestion": "扩展 atk_boost 的 mode/stat"
+      },
+      {
+        "dimension": "effectType",
+        "identifier": "activate",
+        "name": "卡的发动本体",
+        "missing": "未独立",
+        "hits": {
+          "monster": 0,
+          "spell": 2419,
+          "trap": 2009
+        },
+        "priority": "P0",
+        "suggestion": "新增 effectType + 双层结构生成器"
+      },
+      {
+        "dimension": "chain",
+        "identifier": "hint_timing",
+        "name": "提示时点自由位掩码",
+        "missing": "仅4预设",
+        "hits": {
+          "monster": 0,
+          "spell": 347,
+          "trap": 1519
+        },
+        "priority": "P0",
+        "suggestion": "扩展 timing 为位掩码集合"
+      },
+      {
+        "dimension": "chain",
+        "identifier": "break_effect",
+        "name": "多段结算",
+        "missing": "单一 action",
+        "hits": {
+          "monster": 911,
+          "spell": 478,
+          "trap": 351
+        },
+        "priority": "P0",
+        "suggestion": "新增 followup 多段数组"
+      },
+      {
+        "dimension": "chain",
+        "identifier": "set_label",
+        "name": "标签传参",
+        "missing": "无",
+        "hits": {
+          "monster": 874,
+          "spell": 418,
+          "trap": 305
+        },
+        "priority": "P0",
+        "suggestion": "新增 params 维度"
+      }
+    ],
+    "P1": [
+      {
+        "dimension": "action",
+        "identifier": "negate_effect",
+        "name": "效果无效",
+        "missing": "仅 activation",
+        "hits": {
+          "monster": 151,
+          "spell": 36,
+          "trap": 72
+        },
+        "priority": "P1",
+        "suggestion": "扩展 negateKind=effect"
+      },
+      {
+        "dimension": "action",
+        "identifier": "negate_summon",
+        "name": "无效召唤",
+        "missing": "无",
+        "hits": {
+          "monster": 22,
+          "spell": 0,
+          "trap": 28
+        },
+        "priority": "P1",
+        "suggestion": "扩展 negateKind=summon"
+      },
+      {
+        "dimension": "action",
+        "identifier": "negate_attack",
+        "name": "无效攻击",
+        "missing": "无",
+        "hits": {
+          "monster": 64,
+          "spell": 15,
+          "trap": 45
+        },
+        "priority": "P1",
+        "suggestion": "新增 action"
+      },
+      {
+        "dimension": "resistance",
+        "identifier": "destroy_replace",
+        "name": "破坏替代",
+        "missing": "无",
+        "hits": {
+          "monster": 155,
+          "spell": 67,
+          "trap": 23
+        },
+        "priority": "P1",
+        "suggestion": "新增 resistance"
+      },
+      {
+        "dimension": "resistance",
+        "identifier": "leave_field_redirect",
+        "name": "离场改写",
+        "missing": "无",
+        "hits": {
+          "monster": 216,
+          "spell": 16,
+          "trap": 44
+        },
+        "priority": "P1",
+        "suggestion": "新增 resistance"
+      },
+      {
+        "dimension": "resistance",
+        "identifier": "untargetable",
+        "name": "不可取对象",
+        "missing": "仅文本",
+        "hits": {
+          "monster": 279,
+          "spell": 62,
+          "trap": 29
+        },
+        "priority": "P1",
+        "suggestion": "新增 restriction + 效果层"
+      },
+      {
+        "dimension": "effectType",
+        "identifier": "grant",
+        "name": "效果赋予",
+        "missing": "无",
+        "hits": {
+          "monster": 13,
+          "spell": 13,
+          "trap": 4
+        },
+        "priority": "P1",
+        "suggestion": "新增 effectType/action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "equip",
+        "name": "装备手续/状态",
+        "missing": "无",
+        "hits": {
+          "monster": 258,
+          "spell": 269,
+          "trap": 72
+        },
+        "priority": "P1",
+        "suggestion": "新增 action + effectType"
+      },
+      {
+        "dimension": "action",
+        "identifier": "add_counter",
+        "name": "指示物",
+        "missing": "无",
+        "hits": {
+          "monster": 160,
+          "spell": 77,
+          "trap": 18
+        },
+        "priority": "P1",
+        "suggestion": "新增 action + counterType"
+      },
+      {
+        "dimension": "action",
+        "identifier": "change_control",
+        "name": "控制权转移/交换",
+        "missing": "无",
+        "hits": {
+          "monster": 119,
+          "spell": 36,
+          "trap": 45
+        },
+        "priority": "P1",
+        "suggestion": "新增 action + controlTo"
+      },
+      {
+        "dimension": "action",
+        "identifier": "change_position",
+        "name": "表示形式变更",
+        "missing": "无",
+        "hits": {
+          "monster": 295,
+          "spell": 64,
+          "trap": 80
+        },
+        "priority": "P1",
+        "suggestion": "新增 action + pos"
+      },
+      {
+        "dimension": "action",
+        "identifier": "level_change",
+        "name": "等级/阶级变动",
+        "missing": "仅卡面",
+        "hits": {
+          "monster": 338,
+          "spell": 69,
+          "trap": 32
+        },
+        "priority": "P1",
+        "suggestion": "新增 action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "change_attribute",
+        "name": "属性/种族/种类变更",
+        "missing": "仅卡面",
+        "hits": {
+          "monster": 265,
+          "spell": 51,
+          "trap": 33
+        },
+        "priority": "P1",
+        "suggestion": "新增 action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "salvage_banished",
+        "name": "弹回/除外区回收",
+        "missing": "部分",
+        "hits": {
+          "monster": 943,
+          "spell": 193,
+          "trap": 0
+        },
+        "priority": "P1",
+        "suggestion": "扩展 zone"
+      },
+      {
+        "dimension": "action",
+        "identifier": "release_target",
+        "name": "解放(作为效果)",
+        "missing": "仅代价",
+        "hits": {
+          "monster": 40,
+          "spell": 13,
+          "trap": 7
+        },
+        "priority": "P1",
+        "suggestion": "新增 action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "discard_hand",
+        "name": "效果弃手",
+        "missing": "仅代价",
+        "hits": {
+          "monster": 149,
+          "spell": 76,
+          "trap": 42
+        },
+        "priority": "P1",
+        "suggestion": "新增 action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "pierce",
+        "name": "穿透/追加攻击/直接攻击",
+        "missing": "仅文本",
+        "hits": {
+          "monster": 500,
+          "spell": 80,
+          "trap": 30
+        },
+        "priority": "P1",
+        "suggestion": "新增 battle action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "change_battle_damage",
+        "name": "战斗/效果伤害改写",
+        "missing": "无",
+        "hits": {
+          "monster": 200,
+          "spell": 50,
+          "trap": 80
+        },
+        "priority": "P1",
+        "suggestion": "新增 action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "skip_phase",
+        "name": "跳过阶段",
+        "missing": "无",
+        "hits": {
+          "monster": 43,
+          "spell": 19,
+          "trap": 22
+        },
+        "priority": "P1",
+        "suggestion": "新增 restriction"
+      },
+      {
+        "dimension": "action",
+        "identifier": "extra_summon_count",
+        "name": "追加召唤次数",
+        "missing": "无",
+        "hits": {
+          "monster": 75,
+          "spell": 22,
+          "trap": 0
+        },
+        "priority": "P1",
+        "suggestion": "新增 restriction"
+      },
+      {
+        "dimension": "action",
+        "identifier": "announce",
+        "name": "宣言",
+        "missing": "无",
+        "hits": {
+          "monster": 102,
+          "spell": 40,
+          "trap": 35
+        },
+        "priority": "P1",
+        "suggestion": "新增 action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "toss_coin",
+        "name": "掷硬币/骰子",
+        "missing": "无",
+        "hits": {
+          "monster": 154,
+          "spell": 19,
+          "trap": 15
+        },
+        "priority": "P1",
+        "suggestion": "新增 action + 分支"
+      },
+      {
+        "dimension": "chain",
+        "identifier": "delayed_operation",
+        "name": "延迟处理",
+        "missing": "无",
+        "hits": {
+          "monster": 30,
+          "spell": 20,
+          "trap": 0
+        },
+        "priority": "P1",
+        "suggestion": "新增 followup"
+      },
+      {
+        "dimension": "chain",
+        "identifier": "select_effect",
+        "name": "分支选择>2",
+        "missing": "仅二元",
+        "hits": {
+          "monster": 0,
+          "spell": 461,
+          "trap": 292
+        },
+        "priority": "P1",
+        "suggestion": "扩展 choice_* 为 N 分支"
+      },
+      {
+        "dimension": "action",
+        "identifier": "set_monster",
+        "name": "盖放",
+        "missing": "无",
+        "hits": {
+          "monster": 23,
+          "spell": 123,
+          "trap": 147
+        },
+        "priority": "P1",
+        "suggestion": "新增 action"
+      },
+      {
+        "dimension": "effectType",
+        "identifier": "flip",
+        "name": "反转效果",
+        "missing": "无",
+        "hits": {
+          "monster": 193,
+          "spell": 0,
+          "trap": 0
+        },
+        "priority": "P1",
+        "suggestion": "新增 effectType"
+      },
+      {
+        "dimension": "effectType",
+        "identifier": "equip_state",
+        "name": "装备状态效果",
+        "missing": "无",
+        "hits": {
+          "monster": 178,
+          "spell": 216,
+          "trap": 62
+        },
+        "priority": "P1",
+        "suggestion": "新增 effectType"
+      },
+      {
+        "dimension": "effectType",
+        "identifier": "trigger_mandatory",
+        "name": "必发诱发",
+        "missing": "隐式",
+        "hits": {
+          "monster": 1363,
+          "spell": 202,
+          "trap": 136
+        },
+        "priority": "P1",
+        "suggestion": "暴露为 effectType"
+      },
+      {
+        "dimension": "cost",
+        "identifier": "self_banish",
+        "name": "自身除外/送墓/回卡组代价",
+        "missing": "无",
+        "hits": {
+          "monster": 0,
+          "spell": 248,
+          "trap": 0
+        },
+        "priority": "P1",
+        "suggestion": "扩展 cost"
+      },
+      {
+        "dimension": "ruleTexts",
+        "identifier": "cannotBeNegated",
+        "name": "OATH/不可无效",
+        "missing": "无",
+        "hits": {
+          "monster": 47,
+          "spell": 288,
+          "trap": 10
+        },
+        "priority": "P1",
+        "suggestion": "扩展 ruleTexts"
+      }
+    ],
+    "P2": [
+      {
+        "dimension": "effectType",
+        "identifier": "quick_mandatory",
+        "name": "反击必发",
+        "missing": "无",
+        "hits": {
+          "monster": 15,
+          "spell": 1,
+          "trap": 1
+        },
+        "priority": "P2",
+        "suggestion": "扩展 effectType"
+      },
+      {
+        "dimension": "action",
+        "identifier": "equip_limit",
+        "name": "装备限制",
+        "missing": "无",
+        "hits": {
+          "monster": 135,
+          "spell": 50,
+          "trap": 60
+        },
+        "priority": "P2",
+        "suggestion": "参数"
+      },
+      {
+        "dimension": "action",
+        "identifier": "union",
+        "name": "同盟",
+        "missing": "无",
+        "hits": {
+          "monster": 40,
+          "spell": 0,
+          "trap": 0
+        },
+        "priority": "P2",
+        "suggestion": "action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "sort_decktop",
+        "name": "卡组顶排序/放置",
+        "missing": "无",
+        "hits": {
+          "monster": 80,
+          "spell": 14,
+          "trap": 8
+        },
+        "priority": "P2",
+        "suggestion": "action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "move_sequence",
+        "name": "换位/区域封锁",
+        "missing": "无",
+        "hits": {
+          "monster": 0,
+          "spell": 41,
+          "trap": 11
+        },
+        "priority": "P2",
+        "suggestion": "action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "pendulum_move",
+        "name": "灵摆置于摆区",
+        "missing": "无",
+        "hits": {
+          "monster": 147,
+          "spell": 0,
+          "trap": 0
+        },
+        "priority": "P2",
+        "suggestion": "action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "scale_change",
+        "name": "灵摆刻度变更",
+        "missing": "无",
+        "hits": {
+          "monster": 29,
+          "spell": 0,
+          "trap": 0
+        },
+        "priority": "P2",
+        "suggestion": "action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "draw_count_rewrite",
+        "name": "规则改写",
+        "missing": "无",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 8
+        },
+        "priority": "P2",
+        "suggestion": "ruleText"
+      },
+      {
+        "dimension": "action",
+        "identifier": "win_condition",
+        "name": "胜利条件",
+        "missing": "无",
+        "hits": {
+          "monster": 0,
+          "spell": 0,
+          "trap": 7
+        },
+        "priority": "P2",
+        "suggestion": "action"
+      },
+      {
+        "dimension": "action",
+        "identifier": "change_code",
+        "name": "卡名/字段变更(效果层)",
+        "missing": "仅 alias",
+        "hits": {
+          "monster": 146,
+          "spell": 17,
+          "trap": 14
+        },
+        "priority": "P2",
+        "suggestion": "action"
+      },
+      {
+        "dimension": "ruleTexts",
+        "identifier": "materialCheck",
+        "name": "素材替代/额外素材",
+        "missing": "无",
+        "hits": {
+          "monster": 40,
+          "spell": 0,
+          "trap": 0
+        },
+        "priority": "P2",
+        "suggestion": "ruleText"
+      },
+      {
+        "dimension": "ruleTexts",
+        "identifier": "multipleTuners",
+        "name": "多重调整/非调整/超量等级",
+        "missing": "无",
+        "hits": {
+          "monster": 57,
+          "spell": 0,
+          "trap": 0
+        },
+        "priority": "P2",
+        "suggestion": "ruleText"
+      },
+      {
+        "dimension": "ruleTexts",
+        "identifier": "uniqueOnField",
+        "name": "场地唯一",
+        "missing": "无",
+        "hits": {
+          "monster": 0,
+          "spell": 34,
+          "trap": 0
+        },
+        "priority": "P2",
+        "suggestion": "ruleText"
+      },
+      {
+        "dimension": "action",
+        "identifier": "counter_permit",
+        "name": "指示物许可",
+        "missing": "无",
+        "hits": {
+          "monster": 0,
+          "spell": 63,
+          "trap": 1
+        },
+        "priority": "P2",
+        "suggestion": "action"
+      },
+      {
+        "dimension": "cost",
+        "identifier": "cost_and",
+        "name": "组合代价",
+        "missing": "无",
+        "hits": {
+          "monster": 0,
+          "spell": 5,
+          "trap": 0
+        },
+        "priority": "P2",
+        "suggestion": "参数"
+      },
+      {
+        "dimension": "action",
+        "identifier": "attack_restriction",
+        "name": "攻击代价/攻守减半/伤害翻倍",
+        "missing": "无",
+        "hits": {
+          "monster": 100,
+          "spell": 0,
+          "trap": 0
+        },
+        "priority": "P2",
+        "suggestion": "action"
+      },
+      {
+        "dimension": "chain",
+        "identifier": "client_hint",
+        "name": "客户提示/全局标记",
+        "missing": "无",
+        "hits": {
+          "monster": 1126,
+          "spell": 0,
+          "trap": 214
+        },
+        "priority": "P2",
+        "suggestion": "内部机制"
+      }
+    ]
+  }
+}
