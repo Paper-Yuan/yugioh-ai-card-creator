@@ -3,6 +3,23 @@
 本仓库**只包含可自由再分发的卡面素材**（约 79 MB），克隆后卡面主体即可正常渲染。
 出于版权原因，少部分**商业字体**与 **Konami 官方工艺素材**未入库，需自行准备；缺失时程序会自动回退，不会崩溃。
 
+## 构建模式：本地自用 / 公开发布
+
+构建脚本支持两种模式，用于区分「自己用」与「对外分发」：
+
+| 命令 | 模式 | 商业字体 | 产物位置 |
+| --- | --- | --- | --- |
+| `npm run build` | 本地自用 | **保留**（更贴近官方字形） | `dist/web/public` |
+| `npm run build:public` | 公开发布 | **剔除**，回退到思源黑体 | `dist/web/public` |
+| `.\scripts\build-android.ps1` | 本地自用 | 保留 | `release\` |
+| `.\scripts\build-android.ps1 -Public` | 公开发布 | 剔除 | `release\public\` |
+| `.\scripts\build-windows.ps1` | 本地自用 | 保留 | `release\` |
+| `.\scripts\build-windows.ps1 -Public` | 公开发布 | 剔除 | `release\public\` |
+
+- 剔除清单以 `.gitignore` 的「商业字体」段为准（脚本用 `git check-ignore` 权威判定），避免两处清单不同步。
+- GitHub Release 中提供的安装包均由 `-Public` 模式产出，**不含任何第三方商业字体**。
+- `npm run build` 会先清空 `dist/web/public` 再完整复制，避免源目录已删除的文件残留进安装包。
+
 ## 已随仓库提供（可直接使用）
 
 ### 卡框 / 图标 / 箭头等图片
@@ -58,6 +75,11 @@
 > 请遵守 YGOLD 自身的授权条款，并自行确认其中素材的可分发性。
 
 放入时保持**固定文件名**不变即可，渲染代码按文件名加载。
+
+> **关于 Release 安装包**：GitHub Release 提供的安装包按使用者要求**保留了上述 YGOLD 衍生的
+> 工艺素材**（罕贵度 / 镭射 / 出框 / 水印 / 特殊框），但已**剔除全部第三方商业字体**。
+> 这些素材的可分发性由 YGOLD 自身条款约束；若你是相关权利人并认为使用不当，
+> 请通过 Issue 联系，我们会立即从 Release 中移除。
 
 ## 素材版权提示
 

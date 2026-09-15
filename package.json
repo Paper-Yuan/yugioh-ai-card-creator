@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsc && node -e \"const fs=require('fs'); fs.mkdirSync('dist/web/public', {recursive:true}); fs.cpSync('src/web/public', 'dist/web/public', {recursive:true});\"",
+    "build": "tsc && node scripts/build-frontend.js",
+    "build:public": "tsc && node scripts/build-frontend.js --public",
     "start": "node dist/index.js",
     "web": "tsx src/web/server.ts",
     "web:dev": "tsx watch src/web/server.ts",
