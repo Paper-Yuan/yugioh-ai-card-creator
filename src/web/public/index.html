@@ -1343,7 +1343,7 @@
                     </div>
                   </div>
 
-                  <div class="form-grid-2 mt-2">
+                  <div class="form-grid-3 mt-2">
                     <div class="input-field">
                       <label>卡包识别编号 (Set Pack Code)</label>
                       <input type="text" id="cardPackCodeInput" placeholder="例如：BETB-JP028, ROTD-SC001" value="" oninput="onPackCodeChanged(this.value)">
@@ -1358,6 +1358,15 @@
                         <option value="red">红碎红字 (20th / PSER2 20周年红字立体烫印)</option>
                         <option value="blue">蓝碎蓝字 (Special Blue / 蓝字稀有立体烫印)</option>
                         <option value="holo">全息幻彩 (HR 彩虹幻境光谱)</option>
+                      </select>
+                    </div>
+                    <div class="input-field">
+                      <label style="color:#10b981;font-weight:600;">📐 图片清晰度 (Image Quality)</label>
+                      <select id="imageQualitySelect" onchange="onImageQualityChanged()">
+                        <option value="high" selected>高清晰度 (1394×2031 - 推荐)</option>
+                        <option value="medium">中等清晰度 (1024×1491 - 快速)</option>
+                        <option value="low">标准清晰度 (697×1015 - 兼容)</option>
+                        <option value="ultra">超高清 (2091×3046 - 印刷级)</option>
                       </select>
                     </div>
                   </div>

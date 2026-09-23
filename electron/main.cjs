@@ -5,9 +5,24 @@ const { pathToFileURL } = require('url');
 let mainWindow;
 let isQuitting = false;
 
-// 彻底杀死所有进程与后台服务
+// 彻底杀死所有进程与后台服务（包括 Edge WebView2 进程）
 function killEverythingAndExit() {
   isQuitting = true;
+  
+  // 尝试杀死 msedge / msedgewebview2 相关进程
+  if (process.platform === 'win32') {
+    try {
+      const { execSync } = require('child_process');
+      // 杀死所有 msedge 和 msedgewebview2 进程
+      execSync('taskkill /F /IM msedge.exe /T', { stdio: 'ignore' });
+      execSync('taskkill /F /IM msedgewebview2.exe /T', { stdio: 'ignore' });
+      console.log('[Electron] 已彻底杀死 Edge 进程');
+    } catch (e) {
+      // 如果进程不存在，taskkill 会抛出错误，忽略即可
+      console.log('[Electron] Edge 进程清理完成');
+    }
+  }
+  
   try {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.destroy();
@@ -125,13 +140,28 @@ function createWindow() {
         } catch (err) {}
       }
     } else {
+      // 无未保存修改，询问退出或最小化到托盘
       const choice = await dialog.showMessageBox(mainWindow, {
         type: 'question',
-        title: '退出提示',
-        message: '确定要退出游戏王AI制卡器吗？',
-        detail: '退出后将完全关闭程序并彻底终止所有后台服务与进程，释放系统资源。',
-        buttons: ['取消', '确定退出'],
+        title: '退出选项',
+        message: '您希望如何处理？',
+        detail: '• 最小化到托盘：保持程序运行在后台\n• 完全退出：彻底关闭程序并终止所有后台进程（包括 Edge WebView2）',
+        buttons: ['取消', '最小化到托盘', '完全退出'],
         defaultId: 1,
+        cancelId: 0,
+        noLink: true
+      });
+
+      if (choice.response === 0) {
+        // 用户取消
+        return;
+      } else if (choice.response === 1) {
+        // 最小化到托盘（隐藏窗口但不退出）
+        mainWindow.hide();
+        return;
+      }
+      // choice.response === 2: 完全退出（继续执行下面的退出逻辑）
+    }
         cancelId: 0,
         noLink: true
       });

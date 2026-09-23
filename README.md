@@ -1,11 +1,10 @@
-# yugioh-ai-card-creator（游戏王 AI 制卡器）
+# yugioh-ai-card-creator（游戏王制卡器）
 
-一个本地运行的游戏王 DIY 制卡工具：在浏览器里完成卡片编辑与卡面渲染，并导出 YGOPro / MDPro3 可直接使用的 Lua 脚本、卡图、CDB 数据库与 `.ypk` 扩展包。可选接入大模型 API 来辅助生成卡片信息与脚本。
+一个在电脑或手机上本地运行的游戏王自制卡工具。不用联网也能做卡，界面简单直接：填好卡片信息、选择效果、上传卡图，就能渲染出高清卡面，还能导出给 YGOPro / MDPro3 用的脚本、数据库和卡包。如果想偷懒，也可以接入 AI 来帮忙生成卡片描述和基础效果（需要自己的 API Key）。
 
-> 本项目是个人向的制卡辅助工具，不是官方产品，也不追求"完整复刻"任何商业制卡软件。功能以本机自用为主，覆盖面有限，可参考下方[已知限制](#已知限制)。
-> 使用中遇到问题或有改进想法，欢迎[提 Issue](https://github.com/Paper-Yuan/yugioh-ai-card-creator/issues)（见[反馈与贡献](#反馈与贡献)）。
+> 这是个人自用的制卡工具，不是官方产品，功能覆盖有限。用起来遇到问题或有改进想法，欢迎[提 Issue](https://github.com/Paper-Yuan/yugioh-ai-card-creator/issues)。
 
-![Version](https://img.shields.io/badge/version-2.0.1-blue)
+![Version](https://img.shields.io/badge/version-2.2.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
 

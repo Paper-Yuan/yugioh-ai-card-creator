@@ -4,58 +4,71 @@ import { readFile, writeFile } from 'fs/promises';
 
 export class CDBManager {
   private db: Database | null = null;
+  private static sqlInstance: any = null; // 单例 SQL.js 实例
+
+  // 优化：复用 SQL.js 实例，减少重复初始化开销
+  private static async getSqlInstance() {
+    if (!CDBManager.sqlInstance) {
+      CDBManager.sqlInstance = await initSqlJs();
+    }
+    return CDBManager.sqlInstance;
+  }
 
   async createDatabase(filePath: string): Promise<void> {
-    const SQL = await initSqlJs();
-    this.db = new SQL.Database();
+    const SQL = await CDBManager.getSqlInstance();
+    if (!this.db) {
+      this.db = new SQL.Database();
+    }
 
     // 创建 datas 表（卡片基本信息）
-    this.db.run(`
-      CREATE TABLE datas (
-        id INTEGER PRIMARY KEY,
-        ot INTEGER,
-        alias INTEGER,
-        setcode INTEGER,
-        type INTEGER,
-        atk INTEGER,
-        def INTEGER,
-        level INTEGER,
-        race INTEGER,
-        attribute INTEGER,
-        category INTEGER
-      )
-    `);
+    if (this.db) {
+      this.db.run(`
+        CREATE TABLE datas (
+          id INTEGER PRIMARY KEY,
+          ot INTEGER,
+          alias INTEGER,
+          setcode INTEGER,
+          type INTEGER,
+          atk INTEGER,
+          def INTEGER,
+          level INTEGER,
+          race INTEGER,
+          attribute INTEGER,
+          category INTEGER
+        )
+      `);
 
-    // 创建 texts 表（卡片文本信息）
-    this.db.run(`
-      CREATE TABLE texts (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        desc TEXT,
-        str1 TEXT,
-        str2 TEXT,
-        str3 TEXT,
-        str4 TEXT,
-        str5 TEXT,
-        str6 TEXT,
-        str7 TEXT,
-        str8 TEXT,
-        str9 TEXT,
-        str10 TEXT,
-        str11 TEXT,
-        str12 TEXT,
-        str13 TEXT,
-        str14 TEXT,
-        str15 TEXT,
-        str16 TEXT
-      )
-    `);
+      // 创建 texts 表（卡片文本信息）
+      this.db.run(`
+        CREATE TABLE texts (
+          id INTEGER PRIMARY KEY,
+          name TEXT,
+          desc TEXT,
+          str1 TEXT,
+          str2 TEXT,
+          str3 TEXT,
+          str4 TEXT,
+          str5 TEXT,
+          str6 TEXT,
+          str7 TEXT,
+          str8 TEXT,
+          str9 TEXT,
+          str10 TEXT,
+          str11 TEXT,
+          str12 TEXT,
+          str13 TEXT,
+          str14 TEXT,
+          str15 TEXT,
+          str16 TEXT
+        )
+      `);
+    }
 
     await this.saveDatabase(filePath);
   }
 
   async loadDatabase(filePath: string): Promise<void> {
-    const SQL = await initSqlJs();
+    const SQL = await CDBManager.getSqlInstance();
     const buffer = await readFile(filePath);
     this.db = new SQL.Database(buffer);
   }

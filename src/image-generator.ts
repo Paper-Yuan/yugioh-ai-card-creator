@@ -43,6 +43,8 @@ const CJK_FONT_STACK = '"YgoMDKaiFZ", "YgoMDKaiSHS", "Microsoft YaHei", Arial';
 export class CardImageGenerator {
   private readonly CARD_WIDTH = 421;
   private readonly CARD_HEIGHT = 614;
+  private imageCache: Map<string, Buffer> = new Map(); // 图片资源缓存
+  private readonly MAX_CACHE_SIZE = 20; // 最多缓存 20 张图片
 
   async generateCardImage(
     card: CardData,
@@ -77,9 +79,12 @@ export class CardImageGenerator {
       // 绘制卡片效果文字
       this.drawCardText(ctx, card);
 
-      // 保存图片
+      // 保存图片 - 优化：直接使用默认压缩
       const buffer = canvas.toBuffer('image/png');
       await writeFile(outputPath, buffer);
+
+      // 清理画布引用，帮助 GC
+      ctx.clearRect(0, 0, this.CARD_WIDTH, this.CARD_HEIGHT);
 
       return outputPath;
     } catch (error) {

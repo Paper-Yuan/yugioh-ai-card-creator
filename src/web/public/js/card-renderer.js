@@ -12,10 +12,31 @@ class CardRenderer {
   constructor() {
     this.CARD_WIDTH = 1394;
     this.CARD_HEIGHT = 2031;
+    this.imageQuality = 'high'; // 默认高清晰度
     this.baseImage = './assets/yugioh/image';
     this.baseFont = './assets/yugioh/font';
     this.imageCache = new Map();
     this.fontsLoaded = false;
+  }
+
+  /**
+   * 设置图片清晰度
+   * @param {string} quality - 'ultra' | 'high' | 'medium' | 'low'
+   */
+  setImageQuality(quality) {
+    const qualitySettings = {
+      ultra: { width: 2091, height: 3046, scale: 1.5 },
+      high: { width: 1394, height: 2031, scale: 1.0 },
+      medium: { width: 1024, height: 1491, scale: 0.734 },
+      low: { width: 697, height: 1015, scale: 0.5 }
+    };
+    
+    const settings = qualitySettings[quality] || qualitySettings.high;
+    this.CARD_WIDTH = settings.width;
+    this.CARD_HEIGHT = settings.height;
+    this.imageQuality = quality;
+    
+    console.log(`[CardRenderer] Image quality set to: ${quality} (${this.CARD_WIDTH}×${this.CARD_HEIGHT})`);
   }
 
   /**

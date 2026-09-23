@@ -993,216 +993,6 @@ end`,
     tags: ['墓地', '堆墓']
   },
 
-  // ===== 返回卡组 =====
-  {
-    id: 'to_deck',
-    name: '返回卡组',
-    nameEn: 'Return to Deck',
-    category: EffectCategory.EFFECT,
-    description: '将卡片返回卡组',
-    parameters: [
-      {
-        name: 'location',
-        type: 'select',
-        label: '来源位置',
-        options: [
-          { value: 'LOCATION_ONFIELD', label: '场上' },
-          { value: 'LOCATION_GRAVE', label: '墓地' },
-          { value: 'LOCATION_HAND', label: '手卡' },
-          { value: 'LOCATION_REMOVED', label: '除外区' }
-        ],
-        required: true
-      },
-      {
-        name: 'count',
-        type: 'number',
-        label: '返回数量',
-        defaultValue: 1,
-        min: 1,
-        max: 5,
-        required: true
-      },
-      {
-        name: 'position',
-        type: 'select',
-        label: '返回位置',
-        options: [
-          { value: 'SEQ_DECKTOP', label: '卡组顶' },
-          { value: 'SEQ_DECKBOTTOM', label: '卡组底' },
-          { value: 'SEQ_DECKSHUFFLE', label: '洗回卡组' }
-        ],
-        defaultValue: 'SEQ_DECKSHUFFLE',
-        required: true
-      },
-      {
-        name: 'targeted',
-        type: 'boolean',
-        label: '选择对象',
-        defaultValue: true,
-        required: false
-      },
-      {
-        name: 'shuffle',
-        type: 'boolean',
-        label: '之后洗切',
-        defaultValue: false,
-        required: false
-      }
-    ],
-    luaTemplate: `
---返回卡组
-function s.tdfilter(c)
-  return c:IsAbleToDeck()
-end
-{{#if targeted}}
-function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-  if chkc then return chkc:IsLocation({{location}}) and s.tdfilter(chkc) end
-  if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,{{location}},0,1,nil) end
-  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-  local g=Duel.SelectTarget(tp,s.tdfilter,tp,{{location}},0,1,{{count}},nil)
-  Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
-end
-function s.tdop(e,tp,eg,ep,ev,re,r,rp)
-  local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-  if #g>0 then
-    Duel.SendtoDeck(g,nil,{{position}},REASON_EFFECT)
-    {{#if shuffle}}
-    if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
-    {{/if}}
-  end
-end
-{{else}}
-function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-  if chk==0 then return Duel.IsExistingMatchingCard(s.tdfilter,tp,{{location}},0,1,nil) end
-  local g=Duel.GetMatchingGroup(s.tdfilter,tp,{{location}},0,nil)
-  Duel.SetOperationInfo(0,CATEGORY_TODECK,g,{{count}},0,0)
-end
-function s.tdop(e,tp,eg,ep,ev,re,r,rp)
-  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-  local g=Duel.SelectMatchingCard(tp,s.tdfilter,tp,{{location}},0,1,{{count}},nil)
-  if #g>0 then
-    Duel.SendtoDeck(g,nil,{{position}},REASON_EFFECT)
-    {{#if shuffle}}
-    if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
-    {{/if}}
-  end
-end
-{{/if}}`,
-    compatibility: [],
-    examples: ['强欲而谦虚之壶', '凤凰神的羽毛'],
-    tags: ['卡组', '回收', '弹回']
-  },
-
-  // ===== 衍生物生成 =====
-  {
-    id: 'token_summon',
-    name: '衍生物生成',
-    nameEn: 'Create Token',
-    category: EffectCategory.SUMMON,
-    description: '特殊召唤衍生物',
-    parameters: [
-      {
-        name: 'atk',
-        type: 'number',
-        label: '攻击力',
-        defaultValue: 1000,
-        min: 0,
-        max: 5000,
-        required: true
-      },
-      {
-        name: 'def',
-        type: 'number',
-        label: '守备力',
-        defaultValue: 1000,
-        min: 0,
-        max: 5000,
-        required: true
-      },
-      {
-        name: 'level',
-        type: 'number',
-        label: '等级',
-        defaultValue: 4,
-        min: 1,
-        max: 12,
-        required: true
-      },
-      {
-        name: 'race',
-        type: 'select',
-        label: '种族',
-        options: [
-          { value: 'WARRIOR', label: '战士族' },
-          { value: 'SPELLCASTER', label: '魔法师族' },
-          { value: 'DRAGON', label: '龙族' },
-          { value: 'FIEND', label: '恶魔族' },
-          { value: 'MACHINE', label: '机械族' },
-          { value: 'BEAST', label: '兽族' },
-          { value: 'PLANT', label: '植物族' }
-        ],
-        required: true
-      },
-      {
-        name: 'attribute',
-        type: 'select',
-        label: '属性',
-        options: [
-          { value: 'LIGHT', label: '光' },
-          { value: 'DARK', label: '暗' },
-          { value: 'WATER', label: '水' },
-          { value: 'FIRE', label: '火' },
-          { value: 'EARTH', label: '地' },
-          { value: 'WIND', label: '风' }
-        ],
-        required: true
-      },
-      {
-        name: 'count',
-        type: 'number',
-        label: '生成数量',
-        defaultValue: 1,
-        min: 1,
-        max: 5,
-        required: true
-      },
-      {
-        name: 'position',
-        type: 'select',
-        label: '表示形式',
-        options: [
-          { value: 'POS_FACEUP_ATTACK', label: '攻击表示' },
-          { value: 'POS_FACEUP_DEFENSE', label: '守备表示' }
-        ],
-        defaultValue: 'POS_FACEUP_ATTACK',
-        required: true
-      }
-    ],
-    luaTemplate: `
---衍生物生成
-function s.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
-  if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-    and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,{{atk}},{{def}},{{level}},RACE_{{race}},ATTRIBUTE_{{attribute}}) end
-  Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,{{count}},0,0)
-  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,{{count}},tp,0)
-end
-function s.tkop(e,tp,eg,ep,ev,re,r,rp)
-  local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-  if ft<=0 then return end
-  if ft>{{count}} then ft={{count}} end
-  if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
-  if not Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0,TYPES_TOKEN,{{atk}},{{def}},{{level}},RACE_{{race}},ATTRIBUTE_{{attribute}}) then return end
-  for i=1,ft do
-    local token=Duel.CreateToken(tp,id+1)
-    Duel.SpecialSummonStep(token,0,tp,tp,false,false,{{position}})
-  end
-  Duel.SpecialSummonComplete()
-end`,
-    compatibility: [],
-    examples: ['替罪羊', '黑羽龙'],
-    tags: ['衍生物', '特召', 'token']
-  },
-
   // ===== 效果无效化 =====
   {
     id: 'disable_effect',
@@ -1882,6 +1672,184 @@ end
     compatibility: [],
     examples: ['No.101 寂静荣誉方舟骑士', '超量单位'],
     tags: ['超量', '素材', '附加']
+  },
+
+  // ===== Phase 5: P1 效果模块 =====
+  {
+    id: 'excavate',
+    name: '挖掘机制',
+    nameEn: 'Excavate',
+    category: EffectCategory.EFFECT,
+    description: '翻开卡组顶部指定数量的卡片，根据条件进行后续操作',
+    parameters: [
+      {
+        name: 'count',
+        type: 'number',
+        label: '挖掘数量',
+        description: '翻开卡组顶部的卡片数量',
+        defaultValue: 3,
+        min: 1,
+        max: 10,
+        required: true
+      },
+      {
+        name: 'filter_type',
+        type: 'select',
+        label: '筛选类型',
+        description: '挖掘后筛选的卡片类型',
+        options: [
+          { value: 'monster', label: '怪兽卡' },
+          { value: 'spell', label: '魔法卡' },
+          { value: 'trap', label: '陷阱卡' },
+          { value: 'any', label: '任意卡片' },
+          { value: 'archetype', label: '特定字段' }
+        ],
+        defaultValue: 'monster',
+        required: true
+      },
+      {
+        name: 'action',
+        type: 'select',
+        label: '后续操作',
+        description: '对筛选出的卡片进行的操作',
+        options: [
+          { value: 'add_to_hand', label: '加入手牌' },
+          { value: 'special_summon', label: '特殊召唤' },
+          { value: 'send_to_grave', label: '送去墓地' }
+        ],
+        defaultValue: 'add_to_hand',
+        required: true
+      }
+    ],
+    luaTemplate: `
+--挖掘机制效果
+function s.exctg(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=3 end
+end
+function s.excop(e,tp,eg,ep,ev,re,r,rp)
+  Duel.ConfirmDecktop(tp,3)
+  local g=Duel.GetDecktopGroup(tp,3)
+  local sg=g:Filter(Card.IsType,nil,TYPE_MONSTER)
+  if #sg>0 then
+    Duel.SendtoHand(sg,nil,REASON_EFFECT)
+    Duel.ConfirmCards(1-tp,sg)
+  end
+  Duel.ShuffleDeck(tp)
+end`,
+    compatibility: [],
+    examples: ['强欲而谦虚之壶', '命运抽卡'],
+    tags: ['挖掘', '翻开', '卡组']
+  },
+
+  {
+    id: 'counter_system',
+    name: '指示物系统',
+    nameEn: 'Counter System',
+    category: EffectCategory.EFFECT,
+    description: '放置、移除或使用指示物进行效果',
+    parameters: [
+      {
+        name: 'counter_type',
+        type: 'select',
+        label: '指示物类型',
+        options: [
+          { value: 'spell', label: '魔力指示物' },
+          { value: 'predator', label: '捕食指示物' },
+          { value: 'custom', label: '自定义指示物' }
+        ],
+        defaultValue: 'spell',
+        required: true
+      },
+      {
+        name: 'action',
+        type: 'select',
+        label: '指示物操作',
+        options: [
+          { value: 'add', label: '放置指示物' },
+          { value: 'remove', label: '移除指示物' }
+        ],
+        defaultValue: 'add',
+        required: true
+      },
+      {
+        name: 'count',
+        type: 'number',
+        label: '数量',
+        defaultValue: 1,
+        min: 1,
+        max: 10,
+        required: true
+      }
+    ],
+    luaTemplate: `
+--指示物系统效果
+function s.ctop(e,tp,eg,ep,ev,re,r,rp)
+  local c=e:GetHandler()
+  if c:IsRelateToEffect(e) and c:IsFaceup() then
+    c:AddCounter(0x1,1)
+  end
+end`,
+    compatibility: [],
+    examples: ['魔法都市 恩底弥翁', '捕食植物'],
+    tags: ['指示物', 'counter']
+  },
+
+  {
+    id: 'equipment',
+    name: '装备系统',
+    nameEn: 'Equipment System',
+    category: EffectCategory.EFFECT,
+    description: '装备魔法卡或怪兽装备效果',
+    parameters: [
+      {
+        name: 'target_filter',
+        type: 'select',
+        label: '装备目标限制',
+        options: [
+          { value: 'any', label: '任意怪兽' },
+          { value: 'own_only', label: '仅自己怪兽' }
+        ],
+        defaultValue: 'any',
+        required: true
+      },
+      {
+        name: 'effect_type',
+        type: 'select',
+        label: '装备效果类型',
+        options: [
+          { value: 'atk_boost', label: '攻击力上升' },
+          { value: 'atk_def_boost', label: '攻守上升' }
+        ],
+        defaultValue: 'atk_boost',
+        required: true
+      },
+      {
+        name: 'atk_value',
+        type: 'number',
+        label: '攻击力上升值',
+        defaultValue: 500,
+        min: 0,
+        max: 5000,
+        required: true
+      }
+    ],
+    luaTemplate: `
+--装备系统效果
+function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+  if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+  if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+  Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+end
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
+  local c=e:GetHandler()
+  local tc=Duel.GetFirstTarget()
+  if c:IsRelateToEffect(e) and tc and tc:IsFaceup() then
+    Duel.Equip(tp,c,tc)
+  end
+end`,
+    compatibility: [],
+    examples: ['团结之力', '同盟机械'],
+    tags: ['装备', 'equip']
   }
 ];
 

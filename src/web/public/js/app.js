@@ -2164,6 +2164,20 @@ function onFoilNameChanged() {
   refreshLiveCard();
 }
 
+/**
+ * 图片清晰度变更事件处理
+ */
+function onImageQualityChanged() {
+  const quality = document.getElementById('imageQualitySelect')?.value || 'high';
+  if (window.cardRenderer && typeof window.cardRenderer.setImageQuality === 'function') {
+    window.cardRenderer.setImageQuality(quality);
+    console.log(`[App] Image quality changed to: ${quality}`);
+    
+    // 重新渲染卡片预览
+    refreshLiveCard();
+  }
+}
+
 // ========== 全局页面导航与工具 ==========
 
 function bindNavigation() {

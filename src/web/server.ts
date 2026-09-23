@@ -34,17 +34,35 @@ const upload = multer({
   }
 });
 
-// 中间件
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// 中间件 - 优化：降低请求体限制，减少内存峰值
+app.use(express.json({ limit: '10mb' })); // 从 50mb 降至 10mb（卡片数据通常 < 1mb）
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const publicDir = existsSync(path.join(__dirname, 'public'))
   ? path.join(__dirname, 'public')
   : path.join(__dirname, '../../src/web/public');
 app.use(express.static(publicDir));
 
-// 工具实例
+// 工具实例 - 优化：全局单例，避免重复创建
 const scriptAssembler = new ScriptAssembler();
 const imageGenerator = new CardImageGenerator();
+
+// 内存优化：CDB Manager 对象池（最多保留 5 个实例）
+const cdbManagerPool: CDBManager[] = [];
+const MAX_CDB_POOL_SIZE = 5;
+
+function getCDBManager(): CDBManager {
+  if (cdbManagerPool.length > 0) {
+    return cdbManagerPool.pop()!;
+  }
+  return new CDBManager();
+}
+
+function releaseCDBManager(manager: CDBManager) {
+  manager.close();
+  if (cdbManagerPool.length < MAX_CDB_POOL_SIZE) {
+    cdbManagerPool.push(manager);
+  }
+}
 
 // ========== API路由 ==========
 
@@ -234,13 +252,13 @@ app.post('/api/generate-complete', upload.single('image'), async (req, res) => {
     const scriptPath = path.join(workspaceDir, 'script', `c${cardData.id}.lua`);
     await writeFile(scriptPath, scriptResult.lua);
     
-    // 2. 生成CDB数据库
-    const cdbManager = new CDBManager();
+    // 2. 生成CDB数据库 - 优化：使用对象池
+    const cdbManager = getCDBManager();
     const cdbPath = path.join(workspaceDir, `${cardData.id}.cdb`);
     await cdbManager.createDatabase(cdbPath);
     cdbManager.addCard(cardData);
     await cdbManager.saveDatabase(cdbPath);
-    cdbManager.close();
+    releaseCDBManager(cdbManager);
     
     // 3. 生成卡片图片
     const imageOptions: any = {};
