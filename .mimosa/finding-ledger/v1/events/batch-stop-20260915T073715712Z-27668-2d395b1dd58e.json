@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "mimosa-finding-ledger-batch/v1",
+  "batchId": "stop-20260915T073715712Z-27668-2d395b1dd58e",
+  "runId": "20260915T073715712Z-27668-2d395b1dd58e",
+  "runStatus": "completed",
+  "coverage": {
+    "status": "complete",
+    "reasons": []
+  },
+  "source": {
+    "component": "zcode-hook",
+    "operationId": "Stop"
+  },
+  "revision": "698fda43f1dc5d0545209c2fef67af6a42ee2182",
+  "diffHash": "e1d69fd882b2a775686221a3c85f0f58f5e144451e9471cd7e0ac1ecd67071f9",
+  "rulesVersion": "unavailable",
+  "sessionHash": "1460fae59d8c484f43521ac75819a08d18b25ded24053dda49aeb55b12fb4b86",
+  "reportRef": ".mimosa/reports/task-review-sess_8e58b9a7-d4b8-4112-9a10-4c3254f9cf6b-20260915T073715712Z-27668-2d395b1dd58e.json",
+  "events": [],
+  "observedFindingIds": [
+    "mimosa-82204740f1b78b1cddc709f4",
+    "mimosa-43d56035cc7b0a102973afce"
+  ],
+  "verifiedFiles": [
+    {
+      "file": "src/web/public/js/card-renderer.js",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "scripts/build-public.js",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "scripts/build-personal.js",
+      "direct": "complete",
+      "projectContext": "partial"
+    }
+  ],
+  "recordedAt": "2026-09-15T07:37:16.223Z"
+}

@@ -627,6 +627,19 @@ class ClientScriptAssembler {
         lines.push(`  e_rt_da:SetCode(EFFECT_DIRECT_ATTACK)`);
         lines.push(`  c:RegisterEffect(e_rt_da)`);
       }
+
+      // 15. 追加通常召唤次数 (EFFECT_EXTRA_SUMMON_COUNT)
+      if (r.extraSummonCount) {
+        const count = parseInt(r.extraSummonCountValue) || 1;
+        lines.push(`  -- 效果外文本: 追加通常召唤次数`);
+        lines.push(`  local e_rt_extsum=Effect.CreateEffect(c)`);
+        lines.push(`  e_rt_extsum:SetType(EFFECT_TYPE_FIELD)`);
+        lines.push(`  e_rt_extsum:SetRange(LOCATION_MZONE)`);
+        lines.push(`  e_rt_extsum:SetCode(EFFECT_EXTRA_SUMMON_COUNT)`);
+        lines.push(`  e_rt_extsum:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)`);
+        lines.push(`  e_rt_extsum:SetValue(${count})`);
+        lines.push(`  c:RegisterEffect(e_rt_extsum)`);
+      }
     }
 
     // 15. 自定义独有规则：仅写入卡面文本，不生成脚本（引擎无法解析自由语句）

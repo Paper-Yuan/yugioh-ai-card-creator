@@ -11,10 +11,15 @@
   <link rel="icon" type="image/x-icon" href="./favicon.ico">
   <link rel="stylesheet" href="./css/main.css">
   <link rel="stylesheet" href="./css/responsive.css">
+  <link rel="stylesheet" href="./css/effect-wizard.css">
   <!-- 离线依赖库 -->
   <script src="./libs/handlebars.min.js"></script>
   <script src="./libs/sql-wasm.js"></script>
   <script src="./libs/jszip.min.js"></script>
+  <!-- Phase 1A: 效果选择器增强 -->
+  <script src="./js/module-selector.js"></script>
+  <script src="./js/conditional-display.js"></script>
+  <script src="./js/module-selector-init.js"></script>
 </head>
 <body class="theme-obsidian">
   <!-- 商业化专业制卡顶栏 (彻底替代并省略左上角浏览器界面) -->
@@ -1061,8 +1066,19 @@
                   </div>
 
                   <!-- 4. 效果本体 (Effect Body / Action) -->
-                  <div class="input-field mb-3">
-                    <label>4. 效果本体 (Action) <span class="req">*</span></label>
+                  <!-- Phase 1A: 新增效果模块选择器 -->
+                  <div id="enhancedModuleSelectorContainer" class="mb-4" style="display:none;">
+                    <!-- JavaScript 动态渲染的模块选择器将插入到这里 -->
+                  </div>
+
+                  <!-- 传统下拉菜单（向后兼容） -->
+                  <div class="input-field mb-3" id="legacyActionSelector">
+                    <label>
+                      4. 效果本体 (Action) <span class="req">*</span>
+                      <button type="button" class="btn btn-sm btn-outline ml-2" onclick="toggleModuleSelector()" style="font-size:11px;padding:2px 8px;">
+                        切换到模块选择器
+                      </button>
+                    </label>
                     <select id="wizardAction" onchange="onWizardActionChanged(this.value)">
                       <option value="search_deck" selected>检索：从卡组把卡片加入手牌</option>
                       <option value="special_summon_self">特召：这张卡从手卡特殊召唤</option>
@@ -2095,6 +2111,26 @@
       </div>
     </div>
   </div>
+
+  <!-- 应用水印与致谢信息 -->
+  <footer class="app-footer" style="background: rgba(10,14,23,0.95); border-top: 1px solid rgba(255,255,255,0.08); padding: 16px 24px; text-align: center; font-size: 13px; color: #94a3b8; margin-top: auto;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 12px;">
+        <span style="color: #f8fafc; font-weight: 600;">游戏王 AI 制卡器</span> v2.0.1 | 
+        <a href="https://github.com/Paper-Yuan/yugioh-ai-card-creator" target="_blank" style="color: #38bdf8; text-decoration: none;">GitHub</a> | 
+        <a href="https://space.bilibili.com/99201674" target="_blank" style="color: #fb7299; text-decoration: none;">B站 @Paper-Yuan</a>
+      </div>
+      <div style="font-size: 12px; color: #64748b; line-height: 1.6;">
+        致谢开源项目: 
+        <a href="https://code.moenext.com/nanahira/ygopro-scripting-workflow" target="_blank" style="color: #64748b; text-decoration: underline;">ygopro-scripting-workflow</a> · 
+        <a href="https://gitee.com/scutlzl/game-king-card-maker" target="_blank" style="color: #64748b; text-decoration: underline;">YGOLD制卡器</a> · 
+        <a href="https://github.com/kooriookami/yugioh-card" target="_blank" style="color: #64748b; text-decoration: underline;">yugioh-card</a>
+      </div>
+      <div style="font-size: 11px; color: #475569; margin-top: 8px;">
+        本项目仅供学习交流使用 · MIT License
+      </div>
+    </div>
+  </footer>
 
   <!-- 核心交互脚本 -->
   <script src="./js/card-renderer.js"></script>

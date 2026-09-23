@@ -170,6 +170,9 @@ class CardRenderer {
     // 12. 叠加 YGOLD 罕贵度闪膜与工艺特效 (SER/UR/PSER/CR/HR/MR 等)
     await this.drawRareFoil(ctx, cardData);
 
+    // 13. 绘制作者水印 (右下角)
+    this.drawAuthorWatermark(ctx, cardData);
+
     ctx.restore();
   }
 
@@ -1464,6 +1467,27 @@ class CardRenderer {
       console.error('[CardRenderer] DataURL fallback failed:', e);
       resolve(null);
     }
+  }
+
+  /**
+   * 绘制作者水印 (右下角显示作者信息)
+   */
+  drawAuthorWatermark(ctx, card) {
+    // 仅在非public模式下显示完整水印
+    const isPublicBuild = window.IS_PUBLIC_BUILD || false;
+    if (isPublicBuild) return;
+
+    ctx.save();
+    ctx.globalAlpha = 0.15;
+    ctx.fillStyle = '#000000';
+    ctx.font = '14px Arial, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    
+    const watermarkText = 'Made with Paper-Yuan\'s YGO Card Creator';
+    ctx.fillText(watermarkText, this.CARD_WIDTH - 20, this.CARD_HEIGHT - 10);
+    
+    ctx.restore();
   }
 
   /**
