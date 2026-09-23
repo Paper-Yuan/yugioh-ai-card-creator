@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.yugioh.cardcreator',
-  appName: '游戏王AI制卡器',
+  appName: '游戏王制卡器',
   webDir: 'dist/web/public',
   bundledWebRuntime: false,
   server: {
