@@ -40,13 +40,38 @@ if (fs.existsSync(publicIndexPath)) {
   console.log('✅ 已启用 Public 模式标记');
 }
 
-// 4. 移除商业字体文件
+// 4. 复制 EXE 启动器到发布包根目录
+const exeSource = path.join(RELEASE_DIR, 'win-unpacked/游戏王AI制卡器.exe');
+const targetDir = path.join(RELEASE_DIR, 'yugioh-card-creator-public');
+if (!fs.existsSync(targetDir)) {
+  fs.mkdirSync(targetDir, { recursive: true });
+}
+const exeTarget = path.join(targetDir, '游戏王AI制卡器.exe');
+if (fs.existsSync(exeSource)) {
+  fs.copyFileSync(exeSource, exeTarget);
+  console.log('✅ 已复制 EXE 启动器到发布包');
+} else {
+  console.log('⚠️  未找到 EXE 启动器，请先运行 npm run package:win');
+}
+
+// 5. 移除商业字体文件并确保保留开源字体
 const fontDir = path.join(DIST_DIR, 'web/public/assets/yugioh/font');
 const commercialFonts = [
   'RenderFontChineseSimplified.ttf',
   'RenderFontJapanese.ttf',
   'FOT-Rodin Pro DB.otf',
   'Yu-Gi-Oh! FOT-Rodin ProN DB.ttf'
+];
+
+const openSourceFonts = [
+  'SourceHanSansSC-Bold.otf',
+  'SourceHanSansSC-Medium.otf',
+  'YGOLDDFLeisho3.ttf',
+  'AtkDef.ttf',
+  'ygo-sc.woff2',
+  'ygo-atk-def.woff2',
+  'ygo-link.woff2',
+  'ygo-password.woff2'
 ];
 
 if (fs.existsSync(fontDir)) {
@@ -57,9 +82,84 @@ if (fs.existsSync(fontDir)) {
       console.log(`🗑️  已移除商业字体: ${font}`);
     }
   });
+  
+  // 验证开源字体是否存在
+  let missingFonts = 0;
+  openSourceFonts.forEach(font => {
+    const fontPath = path.join(fontDir, font);
+    if (!fs.existsSync(fontPath)) {
+      console.warn(`⚠️  缺少开源字体: ${font}`);
+      missingFonts++;
+    }
+  });
+  
+  if (missingFonts === 0) {
+    console.log(`✅ 已确认所有 ${openSourceFonts.length} 个开源字体文件完整`);
+  } else {
+    console.warn(`⚠️  缺少 ${missingFonts} 个开源字体文件，请检查 src/web/public/assets/yugioh/font/`);
+  }
 }
 
-// 5. 创建压缩包
+// 6. 生成 README 说明文件
+const readmeContent = `# 游戏王 AI 制卡器 - Public 版本
+
+## 快速启动
+
+### Windows 用户
+双击 \`游戏王AI制卡器.exe\` 即可启动
+
+### 其他平台用户
+1. 确保已安装 Node.js (v16+)
+2. 运行命令: \`npm start\`
+3. 浏览器访问 http://localhost:3000
+
+## 字体说明
+
+本 Public 版本使用开源字体，符合商业友好许可：
+
+### 中文字体
+- **SourceHanSansSC-Bold.otf** (思源黑体)
+- **SourceHanSansSC-Medium.otf** (思源黑体)
+  - 许可: SIL Open Font License 1.1
+  - 来源: Adobe / Google
+
+### 日文效果文本字体
+- **YGOLDDFLeisho3.ttf**
+  - 开源替代字体，适用于日文效果文本渲染
+
+### 特殊字体
+- **AtkDef.ttf** (攻守数值)
+- **ygo-sc.woff2** (简体中文 Web 字体)
+- **ygo-atk-def.woff2** (攻守图标)
+- **ygo-link.woff2** (连接箭头)
+- **ygo-password.woff2** (密码数字)
+
+所有字体文件均为开源或免费商用，无商业使用限制。
+
+## 功能特性
+
+- ✅ 完整的游戏王卡牌渲染引擎
+- ✅ AI 辅助卡片描述生成
+- ✅ YGOPro / MDPro3 脚本导出
+- ✅ CDB 数据库管理
+- ✅ 批量制卡与卡包导出
+- ✅ 手机端适配 (Android APK)
+
+## 技术支持
+
+- 项目主页: https://github.com/your-repo
+- 问题反馈: https://github.com/your-repo/issues
+
+## 许可协议
+
+本项目采用 MIT 许可协议开源。
+`;
+
+const readmePath = path.join(targetDir, 'README.txt');
+fs.writeFileSync(readmePath, readmeContent, 'utf-8');
+console.log('✅ 已生成 README.txt 说明文件');
+
+// 7. 创建压缩包
 console.log('📦 正在打包...');
 const output = fs.createWriteStream(PUBLIC_OUTPUT);
 const archive = archiver('zip', { zlib: { level: 9 } });

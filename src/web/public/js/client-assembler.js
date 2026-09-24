@@ -1210,6 +1210,21 @@ class ClientScriptAssembler {
     const mw = (s.filterType === 'monster' || (!s.filterType && monsterDefault)) ? '只' : '张';
     const map = {
       search_deck: isJa ? `デッキから${fp || 'カード'}１枚を手札に加える。` : `从卡组把1${mw}${fp || '卡'}加入手牌。`,
+      
+      // Phase 8: Cost 代价机制
+      discard_cost: isJa ? `手札を${s.costCount || 1}枚捨てる。` : `把${s.costCount || 1}张手卡送去墓地。`,
+      pay_lp_cost: isJa ? `${s.costLp || 500}LPを払う。` : `支付${s.costLp || 500}基本分。`,
+      tribute_cost: isJa ? `自分フィールドのモンスター${s.costCount || 1}体をリリースする。` : `把自己场上${s.costCount || 1}只怪兽解放。`,
+      
+      // Phase 8: 召唤程序
+      fusion_summon: isJa ? `融合召喚する。` : `从额外卡组融合召唤1只${fp || '融合怪兽'}。`,
+      contact_fusion: isJa ? `素材をデッキに戻して融合召喚する。` : `将融合素材返回卡组，从额外卡组融合召唤1只${fp || '融合怪兽'}。`,
+      synchro_summon: isJa ? `シンクロ召喚する。` : `从额外卡组同调召唤1只${fp || '同调怪兽'}。`,
+      xyz_summon: isJa ? `エクシーズ召喚する。` : `从额外卡组超量召唤1只${fp || '超量怪兽'}。`,
+      
+      // Phase 8: 连锁与时点
+      chain_link_check: isJa ? `チェーン${s.minChain || 2}以上の場合に発動できる。` : `连锁${s.minChain || 2}以上才能发动。`,
+      timing_miss_check: isJa ? `タイミングを逃さない。` : `不会错过时点。`,
       dump_deck: isJa ? `デッキから${fp || 'カード'}１枚を墓地へ送る。` : `从卡组把1${mw}${fp || '卡'}送去墓地。`,
       special_summon_deck: isJa ? `デッキから${fp || 'モンスター'}１体を特殊召喚する。` : `从卡组把1只${fp || '怪兽'}特殊召唤。`,
       special_summon_hand: isJa ? `手札から${fp || 'モンスター'}１体を特殊召喚する。` : `从手卡把1只${fp || '怪兽'}特殊召唤。`,

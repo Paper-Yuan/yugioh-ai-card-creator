@@ -1850,6 +1850,633 @@ end`,
     compatibility: [],
     examples: ['团结之力', '同盟机械'],
     tags: ['装备', 'equip']
+  },
+
+  // ===== Phase 8: Cost 代价机制 =====
+  {
+    id: 'discard_cost',
+    name: '丢弃手卡代价',
+    nameEn: 'Discard Cost',
+    category: EffectCategory.EFFECT,
+    description: '发动效果时，需要丢弃指定数量的手卡作为代价',
+    parameters: [
+      {
+        name: 'count',
+        type: 'number',
+        label: '丢弃数量',
+        description: '需要丢弃的手卡数量',
+        defaultValue: 1,
+        required: true
+      },
+      {
+        name: 'specific',
+        type: 'boolean',
+        label: '指定卡片类型',
+        description: '是否限定丢弃的卡片类型',
+        defaultValue: false,
+        required: false
+      },
+      {
+        name: 'card_type',
+        type: 'select',
+        label: '卡片类型',
+        description: '限定丢弃的卡片类型',
+        options: [
+          { value: 'monster', label: '怪兽卡' },
+          { value: 'spell', label: '魔法卡' },
+          { value: 'trap', label: '陷阱卡' }
+        ],
+        required: false
+      }
+    ],
+    luaTemplate: `
+--丢弃手卡代价
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+  {{#if specific}}
+  if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,{{count}},nil) end
+  Duel.DiscardHand(tp,s.cfilter,{{count}},{{count}},REASON_COST+REASON_DISCARD)
+  {{else}}
+  if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>={{count}} end
+  Duel.DiscardHand(tp,aux.TRUE,{{count}},{{count}},REASON_COST+REASON_DISCARD)
+  {{/if}}
+end
+{{#if specific}}
+function s.cfilter(c)
+  {{#if card_type.monster}}
+  return c:IsType(TYPE_MONSTER)
+  {{/if}}
+  {{#if card_type.spell}}
+  return c:IsType(TYPE_SPELL)
+  {{/if}}
+  {{#if card_type.trap}}
+  return c:IsType(TYPE_TRAP)
+  {{/if}}
+end
+{{/if}}`,
+    compatibility: [],
+    examples: ['凤凰神的羽毛', '真红眼融合'],
+    tags: ['cost', '代价', '手卡']
+  },
+
+  {
+    id: 'pay_lp_cost',
+    name: '支付生命值代价',
+    nameEn: 'Pay LP Cost',
+    category: EffectCategory.EFFECT,
+    description: '发动效果时，需要支付指定数量的生命值作为代价',
+    parameters: [
+      {
+        name: 'amount',
+        type: 'number',
+        label: '支付数值',
+        description: '需要支付的生命值数量',
+        defaultValue: 500,
+        required: true
+      },
+      {
+        name: 'percentage',
+        type: 'boolean',
+        label: '百分比支付',
+        description: '是否按生命值百分比支付',
+        defaultValue: false,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--支付生命值代价
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+  {{#if percentage}}
+  local lp=Duel.GetLP(tp)
+  local cost=math.floor(lp*{{amount}}/100)
+  if chk==0 then return Duel.CheckLPCost(tp,cost) end
+  Duel.PayLPCost(tp,cost)
+  {{else}}
+  if chk==0 then return Duel.CheckLPCost(tp,{{amount}}) end
+  Duel.PayLPCost(tp,{{amount}})
+  {{/if}}
+end`,
+    compatibility: [],
+    examples: ['双重召唤', '强欲之壶'],
+    tags: ['cost', '代价', 'LP']
+  },
+
+  {
+    id: 'tribute_cost',
+    name: '解放怪兽代价',
+    nameEn: 'Tribute Cost',
+    category: EffectCategory.EFFECT,
+    description: '发动效果时，需要解放场上的怪兽作为代价',
+    parameters: [
+      {
+        name: 'count',
+        type: 'number',
+        label: '解放数量',
+        description: '需要解放的怪兽数量',
+        defaultValue: 1,
+        required: true
+      },
+      {
+        name: 'self_only',
+        type: 'boolean',
+        label: '仅限自己',
+        description: '是否只能解放自己场上的怪兽',
+        defaultValue: true,
+        required: false
+      },
+      {
+        name: 'specific_type',
+        type: 'boolean',
+        label: '指定种族',
+        description: '是否限定解放的怪兽种族',
+        defaultValue: false,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--解放怪兽代价
+{{#if specific_type}}
+function s.cfilter(c)
+  return c:IsRace(RACE_DRAGON) and c:IsReleasable()
+end
+{{/if}}
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+  {{#if self_only}}
+  local loc=LOCATION_MZONE
+  {{else}}
+  local loc=LOCATION_MZONE
+  {{/if}}
+  {{#if specific_type}}
+  if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,loc,0,{{count}},nil) end
+  local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,loc,0,{{count}},{{count}},nil)
+  {{else}}
+  if chk==0 then return Duel.CheckReleaseGroupCost(tp,aux.TRUE,{{count}},false,nil,nil) end
+  local g=Duel.SelectReleaseGroupCost(tp,aux.TRUE,{{count}},{{count}},false,nil,nil)
+  {{/if}}
+  Duel.Release(g,REASON_COST)
+end`,
+    compatibility: [],
+    examples: ['死者苏生', '真红眼黑龙'],
+    tags: ['cost', '代价', '解放']
+  },
+
+  // ===== Phase 8: Fusion 召唤程序 =====
+  {
+    id: 'fusion_summon',
+    name: '融合召唤',
+    nameEn: 'Fusion Summon',
+    category: EffectCategory.SUMMON,
+    description: '从额外卡组融合召唤指定的融合怪兽',
+    parameters: [
+      {
+        name: 'material_location',
+        type: 'select',
+        label: '素材位置',
+        description: '融合素材的来源位置',
+        options: [
+          { value: 'hand_field', label: '手卡+场上' },
+          { value: 'grave', label: '墓地' },
+          { value: 'banished', label: '除外区' },
+          { value: 'deck', label: '卡组' }
+        ],
+        required: true
+      },
+      {
+        name: 'opponent_material',
+        type: 'boolean',
+        label: '使用对手怪兽',
+        description: '是否可以使用对手的怪兽作为素材',
+        defaultValue: false,
+        required: false
+      },
+      {
+        name: 'specific_fusion',
+        type: 'boolean',
+        label: '指定融合怪兽',
+        description: '是否限定融合召唤特定的怪兽',
+        defaultValue: false,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--融合召唤
+function s.filter(c,e,tp)
+  return c:IsType(TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
+    {{#if specific_fusion}}
+    and c:IsSetCard(0x...)  -- 特定系列
+    {{/if}}
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then
+    {{#if material_location.hand_field}}
+    local loc=LOCATION_HAND+LOCATION_MZONE
+    {{/if}}
+    {{#if material_location.grave}}
+    local loc=LOCATION_GRAVE
+    {{/if}}
+    {{#if material_location.banished}}
+    local loc=LOCATION_REMOVED
+    {{/if}}
+    {{#if opponent_material}}
+    return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
+      and Duel.IsExistingMatchingCard(aux.TRUE,tp,loc,loc,2,nil)
+    {{else}}
+    return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
+      and Duel.IsExistingMatchingCard(aux.TRUE,tp,loc,0,2,nil)
+    {{/if}}
+  end
+  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+  local c=e:GetHandler()
+  {{#if material_location.hand_field}}
+  local loc=LOCATION_HAND+LOCATION_MZONE
+  {{/if}}
+  {{#if material_location.grave}}
+  local loc=LOCATION_GRAVE
+  {{/if}}
+  {{#if opponent_material}}
+  local mg=Duel.GetMatchingGroup(aux.TRUE,tp,loc,loc,nil)
+  {{else}}
+  local mg=Duel.GetMatchingGroup(aux.TRUE,tp,loc,0,nil)
+  {{/if}}
+  local sg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_EXTRA,0,nil,e,tp)
+  if #sg>0 then
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+    local tc=sg:Select(tp,1,1,nil):GetFirst()
+    if tc then
+      local mat=mg:Select(tp,2,99,nil)
+      tc:SetMaterial(mat)
+      Duel.SendtoGrave(mat,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+      Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
+      tc:CompleteProcedure()
+    end
+  end
+end`,
+    compatibility: [],
+    examples: ['融合', '未来融合', '捕食植物'],
+    tags: ['融合', 'fusion', '额外卡组']
+  },
+
+  {
+    id: 'contact_fusion',
+    name: '接触融合',
+    nameEn: 'Contact Fusion',
+    category: EffectCategory.SUMMON,
+    description: '不使用融合魔法卡，将素材返回卡组进行融合召唤',
+    parameters: [
+      {
+        name: 'return_to_deck',
+        type: 'boolean',
+        label: '返回卡组',
+        description: '素材是否返回卡组而非送去墓地',
+        defaultValue: true,
+        required: false
+      },
+      {
+        name: 'shuffle',
+        type: 'boolean',
+        label: '洗牌',
+        description: '返回卡组后是否洗牌',
+        defaultValue: true,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--接触融合
+function s.filter(c,e,tp)
+  return c:IsType(TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then
+    return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
+      and Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_MZONE,0,2,nil)
+  end
+  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+  local mg=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,0,nil)
+  local sg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_EXTRA,0,nil,e,tp)
+  if #sg>0 then
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+    local tc=sg:Select(tp,1,1,nil):GetFirst()
+    if tc then
+      Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+      local mat=mg:Select(tp,2,99,nil)
+      tc:SetMaterial(mat)
+      {{#if return_to_deck}}
+      Duel.SendtoDeck(mat,nil,SEQ_DECKSHUFFLE,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+      {{#if shuffle}}
+      Duel.ShuffleDeck(tp)
+      {{/if}}
+      {{else}}
+      Duel.SendtoGrave(mat,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+      {{/if}}
+      Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+    end
+  end
+end`,
+    compatibility: [],
+    examples: ['新宇侠', '剑斗兽'],
+    tags: ['融合', '接触', '返回卡组']
+  },
+
+  {
+    id: 'synchro_summon',
+    name: '同调召唤',
+    nameEn: 'Synchro Summon',
+    category: EffectCategory.SUMMON,
+    description: '从额外卡组同调召唤指定等级的同调怪兽',
+    parameters: [
+      {
+        name: 'tuner_count',
+        type: 'number',
+        label: '调整者数量',
+        description: '需要的调整者怪兽数量',
+        defaultValue: 1,
+        required: true
+      },
+      {
+        name: 'non_tuner_min',
+        type: 'number',
+        label: '非调整者最小数',
+        description: '非调整者怪兽的最小数量',
+        defaultValue: 1,
+        required: true
+      },
+      {
+        name: 'material_grave',
+        type: 'boolean',
+        label: '墓地素材',
+        description: '是否可以使用墓地的怪兽作为素材',
+        defaultValue: false,
+        required: false
+      },
+      {
+        name: 'specific_type',
+        type: 'boolean',
+        label: '指定种族',
+        description: '是否限定同调召唤特定种族的怪兽',
+        defaultValue: false,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--同调召唤
+function s.synfilter(c,e,tp)
+  return c:IsType(TYPE_SYNCHRO) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)
+    {{#if specific_type}}
+    and c:IsRace(RACE_DRAGON)  -- 特定种族
+    {{/if}}
+end
+function s.matfilter(c)
+  return c:IsFaceup() and c:IsAbleToGraveAsCost()
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then
+    {{#if material_grave}}
+    local loc=LOCATION_MZONE+LOCATION_GRAVE
+    {{else}}
+    local loc=LOCATION_MZONE
+    {{/if}}
+    local tg=Duel.GetMatchingGroup(s.matfilter,tp,loc,0,nil)
+    return Duel.IsExistingMatchingCard(s.synfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
+      and #tg>={{tuner_count}}+{{non_tuner_min}}
+  end
+  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+  {{#if material_grave}}
+  local loc=LOCATION_MZONE+LOCATION_GRAVE
+  {{else}}
+  local loc=LOCATION_MZONE
+  {{/if}}
+  local sg=Duel.GetMatchingGroup(s.synfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
+  if #sg>0 then
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+    local sc=sg:Select(tp,1,1,nil):GetFirst()
+    if sc then
+      local lv=sc:GetLevel()
+      Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+      local mg=Duel.GetMatchingGroup(s.matfilter,tp,loc,0,nil)
+      local mat=Group.CreateGroup()
+      -- 选择调整者
+      local tuner=mg:FilterSelect(tp,Card.IsType,{{tuner_count}},{{tuner_count}},nil,TYPE_TUNER)
+      mat:Merge(tuner)
+      local tlv=tuner:GetSum(Card.GetLevel)
+      -- 选择非调整者
+      mg:Sub(tuner)
+      local non_tuner=mg:Select(tp,{{non_tuner_min}},99,nil)
+      mat:Merge(non_tuner)
+      local sumlv=mat:GetSum(Card.GetLevel)
+      if sumlv==lv then
+        sc:SetMaterial(mat)
+        Duel.SendtoGrave(mat,REASON_EFFECT+REASON_MATERIAL+REASON_SYNCHRO)
+        Duel.SpecialSummon(sc,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
+        sc:CompleteProcedure()
+      end
+    end
+  end
+end`,
+    compatibility: [],
+    examples: ['星尘龙', '流星龙', '一击瞬杀虫'],
+    tags: ['同调', 'synchro', '额外卡组', '调整者']
+  },
+
+  {
+    id: 'xyz_summon',
+    name: '超量召唤',
+    nameEn: 'Xyz Summon',
+    category: EffectCategory.SUMMON,
+    description: '从额外卡组超量召唤指定阶级的超量怪兽',
+    parameters: [
+      {
+        name: 'rank',
+        type: 'number',
+        label: '阶级',
+        description: '超量怪兽的阶级',
+        defaultValue: 4,
+        required: true
+      },
+      {
+        name: 'material_count',
+        type: 'number',
+        label: '素材数量',
+        description: '需要的超量素材数量',
+        defaultValue: 2,
+        required: true
+      },
+      {
+        name: 'level_match',
+        type: 'boolean',
+        label: '等级匹配',
+        description: '素材等级是否必须与阶级相同',
+        defaultValue: true,
+        required: false
+      },
+      {
+        name: 'xyz_overlay',
+        type: 'boolean',
+        label: '叠放超量怪兽',
+        description: '是否可以叠放超量怪兽作为素材',
+        defaultValue: false,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--超量召唤
+function s.xyzfilter(c,e,tp)
+  return c:IsType(TYPE_XYZ) and c:IsRank({{rank}})
+    and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+end
+function s.matfilter(c)
+  {{#if xyz_overlay}}
+  return c:IsFaceup() and (c:IsLevel({{rank}}) or c:IsType(TYPE_XYZ))
+  {{else}}
+  {{#if level_match}}
+  return c:IsFaceup() and c:IsLevel({{rank}})
+  {{else}}
+  return c:IsFaceup()
+  {{/if}}
+  {{/if}}
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then
+    local mg=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_MZONE,0,nil)
+    return Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
+      and #mg>={{material_count}}
+  end
+  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+  local sg=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
+  if #sg>0 then
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+    local xc=sg:Select(tp,1,1,nil):GetFirst()
+    if xc then
+      Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
+      local mg=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_MZONE,0,nil)
+      local mat=mg:Select(tp,{{material_count}},{{material_count}},nil)
+      xc:SetMaterial(mat)
+      Duel.Overlay(xc,mat)
+      Duel.SpecialSummon(xc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
+      xc:CompleteProcedure()
+    end
+  end
+end`,
+    compatibility: [],
+    examples: ['No.39 希望皇 霍普', 'CNo.39 希望皇 霍普雷', '超量单位'],
+    tags: ['超量', 'xyz', '额外卡组', '阶级']
+  },
+
+  // ===== Phase 8: Chain 连锁处理 =====
+  {
+    id: 'chain_link_check',
+    name: '连锁位置判定',
+    nameEn: 'Chain Link Check',
+    category: EffectCategory.EFFECT,
+    description: '检测当前连锁的位置，仅在特定连锁位置才能发动',
+    parameters: [
+      {
+        name: 'min_chain',
+        type: 'number',
+        label: '最小连锁数',
+        description: '至少需要在连锁几以上才能发动',
+        defaultValue: 2,
+        required: true
+      },
+      {
+        name: 'exact_chain',
+        type: 'boolean',
+        label: '精确连锁位置',
+        description: '是否必须是特定连锁位置',
+        defaultValue: false,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--连锁位置判定
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+  {{#if exact_chain}}
+  return Duel.GetCurrentChain()=={{min_chain}}
+  {{else}}
+  return Duel.GetCurrentChain()>={{min_chain}}
+  {{/if}}
+end`,
+    compatibility: [],
+    examples: ['幻变骚灵协议', '王宫的弹压'],
+    tags: ['连锁', 'chain', '时点']
+  },
+
+  {
+    id: 'timing_miss_check',
+    name: '时点检测',
+    nameEn: 'Timing Miss Check',
+    category: EffectCategory.EFFECT,
+    description: '检测效果发动的时点，实现"当...时"与"如果...那么"的区别',
+    parameters: [
+      {
+        name: 'timing_type',
+        type: 'select',
+        label: '时点类型',
+        description: '效果的时点判定类型',
+        options: [
+          { value: 'when', label: '当...时（可能错过时点）' },
+          { value: 'if', label: '如果...那么（不会错过时点）' }
+        ],
+        required: true
+      },
+      {
+        name: 'trigger_event',
+        type: 'select',
+        label: '触发事件',
+        description: '触发效果的事件类型',
+        options: [
+          { value: 'summon', label: '召唤成功时' },
+          { value: 'destroyed', label: '被破坏时' },
+          { value: 'sent_grave', label: '送去墓地时' },
+          { value: 'banished', label: '被除外时' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--时点检测
+{{#if timing_type.when}}
+-- "当...时" - EFFECT_TYPE_TRIGGER_O (选发，可能错过时点)
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+{{#if trigger_event.summon}}
+e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+{{/if}}
+{{#if trigger_event.destroyed}}
+e1:SetCode(EVENT_DESTROYED)
+{{/if}}
+{{#if trigger_event.sent_grave}}
+e1:SetCode(EVENT_TO_GRAVE)
+{{/if}}
+e1:SetProperty(EFFECT_FLAG_DELAY)  -- 延迟发动，容易错过时点
+{{else}}
+-- "如果...那么" - EFFECT_TYPE_TRIGGER_F (必发，不会错过时点)
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_SINGLE)
+{{#if trigger_event.summon}}
+e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+{{/if}}
+{{#if trigger_event.destroyed}}
+e1:SetCode(EVENT_DESTROYED)
+{{/if}}
+{{#if trigger_event.sent_grave}}
+e1:SetCode(EVENT_TO_GRAVE)
+{{/if}}
+e1:SetProperty(0)  -- 必发效果，不会错过时点
+{{/if}}
+e1:SetCondition(s.condition)
+e1:SetTarget(s.target)
+e1:SetOperation(s.operation)
+c:RegisterEffect(e1)`,
+    compatibility: [],
+    examples: ['星尘龙', '炎星侯-豹乐天'],
+    tags: ['时点', 'timing', '错过时点']
   }
 ];
 

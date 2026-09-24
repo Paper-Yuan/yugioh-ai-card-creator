@@ -529,7 +529,12 @@
                     <span class="icon">📜</span>
                     <h3 style="margin:0;">效果外文本 / 独立规则条款 (Rule Texts)</h3>
                   </div>
-                  <span id="ruleTextsAdaptHint" style="font-size:12px;color:var(--text-muted);">将依所选召唤方式与怪兽种类自动适配</span>
+                  <div style="display:flex;gap:8px;align-items:center;">
+                    <button type="button" class="btn btn-sm btn-outline" onclick="autoIntegrateRuleTexts()" style="font-size:12px;padding:4px 10px;color:#c084fc;border-color:#a855f7;" title="按 OCG 官方规范顺序整合已选规则文本">
+                      🔗 一键整合规则文本
+                    </button>
+                    <span id="ruleTextsAdaptHint" style="font-size:12px;color:var(--text-muted);">将依所选召唤方式与怪兽种类自动适配</span>
+                  </div>
                 </div>
 
                 <div class="rule-texts-grid" style="display:grid;grid-template-columns:1fr;gap:12px;">
@@ -1101,6 +1106,21 @@
                       <option value="burn_damage">追伤：给对方造成指定数值伤害</option>
                       <option value="immune_all">永续全抗：不受对方卡的效果影响</option>
                       <option value="atk_boost">永续增幅：攻击力·守备力上升 1000</option>
+                      <optgroup label="🆕 Phase 8: 代价机制 (Cost)">
+                        <option value="discard_cost">代价：丢弃指定数量的手卡</option>
+                        <option value="pay_lp_cost">代价：支付指定数量的生命值</option>
+                        <option value="tribute_cost">代价：解放场上的怪兽</option>
+                      </optgroup>
+                      <optgroup label="🆕 Phase 8: 额外卡组召唤程序">
+                        <option value="fusion_summon">融合召唤：从额外卡组融合召唤</option>
+                        <option value="contact_fusion">接触融合：素材返回卡组的融合</option>
+                        <option value="synchro_summon">同调召唤：从额外卡组同调召唤</option>
+                        <option value="xyz_summon">超量召唤：从额外卡组超量召唤</option>
+                      </optgroup>
+                      <optgroup label="🆕 Phase 8: 连锁与时点判定">
+                        <option value="chain_link_check">连锁判定：检测当前连锁位置</option>
+                        <option value="timing_miss_check">时点检测：实现错过时点机制</option>
+                      </optgroup>
                       <optgroup label="🎯 二选一 / 多选一选项效果 (支持 YGOPro 弹窗精准文字)">
                         <option value="choice_search_or_dump">二选一：从卡组检索手牌 / 从卡组送去墓地</option>
                         <option value="choice_ss_or_search">二选一：从卡组特召怪兽 / 从卡组检索手牌</option>
