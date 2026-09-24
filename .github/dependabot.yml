@@ -1,0 +1,71 @@
+version: 2
+
+updates:
+  # Node.js 依赖自动更新
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    
+    # 自动合并策略
+    open-pull-requests-limit: 10
+    
+    # 提交信息前缀
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    
+    # 标签
+    labels:
+      - "dependencies"
+      - "security"
+    
+    # 审查人
+    reviewers:
+      - "jingyuan0504-ctrl"
+    
+    # 版本更新策略
+    versioning-strategy: increase
+    
+    # 分组更新
+    groups:
+      # 安全更新（优先级最高）
+      security-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "security"
+      
+      # 开发依赖
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # 生产依赖（谨慎更新）
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "patch"
+    
+    # 忽略特定版本（如有已知问题）
+    ignore:
+      # 示例：如果某个版本有问题，可以临时忽略
+      # - dependency-name: "electron-builder"
+      #   versions: ["25.x"]
+
+  # GitHub Actions 依赖自动更新
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "ci"
+      - "dependencies"

@@ -2477,6 +2477,1964 @@ c:RegisterEffect(e1)`,
     compatibility: [],
     examples: ['星尘龙', '炎星侯-豹乐天'],
     tags: ['时点', 'timing', '错过时点']
+  },
+
+  // ===== Phase 9: 核心机制突破 =====
+  
+  // P区与灵摆召唤
+  {
+    id: 'pendulum_summon',
+    name: 'P区灵摆召唤',
+    nameEn: 'Pendulum Summon',
+    category: EffectCategory.SUMMON,
+    description: '将此卡放置到P区，并通过P刻度进行灵摆召唤',
+    parameters: [
+      {
+        name: 'left_scale',
+        type: 'number',
+        label: '左P刻度',
+        description: 'P区左侧的刻度值',
+        min: 0,
+        max: 13,
+        defaultValue: 1,
+        required: true
+      },
+      {
+        name: 'right_scale',
+        type: 'number',
+        label: '右P刻度',
+        description: 'P区右侧的刻度值',
+        min: 0,
+        max: 13,
+        defaultValue: 1,
+        required: true
+      },
+      {
+        name: 'pendulum_effect_type',
+        type: 'select',
+        label: 'P区效果类型',
+        description: 'P区效果的触发类型',
+        options: [
+          { value: 'continuous', label: '永续效果' },
+          { value: 'trigger', label: '诱发效果' },
+          { value: 'ignition', label: '起动效果' },
+          { value: 'quick', label: '快速效果' }
+        ],
+        required: true
+      },
+      {
+        name: 'scale_modification',
+        type: 'boolean',
+        label: '可以修改P刻度',
+        description: 'P区效果是否可以修改自己或其他卡的P刻度',
+        defaultValue: false,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--P区灵摆召唤
+{{#if pendulum_effect_type.continuous}}
+-- P区永续效果
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_FIELD)
+e1:SetCode(EFFECT_UPDATE_ATTACK)
+e1:SetRange(LOCATION_PZONE)
+e1:SetTargetRange(LOCATION_MZONE,0)
+e1:SetValue(500)
+c:RegisterEffect(e1)
+{{/if}}
+{{#if pendulum_effect_type.trigger}}
+-- P区诱发效果
+local e2=Effect.CreateEffect(c)
+e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+e2:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
+e2:SetCode(EVENT_PHASE+PHASE_END)
+e2:SetRange(LOCATION_PZONE)
+e2:SetCountLimit(1,id)
+e2:SetTarget(s.thtg)
+e2:SetOperation(s.thop)
+c:RegisterEffect(e2)
+{{/if}}
+{{#if scale_modification}}
+-- 修改P刻度
+local e3=Effect.CreateEffect(c)
+e3:SetType(EFFECT_TYPE_SINGLE)
+e3:SetCode(EFFECT_CHANGE_LSCALE)
+e3:SetValue({{left_scale}}+1)
+c:RegisterEffect(e3)
+{{/if}}`,
+    compatibility: [],
+    examples: ['异色眼灵摆龙', '虹彩之魔术师', '星光大道'],
+    tags: ['灵摆', 'pendulum', 'P区', 'P刻度']
+  },
+
+  // 手卡/卡组诱发效果
+  {
+    id: 'hand_deck_trigger_effect',
+    name: '手卡/卡组诱发效果',
+    nameEn: 'Hand/Deck Trigger Effect',
+    category: EffectCategory.EFFECT,
+    description: '从手卡或卡组发动的快速效果（俗称"手坑"），可在对手回合响应特定事件',
+    parameters: [
+      {
+        name: 'trigger_location',
+        type: 'select',
+        label: '发动位置',
+        description: '从哪里发动此效果',
+        options: [
+          { value: 'hand', label: '手卡' },
+          { value: 'deck', label: '卡组' },
+          { value: 'hand_deck', label: '手卡或卡组' }
+        ],
+        required: true
+      },
+      {
+        name: 'trigger_event',
+        type: 'select',
+        label: '触发事件',
+        description: '什么情况下可以发动',
+        options: [
+          { value: 'EVENT_SUMMON', label: '对手召唤时' },
+          { value: 'EVENT_SPSUMMON', label: '对手特殊召唤时' },
+          { value: 'EVENT_CHAINING', label: '对手发动效果时' },
+          { value: 'EVENT_SEARCH', label: '对手检索时' },
+          { value: 'EVENT_DRAW', label: '对手抽卡时' },
+          { value: 'EVENT_ATTACK_ANNOUNCE', label: '对手宣言攻击时' }
+        ],
+        required: true
+      },
+      {
+        name: 'effect_type',
+        type: 'select',
+        label: '效果类型',
+        description: '手卡发动后的效果',
+        options: [
+          { value: 'negate', label: '无效对手行动' },
+          { value: 'destroy', label: '破坏对手卡片' },
+          { value: 'special_summon_self', label: '特殊召唤此卡' },
+          { value: 'draw', label: '抽卡' },
+          { value: 'protection', label: '保护己方卡片' }
+        ],
+        required: true
+      },
+      {
+        name: 'discard_cost',
+        type: 'boolean',
+        label: '丢弃此卡作为代价',
+        description: '发动时需要丢弃此卡',
+        defaultValue: true,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--手卡/卡组诱发效果
+local e1=Effect.CreateEffect(c)
+{{#if effect_type.negate}}
+e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+{{/if}}
+{{#if effect_type.special_summon_self}}
+e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+{{/if}}
+e1:SetType(EFFECT_TYPE_QUICK_O)
+e1:SetCode({{trigger_event}})
+{{#if trigger_location.hand}}
+e1:SetRange(LOCATION_HAND)
+{{/if}}
+{{#if trigger_location.deck}}
+e1:SetRange(LOCATION_DECK)
+{{/if}}
+{{#if trigger_location.hand_deck}}
+e1:SetRange(LOCATION_HAND+LOCATION_DECK)
+{{/if}}
+e1:SetCountLimit(1,id)
+{{#if discard_cost}}
+e1:SetCost(s.handcost)
+{{/if}}
+e1:SetTarget(s.handtg)
+e1:SetOperation(s.handop)
+c:RegisterEffect(e1)
+
+{{#if discard_cost}}
+function s.handcost(e,tp,eg,ep,ev,re,r,rp,chk)
+  local c=e:GetHandler()
+  if chk==0 then return c:IsDiscardable() or c:IsAbleToGraveAsCost() end
+  Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
+end
+{{/if}}
+
+function s.handtg(e,tp,eg,ep,ev,re,r,rp,chk)
+  {{#if effect_type.negate}}
+  if chk==0 then return true end
+  Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+  {{/if}}
+  {{#if effect_type.special_summon_self}}
+  if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+    and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+  Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+  {{/if}}
+end
+
+function s.handop(e,tp,eg,ep,ev,re,r,rp)
+  {{#if effect_type.negate}}
+  if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+    Duel.Destroy(eg,REASON_EFFECT)
+  end
+  {{/if}}
+  {{#if effect_type.special_summon_self}}
+  local c=e:GetHandler()
+  if c:IsRelateToEffect(e) then
+    Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+  end
+  {{/if}}
+end`,
+    compatibility: [],
+    examples: ['增殖的G', '灰流丽', 'PSY骨架装备·γ', '效果遮蒙者'],
+    tags: ['手坑', '手卡', '卡组', '诱发', '快速效果', '无效']
+  },
+
+  // ===== P1 中优先级效果 =====
+  
+  // 永续效果
+  {
+    id: 'continuous_effect',
+    name: '永续效果',
+    nameEn: 'Continuous Effect',
+    category: EffectCategory.EFFECT,
+    description: '无需发动即持续生效的被动效果，可以是场地持续效果或怪兽自身效果',
+    parameters: [
+      {
+        name: 'effect_scope',
+        type: 'select',
+        label: '效果范围',
+        options: [
+          { value: 'field', label: '场地效果（影响全场）' },
+          { value: 'self', label: '自身效果（仅影响此卡）' }
+        ],
+        required: true
+      },
+      {
+        name: 'continuous_type',
+        type: 'select',
+        label: '永续效果类型',
+        options: [
+          { value: 'atk_boost', label: '攻击力上升' },
+          { value: 'def_boost', label: '守备力上升' },
+          { value: 'disable_effect', label: '无效效果' },
+          { value: 'protection', label: '保护效果' },
+          { value: 'limit_action', label: '限制行动' }
+        ],
+        required: true
+      },
+      {
+        name: 'target_range',
+        type: 'select',
+        label: '作用范围',
+        options: [
+          { value: 'own', label: '己方' },
+          { value: 'opponent', label: '对手' },
+          { value: 'both', label: '双方' }
+        ],
+        required: true
+      },
+      {
+        name: 'value',
+        type: 'number',
+        label: '数值（攻守变化）',
+        defaultValue: 500,
+        min: -3000,
+        max: 3000,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--永续效果
+{{#if effect_scope.field}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_FIELD)
+{{#if continuous_type.atk_boost}}
+e1:SetCode(EFFECT_UPDATE_ATTACK)
+e1:SetValue({{value}})
+{{/if}}
+{{#if continuous_type.def_boost}}
+e1:SetCode(EFFECT_UPDATE_DEFENSE)
+e1:SetValue({{value}})
+{{/if}}
+{{#if continuous_type.disable_effect}}
+e1:SetCode(EFFECT_DISABLE)
+{{/if}}
+e1:SetRange(LOCATION_MZONE)
+{{#if target_range.own}}
+e1:SetTargetRange(LOCATION_MZONE,0)
+{{/if}}
+{{#if target_range.opponent}}
+e1:SetTargetRange(0,LOCATION_MZONE)
+{{/if}}
+{{#if target_range.both}}
+e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+{{/if}}
+c:RegisterEffect(e1)
+{{/if}}
+{{#if effect_scope.self}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+{{#if continuous_type.atk_boost}}
+e1:SetCode(EFFECT_UPDATE_ATTACK)
+e1:SetValue({{value}})
+{{/if}}
+{{#if continuous_type.protection}}
+e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+e1:SetValue(1)
+{{/if}}
+c:RegisterEffect(e1)
+{{/if}}`,
+    compatibility: [],
+    examples: ['技能抽取', '王宫的敕命', '真龙皇 V.F.D.'],
+    tags: ['永续', 'continuous', '被动', '场地效果']
+  },
+
+  // 战斗破坏抗性
+  {
+    id: 'battle_indestructible',
+    name: '战斗破坏抗性',
+    nameEn: 'Battle Indestructible',
+    category: EffectCategory.EFFECT,
+    description: '此卡不会被战斗破坏',
+    parameters: [
+      {
+        name: 'condition',
+        type: 'select',
+        label: '抗性条件',
+        options: [
+          { value: 'always', label: '无条件抗性' },
+          { value: 'once_per_turn', label: '一回合一次' },
+          { value: 'specific_monster', label: '对特定怪兽有抗性' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--战斗破坏抗性
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+{{#if condition.always}}
+e1:SetValue(1)
+{{/if}}
+{{#if condition.once_per_turn}}
+e1:SetValue(1)
+e1:SetCountLimit(1)
+{{/if}}
+c:RegisterEffect(e1)`,
+    compatibility: [],
+    examples: ['棉花糖', '星尘龙'],
+    tags: ['抗性', '战斗', '破坏保护']
+  },
+
+  // 效果破坏抗性
+  {
+    id: 'effect_indestructible',
+    name: '效果破坏抗性',
+    nameEn: 'Effect Indestructible',
+    category: EffectCategory.EFFECT,
+    description: '此卡不会被效果破坏',
+    parameters: [
+      {
+        name: 'condition',
+        type: 'select',
+        label: '抗性条件',
+        options: [
+          { value: 'always', label: '无条件抗性' },
+          { value: 'once_per_turn', label: '一回合一次' },
+          { value: 'card_effect', label: '卡片效果不受影响' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--效果破坏抗性
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+e1:SetRange(LOCATION_MZONE)
+{{#if condition.always}}
+e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+e1:SetValue(1)
+{{/if}}
+{{#if condition.card_effect}}
+e1:SetCode(EFFECT_IMMUNE_EFFECT)
+e1:SetValue(s.efilter)
+{{/if}}
+c:RegisterEffect(e1)
+
+{{#if condition.card_effect}}
+function s.efilter(e,te)
+  return te:GetOwner()~=e:GetOwner()
+end
+{{/if}}`,
+    compatibility: [],
+    examples: ['真龙皇 V.F.D.', '黑羽龙'],
+    tags: ['抗性', '效果', '破坏保护', '不受影响']
+  },
+
+  // 直接攻击/穿透伤害
+  {
+    id: 'direct_attack_pierce',
+    name: '直接攻击/穿透伤害',
+    nameEn: 'Direct Attack/Pierce',
+    category: EffectCategory.EFFECT,
+    description: '可以直接攻击玩家或穿透守备表示怪兽造成伤害',
+    parameters: [
+      {
+        name: 'attack_type',
+        type: 'select',
+        label: '攻击类型',
+        options: [
+          { value: 'direct', label: '直接攻击' },
+          { value: 'pierce', label: '穿透伤害' },
+          { value: 'both', label: '两者皆有' }
+        ],
+        required: true
+      },
+      {
+        name: 'condition',
+        type: 'select',
+        label: '发动条件',
+        options: [
+          { value: 'always', label: '无条件' },
+          { value: 'no_other_monsters', label: '对手场上没有其他怪兽' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--直接攻击/穿透伤害
+{{#if attack_type.direct}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetCode(EFFECT_DIRECT_ATTACK)
+c:RegisterEffect(e1)
+{{/if}}
+{{#if attack_type.pierce}}
+local e2=Effect.CreateEffect(c)
+e2:SetType(EFFECT_TYPE_SINGLE)
+e2:SetCode(EFFECT_PIERCE)
+c:RegisterEffect(e2)
+{{/if}}
+{{#if attack_type.both}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetCode(EFFECT_DIRECT_ATTACK)
+c:RegisterEffect(e1)
+local e2=Effect.CreateEffect(c)
+e2:SetType(EFFECT_TYPE_SINGLE)
+e2:SetCode(EFFECT_PIERCE)
+c:RegisterEffect(e2)
+{{/if}}`,
+    compatibility: [],
+    examples: ['大革命', '地球巨人 盖亚板块', '暗黑界的龙神 格拉法'],
+    tags: ['直接攻击', '穿透', '伤害']
+  },
+
+  // 连锁攻击/多次攻击
+  {
+    id: 'multiple_attacks',
+    name: '连锁攻击/多次攻击',
+    nameEn: 'Multiple Attacks',
+    category: EffectCategory.EFFECT,
+    description: '此卡可以进行多次攻击',
+    parameters: [
+      {
+        name: 'attack_count',
+        type: 'number',
+        label: '攻击次数',
+        defaultValue: 2,
+        min: 2,
+        max: 5,
+        required: true
+      },
+      {
+        name: 'attack_all',
+        type: 'boolean',
+        label: '可以攻击所有对手怪兽',
+        defaultValue: false,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--多次攻击
+{{#if attack_all}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetCode(EFFECT_ATTACK_ALL)
+e1:SetValue(1)
+c:RegisterEffect(e1)
+{{else}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetCode(EFFECT_EXTRA_ATTACK)
+e1:SetValue({{attack_count}}-1)
+c:RegisterEffect(e1)
+{{/if}}`,
+    compatibility: [],
+    examples: ['钢核', '真红眼暗铁龙', '混沌战士 -开辟的使者-'],
+    tags: ['多次攻击', '连锁攻击', '攻击全体']
+  },
+
+  // 召唤/特召限制
+  {
+    id: 'summon_limit',
+    name: '召唤/特召限制',
+    nameEn: 'Summon Restriction',
+    category: EffectCategory.EFFECT,
+    description: '限制对手的召唤或特殊召唤',
+    parameters: [
+      {
+        name: 'limit_type',
+        type: 'select',
+        label: '限制类型',
+        options: [
+          { value: 'no_special_summon', label: '不能特殊召唤' },
+          { value: 'no_normal_summon', label: '不能通常召唤' },
+          { value: 'cannot_attack', label: '不能攻击' }
+        ],
+        required: true
+      },
+      {
+        name: 'target',
+        type: 'select',
+        label: '限制目标',
+        options: [
+          { value: 'opponent', label: '对手' },
+          { value: 'both', label: '双方' },
+          { value: 'self', label: '自己' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--召唤/特召限制
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_FIELD)
+e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+{{#if limit_type.no_special_summon}}
+e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+{{/if}}
+{{#if limit_type.no_normal_summon}}
+e1:SetCode(EFFECT_CANNOT_SUMMON)
+{{/if}}
+{{#if limit_type.cannot_attack}}
+e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+{{/if}}
+{{#if target.opponent}}
+e1:SetTargetRange(0,1)
+{{/if}}
+{{#if target.both}}
+e1:SetTargetRange(1,1)
+{{/if}}
+{{#if target.self}}
+e1:SetTargetRange(1,0)
+{{/if}}
+e1:SetRange(LOCATION_MZONE)
+Duel.RegisterEffect(e1,tp)`,
+    compatibility: [],
+    examples: ['王宫的弹压', '血鬼术-不死之秘法', '重力网'],
+    tags: ['限制', '召唤限制', '攻击限制']
+  },
+
+  // 卡片宣言
+  {
+    id: 'card_declaration',
+    name: '卡片类型/属性宣言',
+    nameEn: 'Card Declaration',
+    category: EffectCategory.EFFECT,
+    description: '宣言卡片类型、属性或种族',
+    parameters: [
+      {
+        name: 'declare_type',
+        type: 'select',
+        label: '宣言类型',
+        options: [
+          { value: 'attribute', label: '属性' },
+          { value: 'race', label: '种族' },
+          { value: 'type', label: '卡片类型' },
+          { value: 'card_name', label: '卡名' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--卡片宣言
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+  {{#if declare_type.attribute}}
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTRIBUTE)
+  local att=Duel.AnnounceAttribute(tp,1,0xff)
+  -- 后续效果使用 att
+  {{/if}}
+  {{#if declare_type.race}}
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RACE)
+  local race=Duel.AnnounceRace(tp,1,0xffffff)
+  -- 后续效果使用 race
+  {{/if}}
+  {{#if declare_type.card_name}}
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
+  local code=Duel.AnnounceCard(tp)
+  -- 后续效果使用 code
+  {{/if}}
+end`,
+    compatibility: [],
+    examples: ['宣告者的神巫', '真龙皇 V.F.D.', 'DNA 改造手术'],
+    tags: ['宣言', '属性', '种族', '卡名']
+  },
+
+  // 卡片公开
+  {
+    id: 'reveal_cards',
+    name: '卡片公开',
+    nameEn: 'Reveal Cards',
+    category: EffectCategory.EFFECT,
+    description: '公开手卡、卡组或额外卡组的卡片',
+    parameters: [
+      {
+        name: 'reveal_location',
+        type: 'select',
+        label: '公开位置',
+        options: [
+          { value: 'hand', label: '手卡' },
+          { value: 'deck', label: '卡组' },
+          { value: 'extra', label: '额外卡组' }
+        ],
+        required: true
+      },
+      {
+        name: 'target_player',
+        type: 'select',
+        label: '公开对象',
+        options: [
+          { value: 'self', label: '自己' },
+          { value: 'opponent', label: '对手' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--卡片公开
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+  {{#if target_player.opponent}}
+  local p=1-tp
+  {{else}}
+  local p=tp
+  {{/if}}
+  {{#if reveal_location.hand}}
+  local g=Duel.GetFieldGroup(p,LOCATION_HAND,0)
+  if #g>0 then
+    Duel.ConfirmCards(tp,g)
+  end
+  {{/if}}
+  {{#if reveal_location.deck}}
+  Duel.ConfirmDecktop(p,3)
+  {{/if}}
+  {{#if reveal_location.extra}}
+  local g=Duel.GetFieldGroup(p,LOCATION_EXTRA,0)
+  if #g>0 then
+    Duel.ConfirmCards(tp,g)
+  end
+  {{/if}}
+end`,
+    compatibility: [],
+    examples: ['心灵崩坏', '六武众的荒行', 'E·HERO 天空侠'],
+    tags: ['公开', 'reveal', '手卡', '卡组']
+  },
+
+  // 卡组顶操作
+  {
+    id: 'deck_top_manipulation',
+    name: '卡组顶操作',
+    nameEn: 'Deck Top Manipulation',
+    category: EffectCategory.EFFECT,
+    description: '查看、调整或放置卡组顶部的卡片',
+    parameters: [
+      {
+        name: 'operation_type',
+        type: 'select',
+        label: '操作类型',
+        options: [
+          { value: 'view', label: '查看卡组顶' },
+          { value: 'sort', label: '调整顺序' },
+          { value: 'place_top', label: '放置到卡组顶' }
+        ],
+        required: true
+      },
+      {
+        name: 'card_count',
+        type: 'number',
+        label: '卡片数量',
+        defaultValue: 3,
+        min: 1,
+        max: 5,
+        required: true
+      }
+    ],
+    luaTemplate: `
+--卡组顶操作
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+  {{#if operation_type.view}}
+  Duel.ConfirmDecktop(tp,{{card_count}})
+  {{/if}}
+  {{#if operation_type.sort}}
+  Duel.SortDecktop(tp,tp,{{card_count}})
+  {{/if}}
+  {{#if operation_type.place_top}}
+  -- 将选中的卡片放回卡组顶
+  Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)
+  {{/if}}
+end`,
+    compatibility: [],
+    examples: ['突进的旋风', '接下来是你的回合', '命运抽卡'],
+    tags: ['卡组顶', '调整顺序', '查看']
+  },
+
+  // 墓地堆叠（Mill）
+  {
+    id: 'mill_cards',
+    name: '墓地堆叠（Mill）',
+    nameEn: 'Mill Cards',
+    category: EffectCategory.EFFECT,
+    description: '从卡组顶送去墓地指定数量的卡片',
+    parameters: [
+      {
+        name: 'mill_count',
+        type: 'number',
+        label: '送墓数量',
+        defaultValue: 3,
+        min: 1,
+        max: 10,
+        required: true
+      },
+      {
+        name: 'target_player',
+        type: 'select',
+        label: '目标玩家',
+        options: [
+          { value: 'self', label: '自己' },
+          { value: 'opponent', label: '对手' },
+          { value: 'both', label: '双方' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--墓地堆叠（Mill）
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+  {{#if target_player.self}}
+  Duel.DiscardDeck(tp,{{mill_count}},REASON_EFFECT)
+  {{/if}}
+  {{#if target_player.opponent}}
+  Duel.DiscardDeck(1-tp,{{mill_count}},REASON_EFFECT)
+  {{/if}}
+  {{#if target_player.both}}
+  Duel.DiscardDeck(tp,{{mill_count}},REASON_EFFECT)
+  Duel.DiscardDeck(1-tp,{{mill_count}},REASON_EFFECT)
+  {{/if}}
+end`,
+    compatibility: [],
+    examples: ['愚蠢的埋葬', '针虫的巢穴', '光之护封灵剑'],
+    tags: ['mill', '送墓', '卡组堆叠']
+  },
+
+  // 连锁限制与发动条件
+  {
+    id: 'activation_condition',
+    name: '连锁限制与发动条件',
+    nameEn: 'Activation Condition',
+    category: EffectCategory.EFFECT,
+    description: '限定在特定阶段或时机才能发动',
+    parameters: [
+      {
+        name: 'phase_limit',
+        type: 'select',
+        label: '阶段限制',
+        options: [
+          { value: 'battle', label: '战斗阶段' },
+          { value: 'main', label: '主要阶段' },
+          { value: 'end', label: '结束阶段' },
+          { value: 'opponent_turn', label: '对手回合' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--连锁限制与发动条件
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+  {{#if phase_limit.battle}}
+  return Duel.GetCurrentPhase()==PHASE_BATTLE
+  {{/if}}
+  {{#if phase_limit.main}}
+  return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
+  {{/if}}
+  {{#if phase_limit.end}}
+  return Duel.GetCurrentPhase()==PHASE_END
+  {{/if}}
+  {{#if phase_limit.opponent_turn}}
+  return Duel.GetTurnPlayer()==1-tp
+  {{/if}}
+end`,
+    compatibility: [],
+    examples: ['战斗狂', '圣防护罩 -反射镜力-', '虚空的黑暗迪克雷亚'],
+    tags: ['发动条件', '阶段限制', '时机']
+  },
+
+  // ===== P2 低优先级效果（长期规划）=====
+  
+  // 特殊胜利条件
+  {
+    id: 'special_victory',
+    name: '特殊胜利条件',
+    nameEn: 'Special Victory Condition',
+    category: EffectCategory.EFFECT,
+    description: '满足特定条件时直接获得决斗胜利',
+    parameters: [
+      {
+        name: 'victory_type',
+        type: 'select',
+        label: '胜利条件类型',
+        options: [
+          { value: 'exodia', label: 'Exodia 五体集齐' },
+          { value: 'final_countdown', label: '最终倒计时（20回合后）' },
+          { value: 'destiny_board', label: '死亡信息板（D-E-A-T-H）' },
+          { value: 'card_count', label: '卡片数量达标' },
+          { value: 'life_points', label: '基本分达到指定值' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--特殊胜利条件
+{{#if victory_type.exodia}}
+function s.wincon(e,tp,eg,ep,ev,re,r,rp)
+  local g=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_HAND,0,nil,33396948,08124921,44519536,70903634,07902349)
+  if g:GetClassCount(Card.GetCode)==5 then
+    Duel.Win(tp,0x01) -- Exodia 胜利
+  end
+end
+{{/if}}
+{{#if victory_type.final_countdown}}
+function s.wincon(e,tp,eg,ep,ev,re,r,rp)
+  if Duel.GetTurnCount()>=20 then
+    Duel.Win(tp,0x10) -- 最终倒计时胜利
+  end
+end
+{{/if}}
+{{#if victory_type.destiny_board}}
+function s.wincon(e,tp,eg,ep,ev,re,r,rp)
+  local g=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_SZONE,0,nil,94212438,67270095,30170981,42015635,94772232)
+  if g:GetClassCount(Card.GetCode)==5 then
+    Duel.Win(tp,0x11) -- 死亡信息板胜利
+  end
+end
+{{/if}}`,
+    compatibility: [],
+    examples: ['被封印的艾克佐迪亚', '最终倒计时', '死亡信息-死灵板'],
+    tags: ['特殊胜利', 'win condition', 'exodia', '最终倒计时']
+  },
+
+  // 种族特定支援
+  {
+    id: 'race_support',
+    name: '种族特定支援',
+    nameEn: 'Race-Specific Support',
+    category: EffectCategory.EFFECT,
+    description: '强化或支援特定种族的怪兽',
+    parameters: [
+      {
+        name: 'target_race',
+        type: 'select',
+        label: '目标种族',
+        options: [
+          { value: 'RACE_DRAGON', label: '龙族' },
+          { value: 'RACE_SPELLCASTER', label: '魔法师族' },
+          { value: 'RACE_WARRIOR', label: '战士族' },
+          { value: 'RACE_FIEND', label: '恶魔族' },
+          { value: 'RACE_ZOMBIE', label: '不死族' },
+          { value: 'RACE_MACHINE', label: '机械族' },
+          { value: 'RACE_AQUA', label: '水族' },
+          { value: 'RACE_PYRO', label: '炎族' },
+          { value: 'RACE_ROCK', label: '岩石族' },
+          { value: 'RACE_WINDBEAST', label: '鸟兽族' },
+          { value: 'RACE_PLANT', label: '植物族' },
+          { value: 'RACE_INSECT', label: '昆虫族' },
+          { value: 'RACE_THUNDER', label: '雷族' },
+          { value: 'RACE_BEAST', label: '兽族' },
+          { value: 'RACE_BEASTWARRIOR', label: '兽战士族' },
+          { value: 'RACE_DINOSAUR', label: '恐龙族' },
+          { value: 'RACE_FISH', label: '鱼族' },
+          { value: 'RACE_SEASERPENT', label: '海龙族' },
+          { value: 'RACE_REPTILE', label: '爬虫类族' },
+          { value: 'RACE_PSYCHIC', label: '念动力族' },
+          { value: 'RACE_FAIRY', label: '天使族' },
+          { value: 'RACE_WYRM', label: '幻龙族' },
+          { value: 'RACE_CYBERSE', label: '电子界族' }
+        ],
+        required: true
+      },
+      {
+        name: 'support_type',
+        type: 'select',
+        label: '支援类型',
+        options: [
+          { value: 'atk_boost', label: '攻击力上升' },
+          { value: 'search', label: '检索同种族' },
+          { value: 'special_summon', label: '特殊召唤同种族' },
+          { value: 'protection', label: '保护同种族' }
+        ],
+        required: true
+      },
+      {
+        name: 'boost_value',
+        type: 'number',
+        label: '攻击力提升值',
+        defaultValue: 500,
+        min: 0,
+        max: 2000,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--种族特定支援
+{{#if support_type.atk_boost}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_FIELD)
+e1:SetCode(EFFECT_UPDATE_ATTACK)
+e1:SetRange(LOCATION_MZONE)
+e1:SetTargetRange(LOCATION_MZONE,0)
+e1:SetTarget(s.racetg)
+e1:SetValue({{boost_value}})
+c:RegisterEffect(e1)
+function s.racetg(e,c)
+  return c:IsRace({{target_race}})
+end
+{{/if}}
+{{#if support_type.search}}
+function s.searchfilter(c)
+  return c:IsRace({{target_race}}) and c:IsAbleToHand()
+end
+function s.searchtg(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then return Duel.IsExistingMatchingCard(s.searchfilter,tp,LOCATION_DECK,0,1,nil) end
+  Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function s.searchop(e,tp,eg,ep,ev,re,r,rp)
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+  local g=Duel.SelectMatchingCard(tp,s.searchfilter,tp,LOCATION_DECK,0,1,1,nil)
+  if #g>0 then
+    Duel.SendtoHand(g,nil,REASON_EFFECT)
+    Duel.ConfirmCards(1-tp,g)
+  end
+end
+{{/if}}`,
+    compatibility: [],
+    examples: ['龙之溪谷', '六武众之门', '不死世界'],
+    tags: ['种族支援', 'race support', '强化', '检索']
+  },
+
+  // 属性特定支援
+  {
+    id: 'attribute_support',
+    name: '属性特定支援',
+    nameEn: 'Attribute-Specific Support',
+    category: EffectCategory.EFFECT,
+    description: '强化或支援特定属性的怪兽',
+    parameters: [
+      {
+        name: 'target_attribute',
+        type: 'select',
+        label: '目标属性',
+        options: [
+          { value: 'ATTRIBUTE_DARK', label: '暗' },
+          { value: 'ATTRIBUTE_LIGHT', label: '光' },
+          { value: 'ATTRIBUTE_WATER', label: '水' },
+          { value: 'ATTRIBUTE_FIRE', label: '炎' },
+          { value: 'ATTRIBUTE_EARTH', label: '地' },
+          { value: 'ATTRIBUTE_WIND', label: '风' },
+          { value: 'ATTRIBUTE_DIVINE', label: '神' }
+        ],
+        required: true
+      },
+      {
+        name: 'support_type',
+        type: 'select',
+        label: '支援类型',
+        options: [
+          { value: 'atk_boost', label: '攻击力上升' },
+          { value: 'def_boost', label: '守备力上升' },
+          { value: 'protection', label: '保护效果' },
+          { value: 'search', label: '检索同属性' }
+        ],
+        required: true
+      },
+      {
+        name: 'boost_value',
+        type: 'number',
+        label: '攻守提升值',
+        defaultValue: 500,
+        min: 0,
+        max: 2000,
+        required: false
+      }
+    ],
+    luaTemplate: `
+--属性特定支援
+{{#if support_type.atk_boost}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_FIELD)
+e1:SetCode(EFFECT_UPDATE_ATTACK)
+e1:SetRange(LOCATION_MZONE)
+e1:SetTargetRange(LOCATION_MZONE,0)
+e1:SetTarget(s.attrtg)
+e1:SetValue({{boost_value}})
+c:RegisterEffect(e1)
+function s.attrtg(e,c)
+  return c:IsAttribute({{target_attribute}})
+end
+{{/if}}
+{{#if support_type.protection}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_FIELD)
+e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+e1:SetRange(LOCATION_MZONE)
+e1:SetTargetRange(LOCATION_MZONE,0)
+e1:SetTarget(s.attrtg)
+e1:SetValue(1)
+c:RegisterEffect(e1)
+function s.attrtg(e,c)
+  return c:IsAttribute({{target_attribute}})
+end
+{{/if}}`,
+    compatibility: [],
+    examples: ['混沌领域', '光之护封剑', '暗黑界的指导者 瑟莉'],
+    tags: ['属性支援', 'attribute support', '强化']
+  },
+
+  // 融合召唤详细
+  {
+    id: 'fusion_summon_detailed',
+    name: '融合召唤详细',
+    nameEn: 'Fusion Summon Detailed',
+    category: EffectCategory.SUMMON,
+    description: '融合召唤的详细参数（素材指定、融合置换）',
+    parameters: [
+      {
+        name: 'fusion_type',
+        type: 'select',
+        label: '融合类型',
+        options: [
+          { value: 'standard', label: '标准融合（融合魔法）' },
+          { value: 'contact', label: '接触融合（不需要融合魔法）' },
+          { value: 'super_poly', label: '超融合（无法连锁）' },
+          { value: 'substitute', label: '融合置换（用其他卡代替素材）' }
+        ],
+        required: true
+      },
+      {
+        name: 'material_count',
+        type: 'number',
+        label: '融合素材数量',
+        defaultValue: 2,
+        min: 1,
+        max: 5,
+        required: true
+      },
+      {
+        name: 'material_location',
+        type: 'select',
+        label: '素材来源',
+        options: [
+          { value: 'hand_field', label: '手卡+场上' },
+          { value: 'field_only', label: '仅场上' },
+          { value: 'hand_field_grave', label: '手卡+场上+墓地' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--融合召唤详细
+{{#if fusion_type.standard}}
+function s.fusionop(e,tp,eg,ep,ev,re,r,rp)
+  local g=Duel.GetMatchingGroup(Card.IsFusionMaterial,tp,LOCATION_HAND+LOCATION_MZONE,0,nil)
+  if #g>=2 then
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
+    local mat=g:Select(tp,{{material_count}},{{material_count}},nil)
+    local fc=Duel.GetFirstTarget()
+    Duel.SendtoGrave(mat,REASON_FUSION+REASON_MATERIAL)
+    Duel.SpecialSummon(fc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
+  end
+end
+{{/if}}
+{{#if fusion_type.contact}}
+-- 接触融合（不需要融合魔法）
+function s.contactop(e,tp,eg,ep,ev,re,r,rp)
+  local c=e:GetHandler()
+  local g=Duel.GetMatchingGroup(Card.IsAbleToDeckOrExtraAsCost,tp,LOCATION_MZONE,0,nil)
+  if #g>=2 then
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+    local mat=g:Select(tp,{{material_count}},{{material_count}},nil)
+    Duel.SendtoDeck(mat,nil,SEQ_DECKSHUFFLE,REASON_COST)
+    Duel.SpecialSummon(c,SUMMON_TYPE_SPECIAL,tp,tp,false,false,POS_FACEUP)
+  end
+end
+{{/if}}`,
+    compatibility: [],
+    examples: ['融合', '超融合', 'E·HERO 新星领主', '剑斗兽系列'],
+    tags: ['融合', 'fusion', '融合召唤', '素材']
+  },
+
+  // 同调召唤详细
+  {
+    id: 'synchro_summon_detailed',
+    name: '同调召唤详细',
+    nameEn: 'Synchro Summon Detailed',
+    category: EffectCategory.SUMMON,
+    description: '同调召唤的详细参数（调整/非调整限制）',
+    parameters: [
+      {
+        name: 'tuner_count',
+        type: 'number',
+        label: '调整怪兽数量',
+        defaultValue: 1,
+        min: 1,
+        max: 3,
+        required: true
+      },
+      {
+        name: 'non_tuner_count',
+        type: 'number',
+        label: '非调整怪兽数量',
+        defaultValue: 1,
+        min: 1,
+        max: 4,
+        required: true
+      },
+      {
+        name: 'material_restriction',
+        type: 'select',
+        label: '素材限制',
+        options: [
+          { value: 'none', label: '无限制' },
+          { value: 'specific_race', label: '特定种族' },
+          { value: 'specific_attribute', label: '特定属性' },
+          { value: 'specific_name', label: '特定卡名' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--同调召唤详细
+function s.synchrocon(e,c,smat,mg,min,max)
+  if c==nil then return true end
+  if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
+  local minc={{tuner_count}}+{{non_tuner_count}}
+  local maxc=c:IsLocation(LOCATION_EXTRA) and 99 or minc
+  if min and min>minc then return false end
+  if max and max<minc then return false end
+  if smat and smat:IsTuner(c) and (not min or min<=maxc) then
+    return true
+  end
+  if mg then
+    return mg:CheckSubGroup(s.syngroup,minc,maxc,tp,c,smat)
+  else
+    local mg=Duel.GetSynchroMaterial(tp)
+    return mg:CheckSubGroup(s.syngroup,minc,maxc,tp,c,smat)
+  end
+end
+
+function s.syngroup(g,tp,syncard,smat)
+  local ct=g:GetCount()
+  local tg=g:Filter(Card.IsTuner,nil,syncard)
+  local ntg=g:Filter(aux.NOT(Card.IsTuner),nil,syncard)
+  return tg:GetCount()=={{tuner_count}} and ntg:GetCount()=={{non_tuner_count}}
+    and g:GetSum(Card.GetSynchroLevel,syncard)==syncard:GetLevel()
+end`,
+    compatibility: [],
+    examples: ['星尘龙', '废品战士', '流天类星龙'],
+    tags: ['同调', 'synchro', '调整', 'tuner']
+  },
+
+  // 超量召唤详细
+  {
+    id: 'xyz_summon_detailed',
+    name: '超量召唤详细',
+    nameEn: 'Xyz Summon Detailed',
+    category: EffectCategory.SUMMON,
+    description: '超量召唤的详细参数（阶级、素材类型）',
+    parameters: [
+      {
+        name: 'xyz_rank',
+        type: 'number',
+        label: 'X阶级（Rank）',
+        defaultValue: 4,
+        min: 1,
+        max: 12,
+        required: true
+      },
+      {
+        name: 'material_count',
+        type: 'number',
+        label: '超量素材数量',
+        defaultValue: 2,
+        min: 2,
+        max: 5,
+        required: true
+      },
+      {
+        name: 'material_restriction',
+        type: 'select',
+        label: '素材限制',
+        options: [
+          { value: 'none', label: '无限制' },
+          { value: 'specific_race', label: '特定种族' },
+          { value: 'specific_attribute', label: '特定属性' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--超量召唤详细
+function s.xyzcon(e,c,og,min,max)
+  if c==nil then return true end
+  local tp=c:GetControler()
+  local mg=nil
+  if og then
+    mg=og:Filter(s.xyzfilter,nil,c)
+  else
+    mg=Duel.GetFieldGroup(tp,LOCATION_MZONE,0):Filter(s.xyzfilter,nil,c)
+  end
+  local minc={{material_count}}
+  local maxc={{material_count}}
+  if min and min>minc then return false end
+  if max and max<maxc then return false end
+  return mg:CheckSubGroup(aux.mzctcheck,minc,maxc,tp)
+end
+
+function s.xyzfilter(c,xyzc)
+  return c:IsFaceup() and c:IsType(TYPE_MONSTER) 
+    and c:GetLevel()=={{xyz_rank}} and c:IsCanBeXyzMaterial(xyzc)
+end`,
+    compatibility: [],
+    examples: ['No.39 希望皇 霍普', 'No.101 寂静荣誉方舟骑士', 'CNo.39 希望皇 霍普雷'],
+    tags: ['超量', 'xyz', 'rank', '阶级']
+  },
+
+  // 连接召唤详细
+  {
+    id: 'link_summon_detailed',
+    name: '连接召唤详细',
+    nameEn: 'Link Summon Detailed',
+    category: EffectCategory.SUMMON,
+    description: '连接召唤的详细参数（连接标记、素材类型）',
+    parameters: [
+      {
+        name: 'link_rating',
+        type: 'number',
+        label: 'LINK数值',
+        defaultValue: 2,
+        min: 1,
+        max: 6,
+        required: true
+      },
+      {
+        name: 'link_markers',
+        type: 'multiselect',
+        label: '连接标记',
+        options: [
+          { value: 'LINK_MARKER_TOP_LEFT', label: '左上' },
+          { value: 'LINK_MARKER_TOP', label: '上' },
+          { value: 'LINK_MARKER_TOP_RIGHT', label: '右上' },
+          { value: 'LINK_MARKER_LEFT', label: '左' },
+          { value: 'LINK_MARKER_RIGHT', label: '右' },
+          { value: 'LINK_MARKER_BOTTOM_LEFT', label: '左下' },
+          { value: 'LINK_MARKER_BOTTOM', label: '下' },
+          { value: 'LINK_MARKER_BOTTOM_RIGHT', label: '右下' }
+        ],
+        required: true
+      },
+      {
+        name: 'material_restriction',
+        type: 'select',
+        label: '素材限制',
+        options: [
+          { value: 'none', label: '无限制' },
+          { value: 'specific_race', label: '特定种族' },
+          { value: 'specific_attribute', label: '特定属性' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--连接召唤详细
+function s.linkcon(e,c,og,min,max)
+  if c==nil then return true end
+  local tp=c:GetControler()
+  local mg=nil
+  if og then
+    mg=og:Filter(s.linkfilter,nil,c)
+  else
+    mg=Duel.GetFieldGroup(tp,LOCATION_MZONE,0):Filter(s.linkfilter,nil,c)
+  end
+  local minc={{link_rating}}
+  local maxc={{link_rating}}
+  if min and min>minc then return false end
+  if max and max<maxc then return false end
+  return mg:CheckSubGroup(aux.mzctcheck,minc,maxc,tp)
+end
+
+function s.linkfilter(c,linkc)
+  return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsCanBeLinkMaterial(linkc)
+end`,
+    compatibility: [],
+    examples: ['解码语者', '防火龙', '三眼怪'],
+    tags: ['连接', 'link', 'link marker', '连接标记']
+  },
+
+  // 灵摆刻度修改
+  {
+    id: 'pendulum_scale_modify',
+    name: '灵摆刻度修改',
+    nameEn: 'Pendulum Scale Modification',
+    category: EffectCategory.EFFECT,
+    description: '动态修改P刻度的效果',
+    parameters: [
+      {
+        name: 'modify_target',
+        type: 'select',
+        label: '修改目标',
+        options: [
+          { value: 'self', label: '自己的P刻度' },
+          { value: 'all_own', label: '己方所有P卡' },
+          { value: 'opponent', label: '对手的P卡' }
+        ],
+        required: true
+      },
+      {
+        name: 'modify_value',
+        type: 'number',
+        label: '修改数值',
+        defaultValue: 1,
+        min: -5,
+        max: 5,
+        required: true
+      }
+    ],
+    luaTemplate: `
+--灵摆刻度修改
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+e1:SetRange(LOCATION_PZONE)
+{{#if modify_target.self}}
+e1:SetCode(EFFECT_UPDATE_LSCALE)
+e1:SetValue({{modify_value}})
+c:RegisterEffect(e1)
+local e2=e1:Clone()
+e2:SetCode(EFFECT_UPDATE_RSCALE)
+c:RegisterEffect(e2)
+{{/if}}
+{{#if modify_target.all_own}}
+e1:SetCode(EFFECT_UPDATE_LSCALE)
+e1:SetTargetRange(LOCATION_PZONE,0)
+e1:SetValue({{modify_value}})
+c:RegisterEffect(e1)
+{{/if}}`,
+    compatibility: [],
+    examples: ['虹彩之魔术师', '灵摆刻度调整', '星光大道'],
+    tags: ['灵摆刻度', 'pendulum scale', 'P刻度']
+  },
+
+  // 表示形式变更
+  {
+    id: 'position_change',
+    name: '表示形式变更',
+    nameEn: 'Position Change',
+    category: EffectCategory.EFFECT,
+    description: '改变怪兽的表示形式（攻击/守备/表侧/里侧）',
+    parameters: [
+      {
+        name: 'change_type',
+        type: 'select',
+        label: '变更类型',
+        options: [
+          { value: 'to_attack', label: '变为攻击表示' },
+          { value: 'to_defense', label: '变为守备表示' },
+          { value: 'flip', label: '翻转' },
+          { value: 'set', label: '放置（里侧守备）' }
+        ],
+        required: true
+      },
+      {
+        name: 'target_player',
+        type: 'select',
+        label: '目标玩家',
+        options: [
+          { value: 'self', label: '己方怪兽' },
+          { value: 'opponent', label: '对手怪兽' },
+          { value: 'both', label: '全场怪兽' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--表示形式变更
+function s.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+  {{#if target_player.opponent}}
+  if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() end
+  if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+  Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil)
+  {{/if}}
+  {{#if target_player.self}}
+  if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() end
+  if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+  Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil)
+  {{/if}}
+end
+
+function s.posop(e,tp,eg,ep,ev,re,r,rp)
+  local tc=Duel.GetFirstTarget()
+  if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+    {{#if change_type.to_attack}}
+    Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
+    {{/if}}
+    {{#if change_type.to_defense}}
+    Duel.ChangePosition(tc,POS_FACEUP_DEFENSE)
+    {{/if}}
+    {{#if change_type.flip}}
+    Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
+    {{/if}}
+  end
+end`,
+    compatibility: [],
+    examples: ['敌人控制器', '月之书', '重力网'],
+    tags: ['表示形式', 'position', '攻击表示', '守备表示']
+  },
+
+  // 卡片交换/控制权转移
+  {
+    id: 'control_exchange',
+    name: '卡片交换/控制权转移',
+    nameEn: 'Control Exchange',
+    category: EffectCategory.EFFECT,
+    description: '与对手交换怪兽的控制权',
+    parameters: [
+      {
+        name: 'exchange_type',
+        type: 'select',
+        label: '交换类型',
+        options: [
+          { value: 'permanent', label: '永久转移' },
+          { value: 'temporary', label: '临时转移（结束阶段返还）' },
+          { value: 'mutual', label: '双方交换' }
+        ],
+        required: true
+      },
+      {
+        name: 'duration',
+        type: 'select',
+        label: '持续时间',
+        options: [
+          { value: 'permanent', label: '永久' },
+          { value: 'end_phase', label: '结束阶段' },
+          { value: 'one_turn', label: '一回合' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--控制权转移
+function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+  if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsControlerCanBeChanged() end
+  if chk==0 then return Duel.IsExistingTarget(Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,1,nil) end
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
+  local g=Duel.SelectTarget(tp,Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,1,1,nil)
+  Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
+end
+
+function s.ctop(e,tp,eg,ep,ev,re,r,rp)
+  local tc=Duel.GetFirstTarget()
+  if tc and tc:IsRelateToEffect(e) then
+    {{#if duration.permanent}}
+    Duel.GetControl(tc,tp)
+    {{/if}}
+    {{#if duration.end_phase}}
+    Duel.GetControl(tc,tp,PHASE_END,1)
+    {{/if}}
+    {{#if duration.one_turn}}
+    Duel.GetControl(tc,tp,PHASE_END,2)
+    {{/if}}
+  end
+end`,
+    compatibility: [],
+    examples: ['敌人控制器', '洗脑', '精神操作'],
+    tags: ['控制权', 'control', '交换', '夺取']
+  },
+
+  // 场地魔法相关
+  {
+    id: 'field_spell_related',
+    name: '场地魔法相关',
+    nameEn: 'Field Spell Related',
+    category: EffectCategory.EFFECT,
+    description: '依赖场地魔法的效果',
+    parameters: [
+      {
+        name: 'field_dependency',
+        type: 'select',
+        label: '场地依赖类型',
+        options: [
+          { value: 'any_field', label: '任意场地魔法存在' },
+          { value: 'specific_field', label: '特定场地魔法' },
+          { value: 'own_field', label: '自己的场地魔法' }
+        ],
+        required: true
+      },
+      {
+        name: 'effect_type',
+        type: 'select',
+        label: '效果类型',
+        options: [
+          { value: 'atk_boost', label: '攻击力提升' },
+          { value: 'protection', label: '场地保护' },
+          { value: 'search', label: '检索场地魔法' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--场地魔法相关
+{{#if field_dependency.any_field}}
+function s.fieldcon(e)
+  return Duel.IsExistingMatchingCard(Card.IsType,e:GetHandlerPlayer(),LOCATION_FZONE,LOCATION_FZONE,1,nil,TYPE_FIELD)
+end
+{{/if}}
+{{#if effect_type.search}}
+function s.searchfilter(c)
+  return c:IsType(TYPE_FIELD) and c:IsAbleToHand()
+end
+function s.searchtg(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then return Duel.IsExistingMatchingCard(s.searchfilter,tp,LOCATION_DECK,0,1,nil) end
+  Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function s.searchop(e,tp,eg,ep,ev,re,r,rp)
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+  local g=Duel.SelectMatchingCard(tp,s.searchfilter,tp,LOCATION_DECK,0,1,1,nil)
+  if #g>0 then
+    Duel.SendtoHand(g,nil,REASON_EFFECT)
+    Duel.ConfirmCards(1-tp,g)
+  end
+end
+{{/if}}`,
+    compatibility: [],
+    examples: ['大地崩坏', '地碎', '星光大道'],
+    tags: ['场地魔法', 'field spell', '场地依赖']
+  },
+
+  // 永续魔法/陷阱指示物
+  {
+    id: 'continuous_spell_counter',
+    name: '永续魔法/陷阱指示物',
+    nameEn: 'Continuous Spell/Trap Counter',
+    category: EffectCategory.EFFECT,
+    description: '永续魔法或陷阱卡的指示物系统',
+    parameters: [
+      {
+        name: 'counter_type',
+        type: 'select',
+        label: '指示物类型',
+        options: [
+          { value: '0x1', label: '魔力指示物' },
+          { value: '0x1001', label: '宝玉指示物' },
+          { value: '0x1002', label: '楔指示物' },
+          { value: '0x1003', label: '时钟指示物' }
+        ],
+        required: true
+      },
+      {
+        name: 'counter_gain',
+        type: 'select',
+        label: '获得时机',
+        options: [
+          { value: 'on_activate', label: '发动时' },
+          { value: 'standby_phase', label: '准备阶段' },
+          { value: 'spell_activate', label: '魔法卡发动时' }
+        ],
+        required: true
+      },
+      {
+        name: 'counter_use',
+        type: 'select',
+        label: '使用方式',
+        options: [
+          { value: 'remove_for_effect', label: '移除发动效果' },
+          { value: 'count_condition', label: '数量达标触发' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--永续魔法/陷阱指示物
+{{#if counter_gain.on_activate}}
+-- 发动时放置指示物
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+  if e:GetHandler():IsRelateToEffect(e) then
+    e:GetHandler():AddCounter({{counter_type}},1)
+  end
+end
+{{/if}}
+{{#if counter_gain.standby_phase}}
+-- 准备阶段放置指示物
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
+e1:SetRange(LOCATION_SZONE)
+e1:SetCountLimit(1)
+e1:SetOperation(s.ctop)
+c:RegisterEffect(e1)
+function s.ctop(e,tp,eg,ep,ev,re,r,rp)
+  e:GetHandler():AddCounter({{counter_type}},1)
+end
+{{/if}}
+{{#if counter_use.remove_for_effect}}
+-- 移除指示物发动效果
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then return e:GetHandler():IsCanRemoveCounter(tp,{{counter_type}},1,REASON_COST) end
+  e:GetHandler():RemoveCounter(tp,{{counter_type}},1,REASON_COST)
+end
+{{/if}}`,
+    compatibility: [],
+    examples: ['魔力指示物', '魔法都市 恩底弥翁', '宝玉的祈祷'],
+    tags: ['指示物', 'counter', '魔力指示物', '永续魔法']
+  },
+
+  // 装备卡转移
+  {
+    id: 'equip_transfer',
+    name: '装备卡转移',
+    nameEn: 'Equip Transfer',
+    category: EffectCategory.EFFECT,
+    description: '将装备卡转移到其他怪兽',
+    parameters: [
+      {
+        name: 'transfer_target',
+        type: 'select',
+        label: '转移目标',
+        options: [
+          { value: 'own_monster', label: '己方其他怪兽' },
+          { value: 'opponent_monster', label: '对手怪兽' },
+          { value: 'any_monster', label: '任意怪兽' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--装备卡转移
+function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+  if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+  if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) 
+    and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_SZONE,0,1,nil,TYPE_EQUIP) end
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+  local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+end
+
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
+  local tc=Duel.GetFirstTarget()
+  if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+    local ec=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_SZONE,0,1,1,nil,TYPE_EQUIP):GetFirst()
+    if ec then
+      Duel.Equip(tp,ec,tc)
+    end
+  end
+end`,
+    compatibility: [],
+    examples: ['装备交换', '装备转移', '古代机械城塞'],
+    tags: ['装备卡', 'equip', '转移', 'transfer']
+  },
+
+  // 二重召唤/设置
+  {
+    id: 'double_summon',
+    name: '二重召唤/设置',
+    nameEn: 'Double Summon',
+    category: EffectCategory.EFFECT,
+    description: '一回合可以进行额外的通常召唤',
+    parameters: [
+      {
+        name: 'summon_type',
+        type: 'select',
+        label: '额外召唤类型',
+        options: [
+          { value: 'normal_summon', label: '通常召唤' },
+          { value: 'set', label: '放置（盖伏）' },
+          { value: 'both', label: '两者皆可' }
+        ],
+        required: true
+      },
+      {
+        name: 'restriction',
+        type: 'select',
+        label: '使用限制',
+        options: [
+          { value: 'none', label: '无限制' },
+          { value: 'specific_race', label: '特定种族' },
+          { value: 'specific_attribute', label: '特定属性' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--二重召唤/设置
+local e1=Effect.CreateEffect(c)
+e1:SetDescription(aux.Stringid(id,0))
+e1:SetType(EFFECT_TYPE_IGNITION)
+e1:SetRange(LOCATION_HAND)
+e1:SetCountLimit(1,id)
+e1:SetCost(s.sumcost)
+e1:SetTarget(s.sumtg)
+e1:SetOperation(s.sumop)
+c:RegisterEffect(e1)
+
+function s.sumcost(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+  Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+end
+
+function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
+end
+
+function s.sumop(e,tp,eg,ep,ev,re,r,rp)
+  if Duel.GetFlagEffect(tp,id)~=0 then return end
+  local e1=Effect.CreateEffect(e:GetHandler())
+  e1:SetDescription(aux.Stringid(id,1))
+  e1:SetType(EFFECT_TYPE_FIELD)
+  e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
+  e1:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
+  e1:SetValue(1)
+  e1:SetReset(RESET_PHASE+PHASE_END)
+  Duel.RegisterEffect(e1,tp)
+  Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+end`,
+    compatibility: [],
+    examples: ['二重召唤', '召唤师之技', '龙之溪谷'],
+    tags: ['二重召唤', 'double summon', '额外召唤']
+  },
+
+  // 特殊状态标记
+  {
+    id: 'special_status_mark',
+    name: '特殊状态标记',
+    nameEn: 'Special Status Mark',
+    category: EffectCategory.EFFECT,
+    description: '给怪兽添加特殊状态（不能攻击、不能特召等）',
+    parameters: [
+      {
+        name: 'status_type',
+        type: 'select',
+        label: '状态类型',
+        options: [
+          { value: 'cannot_attack', label: '不能攻击' },
+          { value: 'cannot_special_summon', label: '不能特殊召唤' },
+          { value: 'cannot_be_target', label: '不会成为效果对象' },
+          { value: 'cannot_be_destroyed', label: '不会被战斗/效果破坏' }
+        ],
+        required: true
+      },
+      {
+        name: 'duration',
+        type: 'select',
+        label: '持续时间',
+        options: [
+          { value: 'this_turn', label: '本回合' },
+          { value: 'permanent', label: '永久' },
+          { value: 'end_phase', label: '结束阶段' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--特殊状态标记
+{{#if status_type.cannot_attack}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetCode(EFFECT_CANNOT_ATTACK)
+{{#if duration.this_turn}}
+e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+{{/if}}
+c:RegisterEffect(e1)
+{{/if}}
+{{#if status_type.cannot_special_summon}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_FIELD)
+e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+e1:SetTargetRange(1,0)
+{{#if duration.this_turn}}
+e1:SetReset(RESET_PHASE+PHASE_END)
+{{/if}}
+Duel.RegisterEffect(e1,tp)
+{{/if}}
+{{#if status_type.cannot_be_target}}
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+e1:SetRange(LOCATION_MZONE)
+e1:SetValue(aux.tgoval)
+{{#if duration.this_turn}}
+e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+{{/if}}
+c:RegisterEffect(e1)
+{{/if}}`,
+    compatibility: [],
+    examples: ['和睦的使者', '强制脱出装置', '禁止令'],
+    tags: ['状态', 'status', '限制', '不能攻击']
+  },
+
+  // 卡片名称引用
+  {
+    id: 'card_name_reference',
+    name: '卡片名称引用',
+    nameEn: 'Card Name Reference',
+    category: EffectCategory.EFFECT,
+    description: '指定特定卡名的效果（如"青眼白龙"）',
+    parameters: [
+      {
+        name: 'card_code',
+        type: 'number',
+        label: '卡片密码（8位数字）',
+        defaultValue: 89631139,
+        min: 10000000,
+        max: 99999999,
+        required: true
+      },
+      {
+        name: 'reference_type',
+        type: 'select',
+        label: '引用类型',
+        options: [
+          { value: 'search', label: '检索指定卡片' },
+          { value: 'special_summon', label: '特殊召唤指定卡片' },
+          { value: 'name_treated_as', label: '当作指定卡名使用' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--卡片名称引用
+{{#if reference_type.search}}
+function s.searchfilter(c)
+  return c:IsCode({{card_code}}) and c:IsAbleToHand()
+end
+function s.searchtg(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then return Duel.IsExistingMatchingCard(s.searchfilter,tp,LOCATION_DECK,0,1,nil) end
+  Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function s.searchop(e,tp,eg,ep,ev,re,r,rp)
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+  local g=Duel.SelectMatchingCard(tp,s.searchfilter,tp,LOCATION_DECK,0,1,1,nil)
+  if #g>0 then
+    Duel.SendtoHand(g,nil,REASON_EFFECT)
+    Duel.ConfirmCards(1-tp,g)
+  end
+end
+{{/if}}
+{{#if reference_type.name_treated_as}}
+-- 当作指定卡名使用
+local e1=Effect.CreateEffect(c)
+e1:SetType(EFFECT_TYPE_SINGLE)
+e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+e1:SetCode(EFFECT_CHANGE_CODE)
+e1:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
+e1:SetValue({{card_code}})
+c:RegisterEffect(e1)
+{{/if}}`,
+    compatibility: [],
+    examples: ['青眼精灵龙', '黑魔导女孩', '哈比的狩猎场'],
+    tags: ['卡名引用', 'card code', '指定卡名']
+  },
+
+  // 复制效果
+  {
+    id: 'copy_effect',
+    name: '复制效果',
+    nameEn: 'Copy Effect',
+    category: EffectCategory.EFFECT,
+    description: '复制其他卡片的效果',
+    parameters: [
+      {
+        name: 'copy_source',
+        type: 'select',
+        label: '复制来源',
+        options: [
+          { value: 'field', label: '场上的怪兽' },
+          { value: 'grave', label: '墓地的怪兽' },
+          { value: 'banished', label: '除外区的怪兽' }
+        ],
+        required: true
+      },
+      {
+        name: 'copy_duration',
+        type: 'select',
+        label: '复制持续时间',
+        options: [
+          { value: 'this_turn', label: '本回合' },
+          { value: 'permanent', label: '永久' },
+          { value: 'end_phase', label: '结束阶段' }
+        ],
+        required: true
+      }
+    ],
+    luaTemplate: `
+--复制效果
+function s.copyfilter(c)
+  {{#if copy_source.field}}
+  return c:IsFaceup() and c:IsType(TYPE_MONSTER)
+  {{/if}}
+  {{#if copy_source.grave}}
+  return c:IsType(TYPE_MONSTER)
+  {{/if}}
+end
+
+function s.copytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+  {{#if copy_source.field}}
+  if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.copyfilter(chkc) end
+  if chk==0 then return Duel.IsExistingTarget(s.copyfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+  {{/if}}
+  {{#if copy_source.grave}}
+  if chkc then return chkc:IsLocation(LOCATION_GRAVE) and s.copyfilter(chkc) end
+  if chk==0 then return Duel.IsExistingTarget(s.copyfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil) end
+  {{/if}}
+  Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+  Duel.SelectTarget(tp,s.copyfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+end
+
+function s.copyop(e,tp,eg,ep,ev,re,r,rp)
+  local c=e:GetHandler()
+  local tc=Duel.GetFirstTarget()
+  if tc and c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+    local code=tc:GetOriginalCode()
+    local e1=Effect.CreateEffect(c)
+    e1:SetType(EFFECT_TYPE_SINGLE)
+    e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+    e1:SetCode(EFFECT_CHANGE_CODE)
+    e1:SetValue(code)
+    {{#if copy_duration.this_turn}}
+    e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+    {{/if}}
+    c:RegisterEffect(e1)
+    c:CopyEffect(code,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,1)
+  end
+end`,
+    compatibility: [],
+    examples: ['复制植物', '机壳的再生', '死者苏生'],
+    tags: ['复制', 'copy', '效果复制']
   }
 ];
 

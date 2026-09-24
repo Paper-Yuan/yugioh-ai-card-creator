@@ -43,15 +43,49 @@ class ModuleSelectorManager {
   }
 
   getCategoryForModule(module) {
-    // 根据模块ID前缀分类
-    if (module.id.includes('summon') || module.id === 'token_summon') return 'summon';
-    if (module.id.includes('search') || module.id.includes('add_from')) return 'search';
-    if (module.id.includes('destroy')) return 'destroy';
-    if (module.id.includes('draw')) return 'draw';
-    if (module.id.includes('damage') || module.id.includes('gain_lp')) return 'damage';
-    if (module.id.includes('negate') || module.id.includes('disable')) return 'negate';
+    // Phase 10: 完整分类逻辑，支持 P0/P1/P2 全部 60 个模块
+    
+    // 召唤相关（包括融合/同调/超量/连接详细）
+    if (module.id.includes('summon') || module.id === 'token_summon' || 
+        module.id === 'pendulum_summon' || module.id.includes('fusion') || 
+        module.id.includes('synchro') || module.id.includes('xyz') ||
+        module.id.includes('link') || module.id === 'double_summon') return 'summon';
+    
+    // 检索效果（包括种族/属性/场地检索）
+    if (module.id.includes('search') || module.id.includes('add_from') ||
+        module.id === 'race_support' || module.id === 'attribute_support' ||
+        module.id === 'field_spell_related' || module.id === 'card_name_reference') return 'search';
+    
+    // 破坏效果（包括抗性）
+    if (module.id.includes('destroy') || module.id === 'battle_indestructible' || 
+        module.id === 'effect_indestructible') return 'destroy';
+    
+    // 抽卡效果（包括 mill）
+    if (module.id.includes('draw') || module.id === 'mill_cards') return 'draw';
+    
+    // 伤害效果（包括直接攻击/穿透）
+    if (module.id.includes('damage') || module.id.includes('gain_lp') || 
+        module.id === 'direct_attack_pierce' || module.id === 'multiple_attacks') return 'damage';
+    
+    // 无效效果（包括手卡诱发、召唤限制）
+    if (module.id.includes('negate') || module.id.includes('disable') || 
+        module.id === 'hand_deck_trigger_effect' || module.id === 'summon_limit') return 'negate';
+    
+    // 除外效果
     if (module.id.includes('banish')) return 'banish';
-    if (module.id.includes('atk_def')) return 'stat';
+    
+    // 攻守变化（包括永续效果、表示形式变更）
+    if (module.id.includes('atk_def') || module.id === 'continuous_effect' ||
+        module.id === 'position_change') return 'stat';
+    
+    // 其他效果（P2 特殊机制）
+    if (module.id === 'special_victory' || module.id === 'pendulum_scale_modify' ||
+        module.id === 'control_exchange' || module.id === 'continuous_spell_counter' ||
+        module.id === 'equip_transfer' || module.id === 'special_status_mark' ||
+        module.id === 'copy_effect' || module.id === 'card_declaration' ||
+        module.id === 'reveal_cards' || module.id === 'deck_top_manipulation' ||
+        module.id === 'activation_condition') return 'effect';
+    
     return 'effect';
   }
 

@@ -1,0 +1,363 @@
+/* ============================================================
+   Phase 11: UI 优化样式 - 实时预览、智能推荐、拖拽排序
+   ============================================================ */
+
+/* ===== 实时效果预览面板 ===== */
+.live-preview-panel {
+  background: linear-gradient(135deg, #1a1f2e 0%, #0f1419 100%);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 12px;
+  margin: 20px 0;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.live-preview-panel.collapsed .preview-body {
+  display: none;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(96, 165, 250, 0.15);
+  cursor: pointer;
+  user-select: none;
+}
+
+.preview-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #60a5fa;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-toggle-btn {
+  background: none;
+  border: none;
+  color: #60a5fa;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.preview-toggle-btn:hover {
+  background: rgba(96, 165, 250, 0.1);
+}
+
+.preview-body {
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.preview-section {
+  margin-bottom: 20px;
+}
+
+.preview-section:last-child {
+  margin-bottom: 0;
+}
+
+.preview-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preview-text-output {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  border-radius: 8px;
+  padding: 16px;
+  color: #e2e8f0;
+  font-size: 15px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  min-height: 60px;
+  transition: all 0.3s ease;
+}
+
+.preview-script-output {
+  background: #0a0e17;
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  border-radius: 8px;
+  padding: 16px;
+  color: #94a3b8;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 0;
+  transition: all 0.3s ease;
+}
+
+.preview-updating {
+  animation: pulseGlow 0.6s ease;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(96, 165, 250, 0); }
+  50% { box-shadow: 0 0 12px rgba(96, 165, 250, 0.4); }
+}
+
+/* ===== 智能推荐面板 ===== */
+.smart-recommendation-panel {
+  background: linear-gradient(135deg, #1e1b2e 0%, #121016 100%);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 12px;
+  margin: 20px 0;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.recommendation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+}
+
+.recommendation-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #a855f7;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recommendation-refresh-btn {
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #a855f7;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.recommendation-refresh-btn:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.5);
+  transform: scale(1.05);
+}
+
+.recommendation-body {
+  padding: 16px;
+}
+
+.recommendation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recommendation-empty {
+  text-align: center;
+  color: #64748b;
+  padding: 30px;
+  font-size: 14px;
+}
+
+.recommendation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: all 0.2s;
+  animation: slideInLeft 0.3s ease;
+}
+
+.recommendation-item:hover {
+  background: rgba(168, 85, 247, 0.05);
+  border-color: rgba(168, 85, 247, 0.4);
+  transform: translateX(4px);
+}
+
+.recommendation-content {
+  flex: 1;
+}
+
+.recommendation-title {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.recommendation-reason {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.recommendation-add-btn {
+  background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.recommendation-add-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+}
+
+/* ===== 拖拽排序样式 ===== */
+.drag-handle {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: grab;
+  color: #64748b;
+  font-size: 18px;
+  padding: 4px 8px;
+  user-select: none;
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.drag-handle:hover {
+  opacity: 1;
+  color: #60a5fa;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.wizard-effect-item {
+  position: relative;
+  padding-left: 50px; /* 为拖拽手柄留出空间 */
+  transition: all 0.3s ease;
+}
+
+.wizard-effect-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.3);
+}
+
+.wizard-effect-item.drag-over {
+  border-color: #60a5fa;
+  background: rgba(96, 165, 250, 0.05);
+}
+
+/* ===== 动画 ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== 响应式适配 ===== */
+@media (max-width: 768px) {
+  .live-preview-panel,
+  .smart-recommendation-panel {
+    margin: 12px 0;
+  }
+
+  .preview-header,
+  .recommendation-header {
+    padding: 12px 16px;
+  }
+
+  .preview-body,
+  .recommendation-body {
+    padding: 12px;
+  }
+
+  .preview-header h3,
+  .recommendation-header h3 {
+    font-size: 16px;
+  }
+
+  .recommendation-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .recommendation-add-btn {
+    width: 100%;
+  }
+
+  .drag-handle {
+    font-size: 16px;
+    left: 4px;
+  }
+
+  .wizard-effect-item {
+    padding-left: 40px;
+  }
+}
+
+/* ===== 暗色主题兼容 ===== */
+.theme-obsidian .live-preview-panel {
+  background: linear-gradient(135deg, #1a1f2e 0%, #0f1419 100%);
+}
+
+.theme-obsidian .smart-recommendation-panel {
+  background: linear-gradient(135deg, #1e1b2e 0%, #121016 100%);
+}
+
+/* ===== 滚动条美化 ===== */
+.preview-script-output::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.preview-script-output::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.preview-script-output::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.3);
+  border-radius: 4px;
+}
+
+.preview-script-output::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, 0.5);
+}

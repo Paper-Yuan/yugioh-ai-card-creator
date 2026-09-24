@@ -97,6 +97,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 初始化本机原卡池自动侦测与防冲突引擎
   initCdbDetection();
 
+  // Phase 11: 初始化 UI 优化功能
+  if (typeof initLiveEffectPreview === 'function') {
+    initLiveEffectPreview();
+  }
+  if (typeof initSmartEffectRecommender === 'function') {
+    await initSmartEffectRecommender();
+  }
+  if (typeof initDragDropEffectSorter === 'function') {
+    initDragDropEffectSorter();
+  }
+
   // 首屏实时绘制
   refreshLiveCard();
   updateStepDisplay();
@@ -527,6 +538,8 @@ function toggleMonsterTrait(traitMask) {
         onPendulumFieldChanged('init', true);
       }
     }
+    // Phase 9: 灵摆面板条件显示
+    updatePendulumPanelVisibility(curType);
   } else {
     // 调整、特殊召唤、反转、卡通、灵魂、同盟、二重等
     if (curType & traitMask) {
@@ -605,6 +618,9 @@ function onMonsterCategoryChanged(preserveTraits = false) {
   const isLink = !!(typeCode & 67108864);
   const isXyz = !!(typeCode & 8388608);
   const isPendulum = !!(typeCode & 16777216);
+
+  // Phase 9: 更新灵摆面板显示
+  updatePendulumPanelVisibility(typeCode);
 
   const defWrap = document.getElementById('defFieldWrap');
   const linkWrap = document.getElementById('linkMonsterArrowsWrap');

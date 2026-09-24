@@ -1,6 +1,6 @@
 {
   "name": "yugioh-ai-card-creator",
-  "version": "2.2.0",
+  "version": "2.6.0",
   "description": "在电脑或手机上本地运行的游戏王自制卡工具：填信息选效果传卡图，渲染高清卡面，导出 YGOPro/MDPro3 脚本和卡包，可选接入 AI 辅助生成",
   "main": "electron/main.cjs",
   "type": "module",
@@ -25,6 +25,9 @@
     "pack:public": "npm run build && node scripts/build-public.cjs",
     "pack:personal": "npm run build && node scripts/build-personal.cjs",
     "pack:all": "npm run build && node scripts/build-public.cjs && node scripts/build-personal.cjs",
+    "security:audit": "node scripts/security-audit.cjs",
+    "security:fix": "npm audit fix",
+    "security:fix-force": "npm audit fix --force",
     "test": "echo \"Tests coming soon\" && exit 0"
   },
   "keywords": [

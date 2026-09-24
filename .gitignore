@@ -75,3 +75,6 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Security reports (保留本地审计历史)
+security-reports/
