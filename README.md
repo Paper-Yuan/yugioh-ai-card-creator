@@ -1,10 +1,37 @@
-# yugioh-ai-card-creator（游戏王制卡器）
+# 🎮 游戏王 AI 制卡器 v2.3.0
 
-一个在电脑或手机上本地运行的游戏王自制卡工具。不用联网也能做卡，界面简单直接：填好卡片信息、选择效果、上传卡图，就能渲染出高清卡面，还能导出给 YGOPro / MDPro3 用的脚本、数据库和卡包。如果想偷懒，也可以接入 AI 来帮忙生成卡片描述和基础效果（需要自己的 API Key）。
+<div align="center">
 
-> 这是个人自用的制卡工具，不是官方产品，功能覆盖有限。用起来遇到问题或有改进想法，欢迎[提 Issue](https://github.com/Paper-Yuan/yugioh-ai-card-creator/issues)。
+**在电脑或手机上本地运行的游戏王 DIY 制卡工具**
 
-![Version](https://img.shields.io/badge/version-2.2.0-blue)
+不用联网也能做卡 · 30 个效果模块覆盖 75-80% 常见卡片 · 支持 YGOPro/MDPro3
+
+[📖 完整文档](docs/COMPLETE_FEATURES.md) · [🚀 快速开始](#快速开始) · [🎨 效果模块](docs/CURRENT_IMPLEMENTED_EFFECTS.md) · [🐛 问题反馈](https://github.com/Paper-Yuan/yugioh-ai-card-creator/issues)
+
+</div>
+
+---
+
+## ✨ v2.3.0 核心特性
+
+### 🎯 30 个效果模块系统
+- **Phase 8 最新更新**：新增 Cost 代价机制、融合/同调/超量召唤、连锁与时点判定
+- **覆盖率提升**：从 60-65% 提升至 **75-80%**（约 10,300 张卡）
+- **一键整合规则文本**：按 OCG 官方规范自动排序组合效果外文本
+
+### 🎨 专业卡面渲染
+- **18 种卡框**：怪兽 9 种（通常/效果/融合/同调/超量/灵摆/连接/仪式/Token）+ 魔法 6 种 + 陷阱 3 种
+- **4 档清晰度**：预览 407×593 / 标准 813×1185 / 高清 1626×2370 / 超高清 3252×4740
+- **字体管理**：18 个字体文件，支持开源/商业字体双模式
+
+### 🌐 多平台支持
+- **Windows 桌面版**：一键启动 EXE（169 MB）
+- **Android 移动版**：触控优化 APK（182 MB），符合 WCAG 2.1 AA 标准
+- **Web 浏览器版**：Chrome/Edge/Firefox/Safari 最新版
+
+> 💡 个人自用制卡工具，非官方产品。遇到问题或有改进想法，欢迎[提 Issue](https://github.com/Paper-Yuan/yugioh-ai-card-creator/issues)。
+
+![Version](https://img.shields.io/badge/version-2.3.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
 
